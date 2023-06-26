@@ -9,6 +9,7 @@ import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
 import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
+import DashboardAppPage2 from './pages/DashboardAppPage2';
 import LogReportPage from './pages/LogReportPage';
 import DownloadLogPage from './pages/DownloadLogPage';
 
@@ -22,7 +23,11 @@ export default function Router() {
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
+<<<<<<< HEAD
         { path: 'downloadlog', element: <DownloadLogPage /> },
+=======
+        { path: 'dashboard2', element: <DashboardAppPage2 /> },
+>>>>>>> 7368c3aee41686f655c5b16214bda9fb58518eda
         { path: 'logreport', element: <LogReportPage /> },
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
