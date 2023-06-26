@@ -45,7 +45,6 @@ const TABLE_HEAD = [
   { id: '10', label: '10월', alignRight: false },  
   { id: '11', label: '11월', alignRight: false },  
   { id: '12', label: '12월', alignRight: false },  
-  { id: 'sum', label: '합계', alignRight: false },  
 ];
 
 // ----------------------------------------------------------------------
@@ -158,7 +157,7 @@ export default function LogReportPage() {
         <title> Log Report | Minimal UI </title>
       </Helmet>
 
-      <Container>
+      <Container maxWidth="xl">
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
             Log Report
@@ -182,7 +181,7 @@ export default function LogReportPage() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, department, month } = row;
+                    const { id, name, department, logdata } = row;
                     const selectedUser = selected.indexOf(name) !== -1;
 
                     return (
@@ -199,19 +198,13 @@ export default function LogReportPage() {
 
                         <TableCell align="left">{department}</TableCell>
 
-                        <TableCell align="left">1</TableCell>
-                        <TableCell align="left">2</TableCell>
-                        <TableCell align="left">3</TableCell>
-                        <TableCell align="left">4</TableCell>
-                        <TableCell align="left">5</TableCell>
-                        <TableCell align="left">6</TableCell>
-                        <TableCell align="left">7</TableCell>
-                        <TableCell align="left">8</TableCell>
-                        <TableCell align="left">9</TableCell>
-                        <TableCell align="left">10</TableCell>
-                        <TableCell align="left">11</TableCell>
-                        <TableCell align="left">12</TableCell>
-                        <TableCell align="left">100</TableCell>
+                        {logdata.map((col) => {
+                          return (
+                            <TableCell align="left" key={id}>{col}</TableCell>
+                          );  
+                        })}
+                        
+                        
                       </TableRow>
                     );
                   })}

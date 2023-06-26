@@ -1,13 +1,9 @@
-import { faker } from '@faker-js/faker';
-import { sample } from 'lodash';
-
-// ----------------------------------------------------------------------
-
-const logs = [...Array(24)].map(() => ({
-  id: faker.datatype.uuid(),  
-  name: faker.name.fullName(),
-  department: faker.commerce.department(),  
-  month: sample([
+const logs = [
+{
+  id: 0,
+  name: '홍길동',
+  department: '조선',  
+  logdata: [
     '1',
     '2',
     '3',
@@ -20,7 +16,27 @@ const logs = [...Array(24)].map(() => ({
     '10',
     '11',
     '12',
-  ]),
-}));
+  ],
+},
+{
+  id: 1,
+  name: '고길동',
+  department: '둘리',  
+  logdata: [
+    '0',
+    '0',
+    '0',
+    '0',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    '11',
+    '12',
+  ],
+}
+];
 
 export default logs;

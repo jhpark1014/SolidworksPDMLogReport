@@ -27,15 +27,16 @@ export default function useChart(options) {
   const baseOptions = {
     // Colors
     colors: [
-      theme.palette.primary.main,
-      theme.palette.warning.main,
-      theme.palette.info.main,
-      theme.palette.error.main,
-      theme.palette.success.main,
-      theme.palette.warning.dark,
-      theme.palette.success.darker,
-      theme.palette.info.dark,
-      theme.palette.info.darker,
+      // theme.palette.primary.main,
+      // theme.palette.warning.main,
+      // theme.palette.info.main,
+      // theme.palette.error.main,
+      // theme.palette.success.main,
+      // theme.palette.warning.dark,
+      // theme.palette.success.darker,
+      // theme.palette.info.dark,
+      // theme.palette.info.darker,
+      // '#2E93fA', '#2E93fA', '#66DA26', '#66DA26',
     ],
 
     // Chart
@@ -81,8 +82,8 @@ export default function useChart(options) {
     // Stroke
     stroke: {
       width: 3,
-      curve: 'smooth',
-      lineCap: 'round',
+      curve: 'straight',
+      lineCap: 'round',            
     },
 
     // Grid
@@ -202,6 +203,10 @@ export default function useChart(options) {
       },
     ],
   };
+
+  // console.log("baseOptions==>", baseOptions);
+  // console.log("options==>", options);
+  // console.log("merge==>", merge(baseOptions, options));
 
   return merge(baseOptions, options);
 }
