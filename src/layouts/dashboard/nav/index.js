@@ -4,12 +4,14 @@ import { useLocation } from 'react-router-dom';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
+// import Icon from '@material-ui/core/Icon';
 // mock
 import account from '../../../_mock/account';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
 import Logo from '../../../components/logo';
+// import SolkoLogo from '../../../components/solko_logo';
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 //
@@ -55,10 +57,12 @@ export default function Nav({ openNav, onCloseNav }) {
     >
       <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
         <Logo />
+        {/* <Icon>
+          <img className={classes.imageIcon} alt="" src="public/assets/icons/solko_logo1.svg" />
+        </Icon> */}
       </Box>
 
       <NavSection data={navConfig} />
-
     </Scrollbar>
   );
 

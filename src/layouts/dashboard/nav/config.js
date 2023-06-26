@@ -17,6 +17,11 @@ const navConfig = [
     icon: icon('ic_log'),
   },
   {
+    title: '다운로드 로그',
+    path: '/dashboard/downloadlog',
+    icon: icon('ic_analytics'),
+  },
+  {
     title: 'Log Report',
     path: '/dashboard/logreport',
     icon: icon('ic_log'),

@@ -23,11 +23,11 @@ export default function Router() {
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
-<<<<<<< HEAD
+// <<<<<<< HEAD
         { path: 'downloadlog', element: <DownloadLogPage /> },
-=======
+// =======
         { path: 'dashboard2', element: <DashboardAppPage2 /> },
->>>>>>> 7368c3aee41686f655c5b16214bda9fb58518eda
+// >>>>>>> 7368c3aee41686f655c5b16214bda9fb58518eda
         { path: 'logreport', element: <LogReportPage /> },
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },

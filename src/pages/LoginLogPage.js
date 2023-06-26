@@ -1,6 +1,7 @@
+import { spacing } from '@mui/system';
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
-import { sentenceCase } from 'change-case';
+// import { sentenceCase } from 'change-case';
 import { useState } from 'react';
 // @mui
 import {
@@ -8,8 +9,6 @@ import {
   Table,
   Stack,
   Paper,
-  Avatar,
-  Button,
   Popover,
   Checkbox,
   TableRow,
@@ -18,28 +17,36 @@ import {
   TableCell,
   Container,
   Typography,
-  IconButton,
   TableContainer,
   TablePagination,
 } from '@mui/material';
 // components
-import Label from '../components/label';
+// import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
-import USERLIST from '../_mock/user';
+import LOGLIST from '../_mock/logdata';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'name', label: '이름', alignRight: false },
-  { id: 'company', label: '회사명', alignRight: false },
-  { id: 'role', label: '직책', alignRight: false },
-  { id: 'isVerified', label: 'Verified', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
-  { id: '' },
+  { id: 'name', label: '사용자', alignRight: false },
+  { id: 'department', label: '부서', alignRight: false },
+  { id: '1', label: '1월', alignRight: false },
+  { id: '2', label: '2월', alignRight: false },
+  { id: '3', label: '3월', alignRight: false },
+  { id: '4', label: '4월', alignRight: false },
+  { id: '5', label: '5월', alignRight: false },
+  { id: '6', label: '6월', alignRight: false },
+  { id: '7', label: '7월', alignRight: false },
+  { id: '8', label: '8월', alignRight: false },
+  { id: '9', label: '9월', alignRight: false },
+  { id: '10', label: '10월', alignRight: false },
+  { id: '11', label: '11월', alignRight: false },
+  { id: '12', label: '12월', alignRight: false },
+  { id: 'sum', label: '합계', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -73,8 +80,8 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function UserPage() {
-  const [open, setOpen] = useState(null);
+export default function LogReportPage() {
+  // const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
 
@@ -88,13 +95,13 @@ export default function UserPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget);
-  };
+  // const handleOpenMenu = (event) => {
+  //   setOpen(event.currentTarget);
+  // };
 
-  const handleCloseMenu = () => {
-    setOpen(null);
-  };
+  // const handleCloseMenu = () => {
+  //   setOpen(null);
+  // };
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -104,7 +111,7 @@ export default function UserPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = LOGLIST.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -140,46 +147,43 @@ export default function UserPage() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - LOGLIST.length) : 0;
 
-  const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
+  const filteredUsers = applySortFilter(LOGLIST, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
 
   return (
     <>
       <Helmet>
-        <title> Users | Minimal UI </title>
+        <title> Log Report | Minimal UI </title>
       </Helmet>
 
-      <Container maxWidth="xl">
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+      <Container maxWidth="false" disableGutters="true">
+        {/* <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Users
+            Log Report
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-            New User
-          </Button>
-        </Stack>
+        </Stack> */}
 
         <Card>
           <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
           <Scrollbar>
-            <TableContainer sx={{ minWidth: 800 }}>
+            <TableContainer>
               <Table>
                 <UserListHead
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={LOGLIST.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, role, status, company, avatarUrl, isVerified } = row;
+                    const { id, name, department, month } = row;
                     const selectedUser = selected.indexOf(name) !== -1;
 
                     return (
@@ -188,30 +192,27 @@ export default function UserPage() {
                           <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
                         </TableCell>
 
-                        <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar alt={name} src={avatarUrl} />
-                            <Typography variant="subtitle2" noWrap>
-                              {name}
-                            </Typography>
-                          </Stack>
-                        </TableCell>
-
-                        <TableCell align="left">{company}</TableCell>
-
-                        <TableCell align="left">{role}</TableCell>
-
-                        <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell>
-
                         <TableCell align="left">
-                          <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label>
+                          <Typography variant="subtitle2" noWrap>
+                            {name.slice(0, 6)}
+                          </Typography>
                         </TableCell>
 
-                        <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
-                            <Iconify icon={'eva:more-vertical-fill'} />
-                          </IconButton>
-                        </TableCell>
+                        <TableCell align="left">{department}</TableCell>
+
+                        <TableCell align="left">1</TableCell>
+                        <TableCell align="left">2</TableCell>
+                        <TableCell align="left">3</TableCell>
+                        <TableCell align="left">4</TableCell>
+                        <TableCell align="left">5</TableCell>
+                        <TableCell align="left">6</TableCell>
+                        <TableCell align="left">7</TableCell>
+                        <TableCell align="left">8</TableCell>
+                        <TableCell align="left">9</TableCell>
+                        <TableCell align="left">10</TableCell>
+                        <TableCell align="left">11</TableCell>
+                        <TableCell align="left">12</TableCell>
+                        <TableCell align="left">100</TableCell>
                       </TableRow>
                     );
                   })}
@@ -252,7 +253,7 @@ export default function UserPage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={USERLIST.length}
+            count={LOGLIST.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -262,9 +263,9 @@ export default function UserPage() {
       </Container>
 
       <Popover
-        open={Boolean(open)}
-        anchorEl={open}
-        onClose={handleCloseMenu}
+        // open={Boolean(open)}
+        // anchorEl={open}
+        // onClose={handleCloseMenu}
         anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         PaperProps={{
