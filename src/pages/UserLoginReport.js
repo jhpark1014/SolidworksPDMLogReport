@@ -25,7 +25,7 @@ import {
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
+import { UserListHead, UserListToolbarUsers } from '../sections/@dashboard/user';
 // mock
 import LOGLIST from '../_mock/logdata';
 
@@ -80,7 +80,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function LogPage() {
+export default function UserLoginReport() {
   // const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -159,9 +159,13 @@ export default function LogPage() {
         <title> Log Report | Minimal UI </title>
       </Helmet>
 
-      <Container maxWidth="false" disableGutters="true">
+      <Container maxWidth="false" disableGutters={'true'}>
         <Card>
-          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <UserListToolbarUsers
+            numSelected={selected.length}
+            filterName={filterName}
+            onFilterName={handleFilterByName}
+          />
 
           <Scrollbar>
             <TableContainer>
@@ -177,7 +181,7 @@ export default function LogPage() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, department, month } = row;
+                    const { id, name, department, logdata } = row;
                     const selectedUser = selected.indexOf(name) !== -1;
 
                     return (
@@ -194,19 +198,11 @@ export default function LogPage() {
 
                         <TableCell align="left">{department}</TableCell>
 
-                        <TableCell align="left">1</TableCell>
-                        <TableCell align="left">2</TableCell>
-                        <TableCell align="left">3</TableCell>
-                        <TableCell align="left">4</TableCell>
-                        <TableCell align="left">5</TableCell>
-                        <TableCell align="left">6</TableCell>
-                        <TableCell align="left">7</TableCell>
-                        <TableCell align="left">8</TableCell>
-                        <TableCell align="left">9</TableCell>
-                        <TableCell align="left">10</TableCell>
-                        <TableCell align="left">11</TableCell>
-                        <TableCell align="left">12</TableCell>
-                        <TableCell align="left">100</TableCell>
+                        {logdata.map((data) => (
+                          <TableCell align="left" value={data}>
+                            {data}
+                          </TableCell>
+                        ))}
                       </TableRow>
                     );
                   })}
@@ -255,35 +251,6 @@ export default function LogPage() {
           />
         </Card>
       </Container>
-
-      <Popover
-        // open={Boolean(open)}
-        // anchorEl={open}
-        // onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            width: 140,
-            '& .MuiMenuItem-root': {
-              px: 1,
-              typography: 'body2',
-              borderRadius: 0.75,
-            },
-          },
-        }}
-      >
-        <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
-      </Popover>
     </>
   );
 }

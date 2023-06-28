@@ -22,14 +22,24 @@ const navConfig = [
     icon: icon('ic_analytics'),
   },
   {
+    title: '로그인 로그 (라이선스)',
+    path: '/dashboard/licenselog',
+    icon: icon('ic_analytics'),
+  },
+  {
+    title: '로그인 로그 (사용자)',
+    path: '/dashboard/userlog',
+    icon: icon('ic_analytics'),
+  },
+  {
     title: 'Log Report',
     path: '/dashboard/logreport',
     icon: icon('ic_log'),
   },
   {
-   title: 'Users',
-   path: '/dashboard/user',
-   icon: icon('ic_user'),
+    title: 'Users',
+    path: '/dashboard/user',
+    icon: icon('ic_user'),
   },
   // {
   //   title: 'product',

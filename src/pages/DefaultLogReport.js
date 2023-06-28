@@ -25,7 +25,7 @@ import {
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
+import { UserListHead, UserListToolbarDefault } from '../sections/@dashboard/user';
 // mock
 import LOGLIST from '../_mock/logdata';
 
@@ -80,7 +80,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function LogReportPage() {
+export default function DefaultLogReport() {
   // const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -93,7 +93,7 @@ export default function LogReportPage() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   // const handleOpenMenu = (event) => {
   //   setOpen(event.currentTarget);
@@ -150,7 +150,6 @@ export default function LogReportPage() {
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - LOGLIST.length) : 0;
 
   const filteredUsers = applySortFilter(LOGLIST, getComparator(order, orderBy), filterName);
-
   const isNotFound = !filteredUsers.length && !!filterName;
 
   return (
@@ -160,14 +159,12 @@ export default function LogReportPage() {
       </Helmet>
 
       <Container maxWidth="false" disableGutters="true">
-        {/* <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h4" gutterBottom>
-            Log Report
-          </Typography>
-        </Stack> */}
-
         <Card>
-          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <UserListToolbarDefault
+            numSelected={selected.length}
+            filterName={filterName}
+            onFilterName={handleFilterByName}
+          />
 
           <Scrollbar>
             <TableContainer>
@@ -183,8 +180,10 @@ export default function LogReportPage() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, department, month } = row;
+                    const { id, name, department, logdata } = row;
                     const selectedUser = selected.indexOf(name) !== -1;
+                    const datas = LOGLIST.map((n) => n.logdata);
+                    console.log(datas);
 
                     return (
                       <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
@@ -200,19 +199,11 @@ export default function LogReportPage() {
 
                         <TableCell align="left">{department}</TableCell>
 
-                        <TableCell align="left">1</TableCell>
-                        <TableCell align="left">2</TableCell>
-                        <TableCell align="left">3</TableCell>
-                        <TableCell align="left">4</TableCell>
-                        <TableCell align="left">5</TableCell>
-                        <TableCell align="left">6</TableCell>
-                        <TableCell align="left">7</TableCell>
-                        <TableCell align="left">8</TableCell>
-                        <TableCell align="left">9</TableCell>
-                        <TableCell align="left">10</TableCell>
-                        <TableCell align="left">11</TableCell>
-                        <TableCell align="left">12</TableCell>
-                        <TableCell align="left">100</TableCell>
+                        {logdata.map((data) => (
+                          <TableCell align="left" value={data}>
+                            {data}
+                          </TableCell>
+                        ))}
                       </TableRow>
                     );
                   })}
@@ -262,7 +253,7 @@ export default function LogReportPage() {
         </Card>
       </Container>
 
-      <Popover
+      {/* <Popover
         // open={Boolean(open)}
         // anchorEl={open}
         // onClose={handleCloseMenu}
@@ -289,7 +280,7 @@ export default function LogReportPage() {
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
           Delete
         </MenuItem>
-      </Popover>
+      </Popover> */}
     </>
   );
 }

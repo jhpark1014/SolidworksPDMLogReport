@@ -27,15 +27,15 @@ export default function useChart(options) {
   const baseOptions = {
     // Colors
     colors: [
-      // theme.palette.primary.main,
-      // theme.palette.warning.main,
-      // theme.palette.info.main,
-      // theme.palette.error.main,
-      // theme.palette.success.main,
-      // theme.palette.warning.dark,
-      // theme.palette.success.darker,
-      // theme.palette.info.dark,
-      // theme.palette.info.darker,
+      theme.palette.primary.main,
+      theme.palette.warning.main,
+      theme.palette.info.main,
+      theme.palette.error.main,
+      theme.palette.success.main,
+      theme.palette.warning.dark,
+      theme.palette.success.darker,
+      theme.palette.info.dark,
+      theme.palette.info.darker,
       // '#2E93fA', '#2E93fA', '#66DA26', '#66DA26',
     ],
 
@@ -83,7 +83,7 @@ export default function useChart(options) {
     stroke: {
       width: 3,
       curve: 'straight',
-      lineCap: 'round',            
+      lineCap: 'round',
     },
 
     // Grid

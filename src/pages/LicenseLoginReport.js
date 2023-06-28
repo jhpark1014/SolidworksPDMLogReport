@@ -1,3 +1,4 @@
+import { spacing } from '@mui/system';
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 // import { sentenceCase } from 'change-case';
@@ -24,7 +25,7 @@ import {
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { UserListHead, UserListToolbarDefault } from '../sections/@dashboard/user';
+import { UserListHead, UserListToolbarLicense } from '../sections/@dashboard/user';
 // mock
 import LOGLIST from '../_mock/logdata';
 
@@ -45,6 +46,7 @@ const TABLE_HEAD = [
   { id: '10', label: '10월', alignRight: false },
   { id: '11', label: '11월', alignRight: false },
   { id: '12', label: '12월', alignRight: false },
+  { id: 'sum', label: '합계', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -78,7 +80,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function LogReportPage() {
+export default function LicenseLoginReport() {
   // const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -91,7 +93,7 @@ export default function LogReportPage() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   // const handleOpenMenu = (event) => {
   //   setOpen(event.currentTarget);
@@ -157,22 +159,22 @@ export default function LogReportPage() {
         <title> Log Report | Minimal UI </title>
       </Helmet>
 
-      <Container maxWidth="xl">
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+      <Container maxWidth="false" disableGutters={'true'}>
+        {/* <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
             Log Report
           </Typography>
-        </Stack>
+        </Stack> */}
 
         <Card>
-          <UserListToolbarDefault
+          <UserListToolbarLicense
             numSelected={selected.length}
             filterName={filterName}
             onFilterName={handleFilterByName}
           />
 
           <Scrollbar>
-            <TableContainer sx={{ minWidth: 800 }}>
+            <TableContainer>
               <Table>
                 <UserListHead
                   order={order}
@@ -202,13 +204,11 @@ export default function LogReportPage() {
 
                         <TableCell align="left">{department}</TableCell>
 
-                        {logdata.map((col) => {
-                          return (
-                            <TableCell align="left" key={id}>
-                              {col}
-                            </TableCell>
-                          );
-                        })}
+                        {logdata.map((data) => (
+                          <TableCell align="left" value={data}>
+                            {data}
+                          </TableCell>
+                        ))}
                       </TableRow>
                     );
                   })}
@@ -257,35 +257,6 @@ export default function LogReportPage() {
           />
         </Card>
       </Container>
-
-      <Popover
-        // open={Boolean(open)}
-        // anchorEl={open}
-        // onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            width: 140,
-            '& .MuiMenuItem-root': {
-              px: 1,
-              typography: 'body2',
-              borderRadius: 0.75,
-            },
-          },
-        }}
-      >
-        <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
-      </Popover>
     </>
   );
 }

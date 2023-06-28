@@ -17,10 +17,10 @@ import {
   AppConversionRates,
 } from '../sections/@dashboard/app';
 // sections
-import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
+// import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 
 // Log Report
-import LogPage from './LogPage';
+import LogPage from './DefaultLogReport';
 
 // ----------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ export default function DownloadLogPage() {
         <title> Dashboard | Minimal UI </title>
       </Helmet>
 
-      <Container maxWidth="false">
+      <Container maxWidth="false" disableGutters>
         {/* <Typography variant="h4" sx={{ mb: 5 }}>
           Solidworks PDM Log Report
         </Typography> */}

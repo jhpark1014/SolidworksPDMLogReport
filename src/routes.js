@@ -12,6 +12,8 @@ import DashboardAppPage from './pages/DashboardAppPage';
 import DashboardAppPage2 from './pages/DashboardAppPage2';
 import LogReportPage from './pages/LogReportPage';
 import DownloadLogPage from './pages/DownloadLogPage';
+import LicenseLoginLogPage from './pages/LicenseLoginLogPage';
+import UserLoginLogPage from './pages/UserLoginLogPage';
 
 // ----------------------------------------------------------------------
 
@@ -23,11 +25,10 @@ export default function Router() {
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
-// <<<<<<< HEAD
         { path: 'downloadlog', element: <DownloadLogPage /> },
-// =======
+        { path: 'licenselog', element: <LicenseLoginLogPage /> },
+        { path: 'userlog', element: <UserLoginLogPage /> },
         { path: 'dashboard2', element: <DashboardAppPage2 /> },
-// >>>>>>> 7368c3aee41686f655c5b16214bda9fb58518eda
         { path: 'logreport', element: <LogReportPage /> },
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },

@@ -16,13 +16,16 @@ import {
   AppCurrentSubject,
   AppConversionRates,
 } from '../sections/@dashboard/app';
+// sections
+// import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 
 // Log Report
-import DefaultLogReport from './DefaultLogReport';
+import LogPage from './DefaultLogReport';
+import LicenseLoginLogReport from './LicenseLoginReport';
 
 // ----------------------------------------------------------------------
 
-export default function DashboardAppPage() {
+export default function DownloadLogPage() {
   const theme = useTheme();
 
   return (
@@ -31,28 +34,12 @@ export default function DashboardAppPage() {
         <title> Dashboard | Minimal UI </title>
       </Helmet>
 
-      <Container maxWidth="false">
+      <Container maxWidth="false" disableGutters>
         {/* <Typography variant="h4" sx={{ mb: 5 }}>
           Solidworks PDM Log Report
         </Typography> */}
 
         <Grid container spacing={3}>
-          {/* <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:android-filled'} />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="New Users" total={1352831} color="info" icon={'ant-design:apple-filled'} />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Item Orders" total={1723315} color="warning" icon={'ant-design:windows-filled'} />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Bug Reports" total={234} color="error" icon={'ant-design:bug-filled'} />
-          </Grid> */}
-
           <Grid item xs={12} md={6} lg={12}>
             <AppWebsiteVisits
               title="Website Visits"
@@ -92,28 +79,10 @@ export default function DashboardAppPage() {
               ]}
             />
           </Grid>
-
-          {/* <Grid item xs={12} md={6} lg={4}>
-            <AppCurrentVisits
-              title="Current Visits"
-              chartData={[
-                { label: 'America', value: 4344 },
-                { label: 'Asia', value: 5435 },
-                { label: 'Europe', value: 1443 },
-                { label: 'Africa', value: 4443 },
-              ]}
-              chartColors={[
-                theme.palette.primary.main,
-                theme.palette.info.main,
-                theme.palette.warning.main,
-                theme.palette.error.main,
-              ]}
-            />
-          </Grid> */}
         </Grid>
         <br />
         <br />
-        <DefaultLogReport />
+        <LicenseLoginLogReport />
       </Container>
     </>
   );
