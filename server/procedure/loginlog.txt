@@ -1,0 +1,51 @@
+CREATE PROCEDURE [dbo].[SP_LOGIN_LOG_USER]		
+    @START_DATE     NVARCHAR(MAX) = '',
+    @END_DATE     	NVARCHAR(MAX) = '',
+    @LIC_NAME     	NVARCHAR(MAX) = ''
+AS
+BEGIN
+	DECLARE @COLUMNS NVARCHAR(MAX)
+    DECLARE @SQL     		NVARCHAR(MAX)
+	
+	SET @COLUMNS = ''
+        
+	SELECT @COLUMNS = @COLUMNS + '[' + yyyymmhh + '],'
+	FROM (
+			SELECT DISTINCT
+					FORMAT(DATEPART(HOUR, CREATE_DATE), '00') AS yyyymmhh
+			FROM SK_LICENSE_TRACE_DETAIL
+			WHERE CREATE_DATE BETWEEN @START_DATE AND @END_DATE
+		) AS months
+	ORDER BY yyyymmhh
+	
+	
+	IF (@COLUMNS = '')
+	BEGIN 
+		SELECT NULL
+	END
+	ELSE
+	BEGIN
+		SET @COLUMNS = LEFT(@COLUMNS, LEN(@COLUMNS) - 1)	
+		SET @SQL = ' 
+			select *
+			from
+			(
+				select 
+					FORMAT(DATEPART(HOUR, sltd.CREATE_DATE), ''00'') as date
+					, sltd.USER_NAME
+				from SK_LICENSE_TRACE_DETAIL sltd, SK_LICENSE_TRACE slt with(nolock)
+				where sltd.CREATE_DATE >= ''' + @START_DATE + ''' and sltd.CREATE_DATE <= ''' + @END_DATE + '''
+					and slt.id = sltd.id and slt.PRODUCT = ''' + @LIC_NAME + '''
+				GROUP BY
+					DATEPART(HOUR, sltd.CREATE_DATE)
+					, sltd.USER_NAME, slt.PRODUCT
+			) data
+			PIVOT (
+				COUNT(date) FOR date IN (' + @COLUMNS + ')
+			) AS pivot_result
+			order by USER_NAME desc     
+		'
+		EXEC(@SQL)
+	END
+	
+END
