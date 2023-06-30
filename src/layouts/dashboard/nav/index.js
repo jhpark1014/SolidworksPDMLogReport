@@ -3,8 +3,10 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
-import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
+import { Box, Link, Button, Drawer, Typography, Avatar, Stack, IconButton } from '@mui/material';
 // import Icon from '@material-ui/core/Icon';
+import Iconify from '../../../components/iconify/Iconify';
+import SvgColor from '../../../components/svg-color/SvgColor';
 // mock
 import account from '../../../_mock/account';
 // hooks
@@ -19,7 +21,8 @@ import navConfig from './config';
 
 // ----------------------------------------------------------------------
 
-const NAV_WIDTH = 280;
+// const NAV_WIDTH = 280;
+const NAV_WIDTH = 230;
 
 const StyledAccount = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -48,6 +51,8 @@ export default function Nav({ openNav, onCloseNav }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
+  const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />;
+
   const renderContent = (
     <Scrollbar
       sx={{
@@ -55,13 +60,6 @@ export default function Nav({ openNav, onCloseNav }) {
         '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
       }}
     >
-      <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
-        <Logo />
-        {/* <Icon>
-          <img className={classes.imageIcon} alt="" src="public/assets/icons/solko_logo1.svg" />
-        </Icon> */}
-      </Box>
-
       <NavSection data={navConfig} />
     </Scrollbar>
   );
@@ -86,6 +84,9 @@ export default function Nav({ openNav, onCloseNav }) {
             },
           }}
         >
+          <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
+            <Logo />
+          </Box>
           {renderContent}
         </Drawer>
       ) : (
@@ -99,6 +100,28 @@ export default function Nav({ openNav, onCloseNav }) {
             sx: { width: NAV_WIDTH },
           }}
         >
+          <div>
+            <Box sx={{ px: 2.0, py: 3, display: 'inline-flex', top: 100 }}>
+              <IconButton
+                onClick={onCloseNav}
+                sx={{
+                  mr: 1,
+                  mt: 0,
+                  color: 'text.primary',
+                  display: { lg: 'none' },
+                  float: 'left',
+                  left: 10,
+                  top: 0,
+                }}
+              >
+                <Iconify icon="eva:menu-2-fill" />
+              </IconButton>
+              {/* </Box> */}
+              {/* <Box sx={{ flexGrow: 1 }} /> */}
+              {/* <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}> */}
+              <Logo />
+            </Box>
+          </div>
           {renderContent}
         </Drawer>
       )}

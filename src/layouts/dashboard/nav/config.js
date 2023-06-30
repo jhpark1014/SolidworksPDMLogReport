@@ -1,9 +1,15 @@
 // component
+import SvgIcon from '@mui/material/SvgIcon';
+import DownloadIcon from '@mui/icons-material/Download';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
+import UpdateIcon from '@mui/icons-material/Update';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import SvgColor from '../../../components/svg-color';
 
 // ----------------------------------------------------------------------
 
 const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />;
+// const svgIcon = (name) => <SvgIcon>{name}</SvgIcon>;
 
 const navConfig = [
   {
@@ -19,17 +25,27 @@ const navConfig = [
   {
     title: '다운로드 로그',
     path: '/dashboard/downloadlog',
-    icon: icon('ic_analytics'),
+    icon: <DownloadIcon />,
+  },
+  {
+    title: '신규등록 로그',
+    path: '/dashboard/downloadlog',
+    icon: <HowToRegIcon />,
+  },
+  {
+    title: '버전업 로그',
+    path: '/dashboard/downloadlog',
+    icon: <UpdateIcon />,
   },
   {
     title: '로그인 로그 (라이선스)',
     path: '/dashboard/licenselog',
-    icon: icon('ic_analytics'),
+    icon: <VerifiedIcon />,
   },
   {
     title: '로그인 로그 (사용자)',
     path: '/dashboard/userlog',
-    icon: icon('ic_analytics'),
+    icon: icon('ic_user'),
   },
   {
     title: 'Log Report',

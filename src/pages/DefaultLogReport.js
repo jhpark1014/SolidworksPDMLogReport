@@ -2,7 +2,7 @@ import { spacing } from '@mui/system';
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 // import { sentenceCase } from 'change-case';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 // @mui
 import {
   Card,
@@ -19,7 +19,11 @@ import {
   Typography,
   TableContainer,
   TablePagination,
+  ThemeProvider,
+  createTheme,
 } from '@mui/material';
+import { useTheme } from '@emotion/react';
+import { koKR } from '@mui/material/locale';
 // components
 // import Label from '../components/label';
 import Iconify from '../components/iconify';
@@ -31,7 +35,7 @@ import LOGLIST from '../_mock/logdata';
 
 // ----------------------------------------------------------------------
 
-const TABLE_HEAD = [
+const TABLE_HEAD_YEAR = [
   { id: 'name', label: '사용자', alignRight: false },
   { id: 'department', label: '부서', alignRight: false },
   { id: '1', label: '1월', alignRight: false },
@@ -46,6 +50,43 @@ const TABLE_HEAD = [
   { id: '10', label: '10월', alignRight: false },
   { id: '11', label: '11월', alignRight: false },
   { id: '12', label: '12월', alignRight: false },
+  { id: 'sum', label: '합계', alignRight: false },
+];
+
+const TABLE_HEAD_MONTH = [
+  { id: 'name', label: '사용자', alignRight: false },
+  { id: 'department', label: '부서', alignRight: false },
+  { id: '1', label: '1일', alignRight: false },
+  { id: '2', label: '2일', alignRight: false },
+  { id: '3', label: '3일', alignRight: false },
+  { id: '4', label: '4일', alignRight: false },
+  { id: '5', label: '5일', alignRight: false },
+  { id: '6', label: '6일', alignRight: false },
+  { id: '7', label: '7일', alignRight: false },
+  { id: '8', label: '8일', alignRight: false },
+  { id: '9', label: '9일', alignRight: false },
+  { id: '10', label: '10일', alignRight: false },
+  { id: '11', label: '11일', alignRight: false },
+  { id: '12', label: '12일', alignRight: false },
+  { id: '13', label: '13일', alignRight: false },
+  { id: '14', label: '14일', alignRight: false },
+  { id: '15', label: '15일', alignRight: false },
+  { id: '16', label: '16일', alignRight: false },
+  { id: '17', label: '17일', alignRight: false },
+  { id: '18', label: '18일', alignRight: false },
+  { id: '19', label: '19일', alignRight: false },
+  { id: '20', label: '20일', alignRight: false },
+  { id: '21', label: '21일', alignRight: false },
+  { id: '22', label: '22일', alignRight: false },
+  { id: '23', label: '23일', alignRight: false },
+  { id: '24', label: '24일', alignRight: false },
+  { id: '25', label: '25일', alignRight: false },
+  { id: '26', label: '26일', alignRight: false },
+  { id: '27', label: '27일', alignRight: false },
+  { id: '28', label: '28일', alignRight: false },
+  { id: '29', label: '29일', alignRight: false },
+  { id: '30', label: '30일', alignRight: false },
+  { id: '31', label: '31일', alignRight: false },
   { id: 'sum', label: '합계', alignRight: false },
 ];
 
@@ -152,106 +193,114 @@ export default function DefaultLogReport() {
   const filteredUsers = applySortFilter(LOGLIST, getComparator(order, orderBy), filterName);
   const isNotFound = !filteredUsers.length && !!filterName;
 
+  const theme = useTheme();
+  const themeWithLocale = useMemo(() => createTheme(theme, koKR), [koKR, theme]);
+
+  const [dateOption, setDateOption] = useState('month');
+
   return (
     <>
       <Helmet>
         <title> Log Report | Minimal UI </title>
       </Helmet>
 
-      <Container maxWidth="false" disableGutters="true">
-        <Card>
-          <UserListToolbarDefault
-            numSelected={selected.length}
-            filterName={filterName}
-            onFilterName={handleFilterByName}
-          />
+      <ThemeProvider theme={themeWithLocale}>
+        <Container maxWidth="false" disableGutters>
+          <Card>
+            <UserListToolbarDefault
+              numSelected={selected.length}
+              filterName={filterName}
+              onFilterName={handleFilterByName}
+              setDateOption={setDateOption}
+            />
 
-          <Scrollbar>
-            <TableContainer>
-              <Table>
-                <UserListHead
-                  order={order}
-                  orderBy={orderBy}
-                  headLabel={TABLE_HEAD}
-                  rowCount={LOGLIST.length}
-                  numSelected={selected.length}
-                  onRequestSort={handleRequestSort}
-                  onSelectAllClick={handleSelectAllClick}
-                />
-                <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, department, logdata } = row;
-                    const selectedUser = selected.indexOf(name) !== -1;
-                    const datas = LOGLIST.map((n) => n.logdata);
-                    console.log(datas);
-
-                    return (
-                      <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
-                        <TableCell padding="checkbox">
-                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
-                        </TableCell>
-
-                        <TableCell align="left">
-                          <Typography variant="subtitle2" noWrap>
-                            {name.slice(0, 6)}
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell align="left">{department}</TableCell>
-
-                        {logdata.map((data) => (
-                          <TableCell align="left" value={data}>
-                            {data}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    );
-                  })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
-                </TableBody>
-
-                {isNotFound && (
+            <Scrollbar>
+              <TableContainer sx={{ minWidth: 800 }}>
+                <Table>
+                  <UserListHead
+                    order={order}
+                    orderBy={orderBy}
+                    headLabel={dateOption === 'month' ? TABLE_HEAD_MONTH : TABLE_HEAD_YEAR}
+                    rowCount={LOGLIST.length}
+                    numSelected={selected.length}
+                    onRequestSort={handleRequestSort}
+                    onSelectAllClick={handleSelectAllClick}
+                  />
                   <TableBody>
-                    <TableRow>
-                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                        <Paper
-                          sx={{
-                            textAlign: 'center',
-                          }}
-                        >
-                          <Typography variant="h6" paragraph>
-                            Not found
-                          </Typography>
+                    {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                      const { id, name, department, logdata } = row;
+                      const selectedUser = selected.indexOf(name) !== -1;
+                      const datas = LOGLIST.map((n) => n.logdata);
+                      // console.log(datas);
 
-                          <Typography variant="body2">
-                            No results found for &nbsp;
-                            <strong>&quot;{filterName}&quot;</strong>.
-                            <br /> Try checking for typos or using complete words.
-                          </Typography>
-                        </Paper>
-                      </TableCell>
-                    </TableRow>
+                      return (
+                        <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                          {/* <TableCell padding="checkbox">
+                            <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
+                          </TableCell> */}
+
+                          <TableCell align="left">
+                            <Typography variant="subtitle2" noWrap>
+                              {name.slice(0, 6)}
+                            </Typography>
+                          </TableCell>
+
+                          <TableCell align="left">{department}</TableCell>
+
+                          {logdata.map((data) => (
+                            <TableCell align="left" value={data}>
+                              {data}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      );
+                    })}
+                    {emptyRows > 0 && (
+                      <TableRow style={{ height: 53 * emptyRows }}>
+                        <TableCell colSpan={6} />
+                      </TableRow>
+                    )}
                   </TableBody>
-                )}
-              </Table>
-            </TableContainer>
-          </Scrollbar>
 
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={LOGLIST.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Card>
-      </Container>
+                  {isNotFound && (
+                    <TableBody>
+                      <TableRow>
+                        <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                          <Paper
+                            sx={{
+                              textAlign: 'center',
+                            }}
+                          >
+                            <Typography variant="h6" paragraph>
+                              Not found
+                            </Typography>
+
+                            <Typography variant="body2">
+                              No results found for &nbsp;
+                              <strong>&quot;{filterName}&quot;</strong>.
+                              <br /> Try checking for typos or using complete words.
+                            </Typography>
+                          </Paper>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  )}
+                </Table>
+              </TableContainer>
+            </Scrollbar>
+
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={LOGLIST.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Card>
+        </Container>
+      </ThemeProvider>
 
       {/* <Popover
         // open={Boolean(open)}

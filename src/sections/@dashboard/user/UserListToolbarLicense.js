@@ -21,6 +21,7 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useState } from 'react';
 import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
 import { SelectChangeEvent } from '@mui/material/Select';
 // component
 import Iconify from '../../../components/iconify';
@@ -71,14 +72,26 @@ UserListToolbarLicense.propTypes = {
   onFilterName: PropTypes.func,
 };
 
-export default function UserListToolbarLicense({ numSelected, filterName, onFilterName }) {
-  // const [dateOption, setDateOption] = useState(true);
-  const [selectedOption, setSelectedOption] = useState('');
+export default function UserListToolbarLicense({
+  numSelected,
+  filterName,
+  onFilterName,
+  setDateOption,
+  PassSelectedDate, // 선택한 날짜 넘겨주는 function
+}) {
+  const [selectedOption, setSelectedOption] = useState('day');
+  const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
   const onChange = (event) => {
     setSelectedOption(event.target.value);
-    console.log(event.target.value);
+    setDateOption(event.target.value);
   };
-  console.log('으으', selectedOption);
+
+  const dateChange = (value) => {
+    setSelectedDate(dayjs(value.$d).format('YYYY-MM-DD')); // selectedDate를 설정해줌
+    PassSelectedDate(selectedDate); // selectedDate를 받는 function -> Report에서 호출할 것
+    // console.log('바뀐 날짜', dayjs(value.$d).format('YYYY-MM-DD'));
+  };
+
   const [personName, setPersonName] = useState([]);
   const nameChange = (event) => {
     const {
@@ -110,17 +123,18 @@ export default function UserListToolbarLicense({ numSelected, filterName, onFilt
             value={selectedOption}
             onChange={onChange}
             label="dateOption"
+            defaultValue={selectedOption}
           >
-            <MenuItem value="">
+            {/* <MenuItem value="">
               <em>날짜 검색 옵션을 선택해주세요</em>
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem value="day">일 단위</MenuItem>
             <MenuItem value="month">월 단위</MenuItem>
             <MenuItem value="year">년 단위</MenuItem>
           </Select>
         </FormControl>
       </div>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
         <DatePicker
           label={selectedOption === 'year' ? '년 단위' : selectedOption === 'month' ? '월 단위' : '일 단위'}
           openTo={selectedOption === 'year' ? 'year' : selectedOption === 'month' ? 'month' : 'day'}
@@ -134,20 +148,22 @@ export default function UserListToolbarLicense({ numSelected, filterName, onFilt
           sx={{ width: 180, ml: 2 }}
           minDate={dayjs('2015-01-01')}
           maxDate={dayjs()}
-          defaultValue={dayjs()}
+          // defaultValue={dayjs()}
           format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY/MM' : 'YYYY/MM/DD'}
+          value={dayjs(selectedDate)}
+          onChange={dateChange}
         />
       </LocalizationProvider>
       <div>
         <FormControl sx={{ m: 1, width: 300 }}>
-          <InputLabel id="demo-multiple-checkbox-label">라이센스</InputLabel>
+          <InputLabel id="demo-multiple-checkbox-label">라이선스</InputLabel>
           <Select
             labelId="demo-multiple-checkbox-label"
             id="demo-multiple-checkbox"
             multiple
             value={personName}
             onChange={nameChange}
-            input={<OutlinedInput label="라이센스" />}
+            input={<OutlinedInput label="라이선스" />}
             renderValue={(selected) => (
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                 {selected.map((value) => (

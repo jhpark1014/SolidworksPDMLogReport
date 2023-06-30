@@ -23,7 +23,7 @@ import UserLoginReport from './UserLoginReport';
 
 // ----------------------------------------------------------------------
 
-export default function DownloadLogPage() {
+export default function UserLoginLogPage() {
   const theme = useTheme();
 
   return (

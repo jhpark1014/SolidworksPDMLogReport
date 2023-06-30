@@ -20,7 +20,7 @@ import {
 // import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 
 // Log Report
-import LogPage from './DefaultLogReport';
+import DefaultLogReport from './DefaultLogReport';
 
 // ----------------------------------------------------------------------
 
@@ -81,7 +81,7 @@ export default function DownloadLogPage() {
         </Grid>
         <br />
         <br />
-        <LogPage />
+        <DefaultLogReport />
       </Container>
     </>
   );

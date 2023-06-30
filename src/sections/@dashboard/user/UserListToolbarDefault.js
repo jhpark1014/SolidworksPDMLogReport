@@ -17,10 +17,11 @@ import {
   Box,
   Chip,
 } from '@mui/material';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { DatePicker, LocalizationProvider, koKR } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useState } from 'react';
 import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
 import { SelectChangeEvent } from '@mui/material/Select';
 // component
 import Iconify from '../../../components/iconify';
@@ -71,20 +72,20 @@ UserListToolbarDefault.propTypes = {
   onFilterName: PropTypes.func,
 };
 
-export default function UserListToolbarDefault({ numSelected, filterName, onFilterName }) {
-  const [dateOption, setDateOption] = useState(true);
-  const [selectedOption, setselectedOption] = useState('');
-  const dateOptionChange = (event: SelectChangeEvent) => {
+export default function UserListToolbarDefault({ numSelected, filterName, onFilterName, setDateOption }) {
+  // const [dateOption, setDateOption] = useState(true);
+  const [selectedOption, setselectedOption] = useState('month');
+  const dateOptionChange = (event) => {
     // setDateOption((current) => !current);
     setselectedOption(event.target.value);
-    setDateOption(setCalendar(event.target.value));
+    setDateOption(event.target.value);
   };
-  const setCalendar = (option) => {
-    if (option === 'month') {
-      return true;
-    }
-    return false;
-  };
+  // const setCalendar = (option) => {
+  //   if (option === 'month') {
+  //     return true;
+  //   }
+  //   return false;
+  // };
 
   const [personName, setPersonName] = useState([]);
   const nameChange = (event) => {
@@ -117,24 +118,28 @@ export default function UserListToolbarDefault({ numSelected, filterName, onFilt
             value={selectedOption}
             onChange={dateOptionChange}
             label="dateOption"
+            defaultValue="month"
+            selected={selectedOption}
           >
-            <MenuItem value="">
+            {/* <MenuItem value="">
               <em>날짜 검색 옵션을 선택해주세요</em>
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem value="month">월 단위</MenuItem>
             <MenuItem value="year">년 단위</MenuItem>
           </Select>
         </FormControl>
       </div>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
         <DatePicker
-          label={dateOption ? '월 단위' : '년 단위'}
-          openTo={dateOption ? 'month' : 'year'}
-          views={dateOption ? ['month', 'year'] : ['year']}
+          // localeText={koKR}
+          label={selectedOption === 'month' ? '월 단위' : '년 단위'}
+          openTo={selectedOption === 'month' ? 'month' : 'year'}
+          views={selectedOption === 'month' ? ['month', 'year'] : ['year']}
           sx={{ width: 180, ml: 2 }}
           minDate={dayjs('2015-01-01')}
           maxDate={dayjs()}
-          format={dateOption ? 'YYYY/MM' : 'YYYY'}
+          format={selectedOption === 'month' ? 'YYYY/MM' : 'YYYY'}
+          defaultValue={dayjs()}
         />
       </LocalizationProvider>
       <div>

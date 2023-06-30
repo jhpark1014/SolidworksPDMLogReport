@@ -21,6 +21,7 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useState } from 'react';
 import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
 import { SelectChangeEvent } from '@mui/material/Select';
 // component
 import Iconify from '../../../components/iconify';
@@ -71,14 +72,13 @@ UserListToolbarUsers.propTypes = {
   onFilterName: PropTypes.func,
 };
 
-export default function UserListToolbarUsers({ numSelected, filterName, onFilterName }) {
+export default function UserListToolbarUsers({ numSelected, filterName, onFilterName, setDateOption }) {
   // const [dateOption, setDateOption] = useState(true);
-  const [selectedOption, setSelectedOption] = useState('');
+  const [selectedOption, setSelectedOption] = useState('day');
   const onChange = (event) => {
     setSelectedOption(event.target.value);
-    console.log(event.target.value);
+    setDateOption(event.target.value);
   };
-  console.log('으으', selectedOption);
   const [personName, setPersonName] = useState([]);
   const nameChange = (event) => {
     const {
@@ -110,17 +110,15 @@ export default function UserListToolbarUsers({ numSelected, filterName, onFilter
             value={selectedOption}
             onChange={onChange}
             label="dateOption"
+            defaultValue={selectedOption}
           >
-            <MenuItem value="">
-              <em>날짜 검색 옵션을 선택해주세요</em>
-            </MenuItem>
             <MenuItem value="day">일 단위</MenuItem>
             <MenuItem value="month">월 단위</MenuItem>
             <MenuItem value="year">년 단위</MenuItem>
           </Select>
         </FormControl>
       </div>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
         <DatePicker
           label={selectedOption === 'year' ? '년 단위' : selectedOption === 'month' ? '월 단위' : '일 단위'}
           openTo={selectedOption === 'year' ? 'year' : selectedOption === 'month' ? 'month' : 'day'}

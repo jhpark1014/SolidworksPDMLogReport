@@ -3,7 +3,8 @@ import { faker } from '@faker-js/faker';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import dayjs from 'dayjs';
 // sections
 import {
   AppTasks,
@@ -25,8 +26,18 @@ import LicenseLoginLogReport from './LicenseLoginReport';
 
 // ----------------------------------------------------------------------
 
-export default function DownloadLogPage() {
+export default function LicenseLoginLogPage() {
   const theme = useTheme();
+  const [passSelectedDate, setPassSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
+  useMemo(() => {
+    setPassSelectedDate(passSelectedDate);
+  }, [passSelectedDate]);
+
+  console.log('으으', passSelectedDate);
+
+  // if (selectedDatePass.length > 4) {
+  //   selectedDatePass.split('/');
+  // }
 
   return (
     <>
@@ -42,8 +53,8 @@ export default function DownloadLogPage() {
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={12}>
             <AppWebsiteVisits
-              title="Website Visits"
-              subheader="(+43%) than last year"
+              title="로그인 로그 (라이선스)"
+              subheader={passSelectedDate}
               chartLabels={[
                 '01/01/2003',
                 '02/01/2003',
@@ -82,7 +93,7 @@ export default function DownloadLogPage() {
         </Grid>
         <br />
         <br />
-        <LicenseLoginLogReport />
+        <LicenseLoginLogReport setPassSelectedDate={setPassSelectedDate} />
       </Container>
     </>
   );
