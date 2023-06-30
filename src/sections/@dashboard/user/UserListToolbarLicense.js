@@ -68,15 +68,17 @@ const MenuProps = {
 
 UserListToolbarLicense.propTypes = {
   numSelected: PropTypes.number,
-  filterName: PropTypes.string,
+  filterName: PropTypes.array,
   onFilterName: PropTypes.func,
 };
 
 export default function UserListToolbarLicense({
   numSelected,
-  filterName,
-  onFilterName,
+  // filterName,
+  // onFilterName,
   setDateOption,
+  filterLicense, // 선택한 라이선스
+  onFilterLicense,
   PassSelectedDate, // 선택한 날짜 넘겨주는 function
 }) {
   const [selectedOption, setSelectedOption] = useState('day');
@@ -92,12 +94,24 @@ export default function UserListToolbarLicense({
     // console.log('바뀐 날짜', dayjs(value.$d).format('YYYY-MM-DD'));
   };
 
-  const [personName, setPersonName] = useState([]);
-  const nameChange = (event) => {
+  // const [personName, setPersonName] = useState([]);
+  // const nameChange = (event) => {
+  //   const {
+  //     target: { value },
+  //   } = event;
+  //   setPersonName(
+  //     // On autofill we get a stringified value.
+  //     typeof value === 'string' ? value.split(',') : value
+  //   );
+  // };
+
+  const [licenseName, setLicenseName] = useState([]);
+  console.log('license', licenseName);
+  const licenseChange = (event) => {
     const {
       target: { value },
     } = event;
-    setPersonName(
+    setLicenseName(
       // On autofill we get a stringified value.
       typeof value === 'string' ? value.split(',') : value
     );
@@ -114,91 +128,78 @@ export default function UserListToolbarLicense({
         }),
       }}
     >
-      <div>
-        <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-          <InputLabel id="demo-simple-select-standard-label">날짜 검색</InputLabel>
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
-            value={selectedOption}
-            onChange={onChange}
-            label="dateOption"
-            defaultValue={selectedOption}
-          >
-            {/* <MenuItem value="">
-              <em>날짜 검색 옵션을 선택해주세요</em>
-            </MenuItem> */}
-            <MenuItem value="day">일 단위</MenuItem>
-            <MenuItem value="month">월 단위</MenuItem>
-            <MenuItem value="year">년 단위</MenuItem>
-          </Select>
-        </FormControl>
-      </div>
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
-        <DatePicker
-          label={selectedOption === 'year' ? '년 단위' : selectedOption === 'month' ? '월 단위' : '일 단위'}
-          openTo={selectedOption === 'year' ? 'year' : selectedOption === 'month' ? 'month' : 'day'}
-          views={
-            selectedOption === 'year'
-              ? ['year']
-              : selectedOption === 'month'
-              ? ['month', 'year']
-              : ['year', 'month', 'day']
-          }
-          sx={{ width: 180, ml: 2 }}
-          minDate={dayjs('2015-01-01')}
-          maxDate={dayjs()}
-          // defaultValue={dayjs()}
-          format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY/MM' : 'YYYY/MM/DD'}
-          value={dayjs(selectedDate)}
-          onChange={dateChange}
-        />
-      </LocalizationProvider>
-      <div>
-        <FormControl sx={{ m: 1, width: 300 }}>
-          <InputLabel id="demo-multiple-checkbox-label">라이선스</InputLabel>
-          <Select
-            labelId="demo-multiple-checkbox-label"
-            id="demo-multiple-checkbox"
-            multiple
-            value={personName}
-            onChange={nameChange}
-            input={<OutlinedInput label="라이선스" />}
-            renderValue={(selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip key={value} label={value} />
-                ))}
-              </Box>
-            )}
-            MenuProps={MenuProps}
-          >
-            <MenuItem key="all" value="all">
-              <Checkbox checked />
-              모두 선택
-            </MenuItem>
-            {selected.map((name) => (
-              <MenuItem key={name} value={name}>
-                <Checkbox checked={personName.indexOf(name) > -1} />
-                <ListItemText primary={name} />
+      <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+        <div>
+          <FormControl sx={{ m: 2, minWidth: 120, ml: 'auto' }}>
+            <InputLabel id="demo-simple-select-standard-label">날짜 옵션</InputLabel>
+            <Select
+              labelId="demo-simple-select-standard-label"
+              id="demo-simple-select-standard"
+              value={selectedOption}
+              onChange={onChange}
+              label="dateOption"
+              defaultValue={selectedOption}
+            >
+              <MenuItem value="day">일 단위</MenuItem>
+              <MenuItem value="month">월 단위</MenuItem>
+              <MenuItem value="year">년 단위</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
+          <DatePicker
+            sx={{ width: 180, m: 2 }}
+            label={selectedOption === 'year' ? '년 단위' : selectedOption === 'month' ? '월 단위' : '일 단위'}
+            openTo={selectedOption === 'year' ? 'year' : selectedOption === 'month' ? 'month' : 'day'}
+            views={
+              selectedOption === 'year'
+                ? ['year']
+                : selectedOption === 'month'
+                ? ['month', 'year']
+                : ['year', 'month', 'day']
+            }
+            minDate={dayjs('2015-01-01')}
+            maxDate={dayjs()}
+            // defaultValue={dayjs()}
+            format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY/MM' : 'YYYY/MM/DD'}
+            value={dayjs(selectedDate)}
+            onChange={dateChange}
+          />
+        </LocalizationProvider>
+        <div>
+          <FormControl sx={{ m: 2, width: 300 }}>
+            <InputLabel id="demo-multiple-checkbox-label">라이선스</InputLabel>
+            <Select
+              labelId="demo-multiple-checkbox-label"
+              id="demo-multiple-checkbox"
+              multiple
+              value={[filterLicense]}
+              onChange={licenseChange}
+              input={<OutlinedInput label="라이선스" />}
+              renderValue={(selected) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip key={value} label={value} />
+                  ))}
+                </Box>
+              )}
+              MenuProps={MenuProps}
+            >
+              <MenuItem key="all" value="">
+                <Checkbox checked onChange={checkAll} />
+                모두 선택
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </div>
-      <StyledSearch
-        value={filterName}
-        onChange={onFilterName}
-        placeholder="Search user..."
-        startAdornment={
-          <InputAdornment position="start">
-            <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
-          </InputAdornment>
-        }
-        sx={{
-          ml: 'auto',
-        }}
-      />
+              {selected.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={licenseName.indexOf(name) > -1} />
+                  <ListItemText primary={name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+      </Box>
+      <Box sx={{ m: 3 }}>단위 : {selectedOption === 'year' ? '월' : selectedOption === 'month' ? '일' : '시'}</Box>
     </StyledRoot>
   );
 }

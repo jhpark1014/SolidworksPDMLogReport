@@ -84,7 +84,7 @@ export default function Nav({ openNav, onCloseNav }) {
             },
           }}
         >
-          <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
+          <Box sx={{ px: 3.5, py: 3, display: 'inline-flex' }}>
             <Logo />
           </Box>
           {renderContent}
@@ -101,24 +101,7 @@ export default function Nav({ openNav, onCloseNav }) {
           }}
         >
           <div>
-            <Box sx={{ px: 2.0, py: 3, display: 'inline-flex', top: 100 }}>
-              <IconButton
-                onClick={onCloseNav}
-                sx={{
-                  mr: 1,
-                  mt: 0,
-                  color: 'text.primary',
-                  display: { lg: 'none' },
-                  float: 'left',
-                  left: 10,
-                  top: 0,
-                }}
-              >
-                <Iconify icon="eva:menu-2-fill" />
-              </IconButton>
-              {/* </Box> */}
-              {/* <Box sx={{ flexGrow: 1 }} /> */}
-              {/* <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}> */}
+            <Box sx={{ px: 3.5, py: 3, display: 'inline-flex', top: 100 }}>
               <Logo />
             </Box>
           </div>

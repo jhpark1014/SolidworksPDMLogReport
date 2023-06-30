@@ -80,6 +80,7 @@ export default function UserListToolbarUsers({ numSelected, filterName, onFilter
     setDateOption(event.target.value);
   };
   const [personName, setPersonName] = useState([]);
+  console.log('person', personName);
   const nameChange = (event) => {
     const {
       target: { value },
