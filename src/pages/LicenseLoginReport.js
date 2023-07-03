@@ -51,44 +51,42 @@ const TABLE_HEAD_YEAR = [
   { id: '10', label: '10월', alignRight: false },
   { id: '11', label: '11월', alignRight: false },
   { id: '12', label: '12월', alignRight: false },
-  { id: 'sum', label: '합계', alignRight: false },
 ];
 
 const TABLE_HEAD_MONTH = [
   { id: 'name', label: '사용자', alignRight: false },
   { id: 'department', label: '부서', alignRight: false },
-  { id: '1', label: '1일', alignRight: false },
-  { id: '2', label: '2일', alignRight: false },
-  { id: '3', label: '3일', alignRight: false },
-  { id: '4', label: '4일', alignRight: false },
-  { id: '5', label: '5일', alignRight: false },
-  { id: '6', label: '6일', alignRight: false },
-  { id: '7', label: '7일', alignRight: false },
-  { id: '8', label: '8일', alignRight: false },
-  { id: '9', label: '9일', alignRight: false },
-  { id: '10', label: '10일', alignRight: false },
-  { id: '11', label: '11일', alignRight: false },
-  { id: '12', label: '12일', alignRight: false },
-  { id: '13', label: '13일', alignRight: false },
-  { id: '14', label: '14일', alignRight: false },
-  { id: '15', label: '15일', alignRight: false },
-  { id: '16', label: '16일', alignRight: false },
-  { id: '17', label: '17일', alignRight: false },
-  { id: '18', label: '18일', alignRight: false },
-  { id: '19', label: '19일', alignRight: false },
-  { id: '20', label: '20일', alignRight: false },
-  { id: '21', label: '21일', alignRight: false },
-  { id: '22', label: '22일', alignRight: false },
-  { id: '23', label: '23일', alignRight: false },
-  { id: '24', label: '24일', alignRight: false },
-  { id: '25', label: '25일', alignRight: false },
-  { id: '26', label: '26일', alignRight: false },
-  { id: '27', label: '27일', alignRight: false },
-  { id: '28', label: '28일', alignRight: false },
-  { id: '29', label: '29일', alignRight: false },
-  { id: '30', label: '30일', alignRight: false },
-  { id: '31', label: '31일', alignRight: false },
-  { id: 'sum', label: '합계', alignRight: false },
+  { id: '1', label: '1', alignRight: false },
+  { id: '2', label: '2', alignRight: false },
+  { id: '3', label: '3', alignRight: false },
+  { id: '4', label: '4', alignRight: false },
+  { id: '5', label: '5', alignRight: false },
+  { id: '6', label: '6', alignRight: false },
+  { id: '7', label: '7', alignRight: false },
+  { id: '8', label: '8', alignRight: false },
+  { id: '9', label: '9', alignRight: false },
+  { id: '10', label: '10', alignRight: false },
+  { id: '11', label: '11', alignRight: false },
+  { id: '12', label: '12', alignRight: false },
+  { id: '13', label: '13', alignRight: false },
+  { id: '14', label: '14', alignRight: false },
+  { id: '15', label: '15', alignRight: false },
+  { id: '16', label: '16', alignRight: false },
+  { id: '17', label: '17', alignRight: false },
+  { id: '18', label: '18', alignRight: false },
+  { id: '19', label: '19', alignRight: false },
+  { id: '20', label: '20', alignRight: false },
+  { id: '21', label: '21', alignRight: false },
+  { id: '22', label: '22', alignRight: false },
+  { id: '23', label: '23', alignRight: false },
+  { id: '24', label: '24', alignRight: false },
+  { id: '25', label: '25', alignRight: false },
+  { id: '26', label: '26', alignRight: false },
+  { id: '27', label: '27', alignRight: false },
+  { id: '28', label: '28', alignRight: false },
+  { id: '29', label: '29', alignRight: false },
+  { id: '30', label: '30', alignRight: false },
+  { id: '31', label: '31', alignRight: false },
 ];
 
 const TABLE_HEAD_DAY = [
@@ -137,6 +135,20 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
+// Search Filtering
+// function applySortFilter(array, comparator, query) {
+//   const stabilizedThis = array.map((el, index) => [el, index]);
+//   stabilizedThis.sort((a, b) => {
+//     const order = comparator(a[0], b[0]);
+//     if (order !== 0) return order;
+//     return a[1] - b[1];
+//   });
+//   if (query) {
+//     return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+//   }
+//   return stabilizedThis.map((el) => el[0]);
+// }
+
 function applySortFilter(array, comparator, query) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -150,6 +162,8 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
+// applySortFilter(LOGLIST, getComparator(order, orderBy), filterLicense);
+
 export default function LicenseLoginReport({ setPassSelectedDate, setTableHead }) {
   // const [open, setOpen] = useState(null);
 
@@ -157,7 +171,8 @@ export default function LicenseLoginReport({ setPassSelectedDate, setTableHead }
   const [order, setOrder] = useState('asc');
   const [selected, setSelected] = useState([]);
   const [orderBy, setOrderBy] = useState('name');
-  const [filterName, setFilterName] = useState('');
+  // const [filterName, setFilterName] = useState('');
+  const [filterLicense, setFilterLicense] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -198,16 +213,23 @@ export default function LicenseLoginReport({ setPassSelectedDate, setTableHead }
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const handleFilterByName = (event) => {
+  // const handleFilterByName = (event) => {
+  //   setPage(0);
+  //   setFilterName(event.target.value);
+  // };
+  const handleFilterByLicense = (event) => {
     setPage(0);
-    setFilterName(event.target.value);
+    setFilterLicense(event.target.value);
+    console.log('뭔데', event.target.value);
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - LOGLIST.length) : 0;
 
-  const filteredUsers = applySortFilter(LOGLIST, getComparator(order, orderBy), filterName);
+  // const filteredUsers = applySortFilter(LOGLIST, getComparator(order, orderBy), filterName);
+  const filteredLicense = applySortFilter(LOGLIST, getComparator(order, orderBy), filterLicense);
 
-  const isNotFound = !filteredUsers.length && !!filterName;
+  // const isNotFound = !filteredUsers.length && !!filterName;
+  const isNotFound = !filteredLicense.length && !!filterLicense;
 
   const theme = useTheme();
   const themeWithLocale = useMemo(() => createTheme(theme, koKR), [koKR, theme]);
@@ -241,9 +263,11 @@ export default function LicenseLoginReport({ setPassSelectedDate, setTableHead }
           <Card>
             <UserListToolbarLicense
               numSelected={selected.length}
-              filterName={filterName}
-              onFilterName={handleFilterByName}
+              // filterName={filterName}
+              // onFilterName={handleFilterByName}
               setDateOption={setDateOption}
+              filterLicense={filterLicense}
+              onFilterLicense={handleFilterByLicense}
               PassSelectedDate={PassSelectedDate}
             />
             <input type="hidden" value={selectedDate} />
@@ -267,26 +291,24 @@ export default function LicenseLoginReport({ setPassSelectedDate, setTableHead }
                     // onSelectAllClick={handleSelectAllClick}
                   />
                   <TableBody>
-                    {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                    {filteredLicense.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                       const { id, name, department, logdata } = row;
                       const selectedUser = selected.indexOf(name) !== -1;
 
                       return (
                         <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
-                          {/* <TableCell padding="checkbox">
-                            <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
-                          </TableCell> */}
-
-                          <TableCell align="left">
+                          <TableCell align="left" sx={{ border: 0 }}>
                             <Typography variant="subtitle2" noWrap>
                               {name.slice(0, 6)}
                             </Typography>
                           </TableCell>
 
-                          <TableCell align="left">{department}</TableCell>
+                          <TableCell align="left" sx={{ border: 0 }}>
+                            {department}
+                          </TableCell>
 
                           {logdata.map((data) => (
-                            <TableCell align="left" value={data}>
+                            <TableCell align="left" value={data} sx={{ border: 0 }}>
                               {data}
                             </TableCell>
                           ))}
@@ -315,7 +337,8 @@ export default function LicenseLoginReport({ setPassSelectedDate, setTableHead }
 
                             <Typography variant="body2">
                               No results found for &nbsp;
-                              <strong>&quot;{filterName}&quot;</strong>.
+                              {/* <strong>&quot;{filterName}&quot;</strong>. */}
+                              <strong>&quot;{filterLicense}&quot;</strong>.
                               <br /> Try checking for typos or using complete words.
                             </Typography>
                           </Paper>

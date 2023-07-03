@@ -50,8 +50,8 @@ export default function LicenseLoginLogPage() {
           Solidworks PDM Log Report
         </Typography> */}
 
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6} lg={12}>
+        <Grid container>
+          <Grid item xs={12} md={12} lg={12}>
             <AppWebsiteVisits
               title="로그인 로그 (라이선스)"
               subheader={passSelectedDate}
