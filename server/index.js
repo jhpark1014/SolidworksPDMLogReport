@@ -12,7 +12,7 @@ app.use(express.json());
 app.use("/server/logs", logRoutes);
 
 app.listen(9900, async ()=>{
-    console.log("Connected~!");
+    console.log("Connected~!============================================================================================");
     // try {
     //     // make sure that any items are correctly URL encoded in the connection string
     //     await sql.connect(sqlConfig)
