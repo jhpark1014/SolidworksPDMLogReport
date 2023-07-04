@@ -33,12 +33,12 @@ async function getLogData(tableName, req) {
       let logdata = new Object() ;
       
       logdata.id = idx;        
-      logdata.user_id = data.user_id;        
-      logdata.user_name = data.user_name;        
+      logdata.userid = data.user_id;        
+      logdata.username = data.user_name;        
       logdata.department = data.department;
       //console.log("data==>", data);
 
-      logdata.log_data = Object.values(JSON.parse(
+      logdata.logdata = Object.values(JSON.parse(
         JSON.stringify(data, (key, value) => {                      
           const ret = (typeof value !== "object") ? ((isNaN(parseInt(key))) ? undefined : value) : value;
           return ret;            
@@ -105,10 +105,11 @@ export const loginuserList = async (req,res)=>{
       let logdata = new Object() ;
       
       logdata.id = idx;
-      logdata.user_name = data.user_name;        
-      logdata.department = '';
+      logdata.userid = data.user_id;        
+      logdata.username = data.user_name;        
+      logdata.department = data.department;
       // console.log("data==>", data);
-      logdata.log_data = Object.values(JSON.parse(
+      logdata.logdata = Object.values(JSON.parse(
         JSON.stringify(data, (key, value) => {
           // pivot 데이터를 배열에 담기
 
@@ -138,7 +139,7 @@ export const loginuserList = async (req,res)=>{
   }    
 }
 
-// 로그인 로그(라이선스)
+// 로그인 로그(라이선스), /logs/loginlicense
 export const loginlicenseList = async (req,res) => {
   //res.json("loginlicenseList from controller");
   const searchtype = req.query.search_type;
@@ -172,10 +173,10 @@ export const loginlicenseList = async (req,res) => {
       let logdata = new Object() ;
       
       logdata.id = idx;
-      logdata.lic_name = data.lic_name;        
-      logdata.hold_qty = data.hold_qty;
-      //console.log("data==>", data);
-      logdata.log_data = Object.values(JSON.parse(
+      logdata.licid = data.lic_id;        
+      logdata.licname = data.lic_name;        
+      logdata.holdqty = data.hold_qty;
+      logdata.logdata = Object.values(JSON.parse(
         JSON.stringify(data, (key, value) => {            
           const ret = (typeof value !== "object") ? ((isNaN(parseInt(key))) ? undefined : value) : value;
           return ret;            
