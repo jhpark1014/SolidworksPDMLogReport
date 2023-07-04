@@ -26,18 +26,18 @@ import LicenseLoginLogReport from './LicenseLoginReport';
 
 // ----------------------------------------------------------------------
 
-export default function LicenseLoginLogPage() {
+export default function LicenseLoginLogPage(dateOption, selectedDate) {
   const theme = useTheme();
-  const [passSelectedDate, setPassSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
-  useMemo(() => {
-    setPassSelectedDate(passSelectedDate);
-  }, [passSelectedDate]);
-
-  console.log('으으', passSelectedDate);
+  // const [passSelectedDate, setPassSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
+  // useMemo(() => {
+  //   setPassSelectedDate(passSelectedDate);
+  // }, [passSelectedDate]);
+  // console.log('으으', passSelectedDate);
 
   // if (selectedDatePass.length > 4) {
   //   selectedDatePass.split('/');
   // }
+  console.log('grid selected date', JSON.stringify(selectedDate));
 
   return (
     <>
@@ -54,7 +54,7 @@ export default function LicenseLoginLogPage() {
           <Grid item xs={12} md={12} lg={12}>
             <AppWebsiteVisits
               title="로그인 로그 (라이선스)"
-              subheader={passSelectedDate}
+              subheader={String(selectedDate)}
               chartLabels={[
                 '01/01/2003',
                 '02/01/2003',
@@ -93,7 +93,7 @@ export default function LicenseLoginLogPage() {
         </Grid>
         <br />
         <br />
-        <LicenseLoginLogReport setPassSelectedDate={setPassSelectedDate} />
+        {/* <LicenseLoginLogReport setPassSelectedDate={setPassSelectedDate} /> */}
       </Container>
     </>
   );

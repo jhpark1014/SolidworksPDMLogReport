@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import { SelectChangeEvent } from '@mui/material/Select';
@@ -62,6 +62,7 @@ const MenuProps = {
       width: 250,
     },
   },
+  autoFocus: false,
 };
 
 // ----------------------------------------------------------------------
@@ -77,7 +78,7 @@ export default function UserListToolbarLicense({
   // filterName,
   // onFilterName,
   setDateOption,
-  filterLicense, // 선택한 라이선스
+  // filterLicense, // 선택한 라이선스/
   onFilterLicense,
   PassSelectedDate, // 선택한 날짜 넘겨주는 function
 }) {
@@ -105,19 +106,58 @@ export default function UserListToolbarLicense({
   //   );
   // };
 
-  const [licenseName, setLicenseName] = useState([]);
-  console.log('license', licenseName);
+  const selected = LOGLIST.map((n) => n.name);
+
+  const [licenseName, setLicenseName] = useState(selected);
   const licenseChange = (event) => {
     const {
       target: { value },
     } = event;
+    // console.log('selected option', event.target.value);
     setLicenseName(
       // On autofill we get a stringified value.
       typeof value === 'string' ? value.split(',') : value
     );
+    // console.log('setLicensename', event.target.value);
+    // console.log('setLicensename222', typeof value === 'string' ? value.split(',') : value);
+  };
+  console.log('license', licenseName);
+
+  const checkAll = (checked) => {
+    console.log('checked: ', checked);
+    if (checked) {
+      setLicenseName(selected);
+      console.log('yes checked: ', licenseName);
+      console.log('yes length:', licenseName.filter((license) => license !== 'all').length);
+    } else {
+      setLicenseName([]);
+      console.log('no checked: ', licenseName);
+      console.log('no length:', licenseName.filter((license) => license !== 'all').length);
+    }
+    console.log('checked2: ', checked);
+    onFilterLicense(licenseName);
+    // FilterLicense(licenseName);
   };
 
-  const selected = LOGLIST.map((n) => n.name);
+  const checkSingle = (checked, value) => {
+    if (checked) {
+      setLicenseName((prev) => [...prev, value]);
+      console.log(
+        'licenseName yes',
+        licenseName.filter((license) => license !== 'all')
+      );
+    } else {
+      setLicenseName(licenseName.filter((el) => el !== value));
+      console.log(
+        'licenseName else',
+        licenseName.filter((license) => license !== 'all')
+      );
+    }
+    onFilterLicense(licenseName);
+  };
+
+  // filterLicense = licenseName;
+  // console.log('filterLicense: ', filterLicense);
 
   return (
     <StyledRoot
@@ -129,6 +169,7 @@ export default function UserListToolbarLicense({
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+        {/* 날짜 검색 옵션 */}
         <div>
           <FormControl sx={{ m: 2, minWidth: 120, ml: 'auto' }}>
             <InputLabel id="demo-simple-select-standard-label">날짜 옵션</InputLabel>
@@ -146,6 +187,7 @@ export default function UserListToolbarLicense({
             </Select>
           </FormControl>
         </div>
+        {/* 달력 */}
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
           <DatePicker
             sx={{ width: 180, m: 2 }}
@@ -166,6 +208,7 @@ export default function UserListToolbarLicense({
             onChange={dateChange}
           />
         </LocalizationProvider>
+        {/* 라이선스 선택 */}
         <div>
           <FormControl sx={{ m: 2, width: 300 }}>
             <InputLabel id="demo-multiple-checkbox-label">라이선스</InputLabel>
@@ -173,25 +216,24 @@ export default function UserListToolbarLicense({
               labelId="demo-multiple-checkbox-label"
               id="demo-multiple-checkbox"
               multiple
-              value={[filterLicense]}
+              value={licenseName.filter((license) => license !== 'all')}
               onChange={licenseChange}
               input={<OutlinedInput label="라이선스" />}
-              renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {selected.map((value) => (
-                    <Chip key={value} label={value} />
-                  ))}
-                </Box>
-              )}
+              renderValue={(selected) => selected.join(', ')}
               MenuProps={MenuProps}
             >
-              <MenuItem key="all" value="">
-                <Checkbox checked onChange={checkAll} />
-                모두 선택
+              <MenuItem key="all" value="all">
+                <Checkbox
+                  checked={licenseName.filter((license) => license !== 'all').length === selected.length}
+                  value="모두 선택"
+                  onChange={(event) => checkAll(event.target.checked)}
+                />
+                <ListItemText primary="모두 선택" />
+                {/* 모두 선택 */}
               </MenuItem>
               {selected.map((name) => (
-                <MenuItem key={name} value={name}>
-                  <Checkbox checked={licenseName.indexOf(name) > -1} />
+                <MenuItem key={name} value={name} onClick={checkSingle}>
+                  <Checkbox checked={licenseName.includes(name)} value={name} />
                   <ListItemText primary={name} />
                 </MenuItem>
               ))}

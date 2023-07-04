@@ -25,17 +25,20 @@ import {
 import { useTheme } from '@emotion/react';
 import { koKR } from '@mui/material/locale';
 import dayjs from 'dayjs';
+import axios from 'axios';
 // components
 // import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHead, UserListToolbarLicense } from '../sections/@dashboard/user';
+import LicenseLoginLogPage from './LicenseLoginLogPage';
 // mock
 import LOGLIST from '../_mock/logdata';
 
 // ----------------------------------------------------------------------
 
+// Table Headers
 const TABLE_HEAD_YEAR = [
   { id: 'name', label: '사용자', alignRight: false },
   { id: 'department', label: '부서', alignRight: false },
@@ -119,6 +122,7 @@ const TABLE_HEAD_DAY = [
 ];
 // ----------------------------------------------------------------------
 
+// Search Filtering
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -135,7 +139,6 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Search Filtering
 // function applySortFilter(array, comparator, query) {
 //   const stabilizedThis = array.map((el, index) => [el, index]);
 //   stabilizedThis.sort((a, b) => {
@@ -149,30 +152,19 @@ function getComparator(order, orderBy) {
 //   return stabilizedThis.map((el) => el[0]);
 // }
 
-function applySortFilter(array, comparator, query) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
-  }
-  return stabilizedThis.map((el) => el[0]);
+function applyLicenseFilter(datas, licenseList) {
+  return datas.filter((data) => licenseList.includes(data.name));
 }
 
 // applySortFilter(LOGLIST, getComparator(order, orderBy), filterLicense);
 
-export default function LicenseLoginReport({ setPassSelectedDate, setTableHead }) {
-  // const [open, setOpen] = useState(null);
-
+export default function LicenseLoginReport({ setTableHead }) {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [selected, setSelected] = useState([]);
   const [orderBy, setOrderBy] = useState('name');
   // const [filterName, setFilterName] = useState('');
-  const [filterLicense, setFilterLicense] = useState('');
+  const [filterLicense, setFilterLicense] = useState(LOGLIST.map((n) => n.name));
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -217,37 +209,83 @@ export default function LicenseLoginReport({ setPassSelectedDate, setTableHead }
   //   setPage(0);
   //   setFilterName(event.target.value);
   // };
-  const handleFilterByLicense = (event) => {
+  // const handleFilterByLicense = (event) => {
+  const handleFilterByLicense = () => {
     setPage(0);
-    setFilterLicense(event.target.value);
-    console.log('뭔데', event.target.value);
+    setFilterLicense(filterLicense);
+    console.log('뭔데', filterLicense);
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - LOGLIST.length) : 0;
 
   // const filteredUsers = applySortFilter(LOGLIST, getComparator(order, orderBy), filterName);
-  const filteredLicense = applySortFilter(LOGLIST, getComparator(order, orderBy), filterLicense);
 
   // const isNotFound = !filteredUsers.length && !!filterName;
-  const isNotFound = !filteredLicense.length && !!filterLicense;
+  const isNotFound = !filterLicense.length && !!filterLicense;
 
+  // 한국어 Grid
   const theme = useTheme();
   const themeWithLocale = useMemo(() => createTheme(theme, koKR), [koKR, theme]);
 
+  // Toolbar에서 날짜 검색 옵션 불러오기
   const [dateOption, setDateOption] = useState('day');
   const [selectedDate, PassSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
-
-  useMemo(() => {
-    PassSelectedDate(selectedDate);
-    setPassSelectedDate(selectedDate);
-  }, [selectedDate]);
-
+  // useMemo(() => {
+  //   PassSelectedDate(selectedDate);
+  //   // setPassSelectedDate(selectedDate);
+  // }, [selectedDate]);
   console.log('dateOption', dateOption);
-  console.log('selected date', selectedDate);
-  // useMemo(() => {}, [selectedDate]);
+  // console.log('selected date', selectedDate);
+  console.log('report filter license', filterLicense);
+
+  // 필터링 된 그리드에 보여질 새 데이터
+  const newData = applyLicenseFilter(LOGLIST, filterLicense);
+
+  // 서버 연결하기
+  const [inputs, setInputs] = useState({
+    search_type: '',
+    search_date: '',
+    lic_name: '',
+  });
+  const [err, setError] = useState(null);
+
+  const handleChange = (e) => {
+    setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  // setInputs((prev) => ({ ...prev, [search_type]: dateOption }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      console.log('inputs==>', inputs);
+
+      const url = `/logs/loginuser?search_type=${inputs.search_type}&search_date=${inputs.search_date}&lic_name=${inputs.lic_name}`;
+      const res = await axios.get(url, inputs);
+
+      console.log(res.data);
+    } catch (err) {
+      setError(err.response.data);
+    }
+  };
+
+  console.log('passdate', selectedDate);
 
   return (
     <>
+      <div className="auth">
+        <form>
+          <input required type="text" placeholder="검색 구분" name="search_type" onChange={handleChange} />
+          <br />
+          <input required type="text" placeholder="검색 날짜" name="search_date" onChange={handleChange} />
+          <br />
+          <input required type="text" placeholder="lic_name" name="lic_name" onChange={handleChange} />
+          <br />
+          <button onClick={handleSubmit}>submit</button>
+          {err && <p>{err}</p>}
+        </form>
+      </div>
+      <LicenseLoginLogPage selectedDate={selectedDate} />
       <Helmet>
         <title> Log Report | Minimal UI </title>
       </Helmet>
@@ -266,11 +304,10 @@ export default function LicenseLoginReport({ setPassSelectedDate, setTableHead }
               // filterName={filterName}
               // onFilterName={handleFilterByName}
               setDateOption={setDateOption}
-              filterLicense={filterLicense}
-              onFilterLicense={handleFilterByLicense}
+              // filterLicense={filterLicense}
+              onFilterLicense={setFilterLicense}
               PassSelectedDate={PassSelectedDate}
             />
-            <input type="hidden" value={selectedDate} />
 
             <Scrollbar>
               <TableContainer>
@@ -291,24 +328,23 @@ export default function LicenseLoginReport({ setPassSelectedDate, setTableHead }
                     // onSelectAllClick={handleSelectAllClick}
                   />
                   <TableBody>
-                    {filteredLicense.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                    {/* {filteredLicense.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => { */}
+                    {newData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                       const { id, name, department, logdata } = row;
                       const selectedUser = selected.indexOf(name) !== -1;
 
                       return (
                         <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
-                          <TableCell align="left" sx={{ border: 0 }}>
+                          <TableCell align="left">
                             <Typography variant="subtitle2" noWrap>
                               {name.slice(0, 6)}
                             </Typography>
                           </TableCell>
 
-                          <TableCell align="left" sx={{ border: 0 }}>
-                            {department}
-                          </TableCell>
+                          <TableCell align="left">{department}</TableCell>
 
                           {logdata.map((data) => (
-                            <TableCell align="left" value={data} sx={{ border: 0 }}>
+                            <TableCell align="left" value={data}>
                               {data}
                             </TableCell>
                           ))}
