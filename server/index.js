@@ -9,7 +9,7 @@ dotenv.config();
 
 
 app.use(express.json());
-app.use("/server/logs", logRoutes);
+app.use("/logs", logRoutes);
 
 app.listen(9900, async ()=>{
     console.log("Connected~!============================================================================================");
