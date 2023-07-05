@@ -26,7 +26,71 @@ import LicenseLoginLogReport from './LicenseLoginReport';
 
 // ----------------------------------------------------------------------
 
-export default function LicenseLoginLogPage(dateOption, selectedDate) {
+const CHART_LABEL_DAY = [
+  '1시',
+  '2시',
+  '3시',
+  '4시',
+  '5시',
+  '6시',
+  '7시',
+  '8시',
+  '9시',
+  '10시',
+  '11시',
+  '12시',
+  '13시',
+  '14시',
+  '15시',
+  '16시',
+  '17시',
+  '18시',
+  '19시',
+  '20시',
+  '21시',
+  '22시',
+  '23시',
+  '24시',
+];
+
+const CHART_LABEL_MONTH = [
+  '1일',
+  '2일',
+  '3일',
+  '4일',
+  '5일',
+  '6일',
+  '7일',
+  '8일',
+  '9일',
+  '10일',
+  '11일',
+  '12일',
+  '13일',
+  '14일',
+  '15일',
+  '16일',
+  '17일',
+  '18일',
+  '19일',
+  '20일',
+  '21일',
+  '22일',
+  '23일',
+  '24일',
+  '24일',
+  '25일',
+  '26일',
+  '27일',
+  '28일',
+  '29일',
+  '30일',
+  '31일',
+];
+
+const CHART_LABEL_YEAR = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+
+export default function LicenseLoginLogPage({ dateOption, selectedDate }) {
   const theme = useTheme();
   // const [passSelectedDate, setPassSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
   // useMemo(() => {
@@ -37,7 +101,8 @@ export default function LicenseLoginLogPage(dateOption, selectedDate) {
   // if (selectedDatePass.length > 4) {
   //   selectedDatePass.split('/');
   // }
-  console.log('grid selected date', JSON.stringify(selectedDate));
+  // console.log('grid selected date', JSON.stringify(dateOption));
+  // console.log('typeof', typeof CHART_LABEL_YEAR);
 
   return (
     <>
@@ -46,28 +111,30 @@ export default function LicenseLoginLogPage(dateOption, selectedDate) {
       </Helmet>
 
       <Container maxWidth="false" disableGutters>
-        {/* <Typography variant="h4" sx={{ mb: 5 }}>
-          Solidworks PDM Log Report
-        </Typography> */}
+        <Typography variant="h4" sx={{ mb: 5 }}>
+          {/* Solidworks PDM Log Report */}
+          로그인 로그 (라이선스)
+        </Typography>
 
         <Grid container>
-          <Grid item xs={12} md={12} lg={12}>
+          <Grid item xs={12} md={12} lg={24}>
             <AppWebsiteVisits
               title="로그인 로그 (라이선스)"
-              subheader={String(selectedDate)}
-              chartLabels={[
-                '01/01/2003',
-                '02/01/2003',
-                '03/01/2003',
-                '04/01/2003',
-                '05/01/2003',
-                '06/01/2003',
-                '07/01/2003',
-                '08/01/2003',
-                '09/01/2003',
-                '10/01/2003',
-                '11/01/2003',
-              ]}
+              subheader={
+                // JSON.stringify(dateOption) === '"year"'
+                //   ? JSON.stringify(selectedDate).split(/["-]/)[1]
+                //   : JSON.stringify(dateOption) === '"month"'
+                //   ? JSON.stringify(selectedDate).slice(0, -4).split('"')
+                //   : JSON.stringify(selectedDate).split('"')
+                JSON.stringify(selectedDate)
+              }
+              chartLabels={
+                JSON.stringify(dateOption) === '"year"'
+                  ? CHART_LABEL_YEAR
+                  : JSON.stringify(dateOption) === '"month"'
+                  ? CHART_LABEL_MONTH
+                  : CHART_LABEL_DAY
+              }
               chartData={[
                 {
                   name: 'Team A',

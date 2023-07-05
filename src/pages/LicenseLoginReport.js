@@ -2,7 +2,7 @@ import { spacing } from '@mui/system';
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 // import { sentenceCase } from 'change-case';
-import { useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 // @mui
 import {
   Card,
@@ -133,11 +133,11 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
+// function getComparator(order, orderBy) {
+//   return order === 'desc'
+//     ? (a, b) => descendingComparator(a, b, orderBy)
+//     : (a, b) => -descendingComparator(a, b, orderBy);
+// }
 
 // function applySortFilter(array, comparator, query) {
 //   const stabilizedThis = array.map((el, index) => [el, index]);
@@ -158,13 +158,22 @@ function applyLicenseFilter(datas, licenseList) {
 
 // applySortFilter(LOGLIST, getComparator(order, orderBy), filterLicense);
 
-export default function LicenseLoginReport({ setTableHead }) {
+export default function LicenseLoginReport() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [selected, setSelected] = useState([]);
   const [orderBy, setOrderBy] = useState('name');
   // const [filterName, setFilterName] = useState('');
-  const [filterLicense, setFilterLicense] = useState(LOGLIST.map((n) => n.name));
+
+  const [res, setRes] = useState([
+    {
+      lic_name: 'swepdm_cadeditorandweb',
+      hold_qty: '13',
+      log_data: [0, 0, 0, 0, 0, 0, 0, 1, 6, 7, 7, 6, 6, 6, 4, 4, 4, 5, 5, 5, 4, 2, 1, 0],
+    },
+  ]);
+
+  const [filterLicense, setFilterLicense] = useState(res.map((n) => n.lic_name));
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -172,29 +181,29 @@ export default function LicenseLoginReport({ setTableHead }) {
     setOrderBy(property);
   };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = LOGLIST.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
+  // const handleSelectAllClick = (event) => {
+  //   if (event.target.checked) {
+  //     const newSelecteds = LOGLIST.map((n) => n.name);
+  //     setSelected(newSelecteds);
+  //     return;
+  //   }
+  //   setSelected([]);
+  // };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
-    setSelected(newSelected);
-  };
+  // const handleClick = (event, name) => {
+  //   const selectedIndex = selected.indexOf(name);
+  //   let newSelected = [];
+  //   if (selectedIndex === -1) {
+  //     newSelected = newSelected.concat(selected, name);
+  //   } else if (selectedIndex === 0) {
+  //     newSelected = newSelected.concat(selected.slice(1));
+  //   } else if (selectedIndex === selected.length - 1) {
+  //     newSelected = newSelected.concat(selected.slice(0, -1));
+  //   } else if (selectedIndex > 0) {
+  //     newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
+  //   }
+  //   setSelected(newSelected);
+  // };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -210,11 +219,11 @@ export default function LicenseLoginReport({ setTableHead }) {
   //   setFilterName(event.target.value);
   // };
   // const handleFilterByLicense = (event) => {
-  const handleFilterByLicense = () => {
-    setPage(0);
-    setFilterLicense(filterLicense);
-    console.log('뭔데', filterLicense);
-  };
+  // const handleFilterByLicense = () => {
+  //   setPage(0);
+  //   setFilterLicense(filterLicense);
+  //   console.log('뭔데', filterLicense);
+  // };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - LOGLIST.length) : 0;
 
@@ -230,38 +239,62 @@ export default function LicenseLoginReport({ setTableHead }) {
   // Toolbar에서 날짜 검색 옵션 불러오기
   const [dateOption, setDateOption] = useState('day');
   const [selectedDate, PassSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
-  // useMemo(() => {
-  //   PassSelectedDate(selectedDate);
-  //   // setPassSelectedDate(selectedDate);
-  // }, [selectedDate]);
-  console.log('dateOption', dateOption);
+  // console.log('dateOption', dateOption);
   // console.log('selected date', selectedDate);
-  console.log('report filter license', filterLicense);
-
-  // 필터링 된 그리드에 보여질 새 데이터
-  const newData = applyLicenseFilter(LOGLIST, filterLicense);
+  // console.log('report filter license', filterLicense);
 
   // 서버 연결하기
   const [inputs, setInputs] = useState({
-    search_type: '',
-    search_date: '',
-    lic_name: '',
+    search_type: 'day',
+    search_date: dayjs().format('YYYY-MM-DD'),
+    lic_name: 'All',
   });
   const [err, setError] = useState(null);
 
-  const handleChange = (e) => {
-    setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  // const handleChange = (e) => {
+  //   setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  // };
 
-  // setInputs((prev) => ({ ...prev, [search_type]: dateOption }));
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     console.log('inputs==>', inputs);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  //     const url = `/logs/loginuser?search_type=${inputs.search_type}&search_date=${inputs.search_date}&lic_name=${inputs.lic_name}`;
+  //     const res = await axios.get(url, inputs);
+  //     setRes(res);
+
+  //     console.log(res.data);
+  //   } catch (err) {
+  //     setError(err.response.data);
+  //   }
+  // };
+  console.log('ㅗㅗ', dateOption, selectedDate, filterLicense);
+
+  useEffect(() => {
+    setInputs({
+      search_type: dateOption,
+      search_date:
+        dateOption === 'year'
+          ? JSON.stringify(selectedDate).split('"').slice(0, 3)
+          : dateOption === 'month'
+          ? JSON.stringify(selectedDate).split('"').slice(0, 6)
+          : JSON.stringify(dayjs(selectedDate).format('YYYY-MM-DD')),
+      lic_name: filterLicense,
+    });
+    console.log('inputs: ', inputs);
+    console.log('바뀜ㄴ: ');
+    handleChange();
+  }, [dateOption, selectedDate, filterLicense]);
+
+  const handleChange = async (e) => {
+    // e.preventDefault();
     try {
-      console.log('inputs==>', inputs);
+      // console.log('inputs==>', inputs);
 
       const url = `/logs/loginuser?search_type=${inputs.search_type}&search_date=${inputs.search_date}&lic_name=${inputs.lic_name}`;
       const res = await axios.get(url, inputs);
+      setRes(res);
 
       console.log(res.data);
     } catch (err) {
@@ -269,7 +302,13 @@ export default function LicenseLoginReport({ setTableHead }) {
     }
   };
 
-  console.log('passdate', selectedDate);
+  // console.log('passdate', selectedDate);
+
+  // 필터링 된 그리드에 보여질 새 데이터
+  // const newData = applyLicenseFilter(LOGLIST, filterLicense);
+  const newData = applyLicenseFilter(res, filterLicense);
+
+  // console.log('newdata: ', newData);
 
   return (
     <>
@@ -281,11 +320,11 @@ export default function LicenseLoginReport({ setTableHead }) {
           <br />
           <input required type="text" placeholder="lic_name" name="lic_name" onChange={handleChange} />
           <br />
-          <button onClick={handleSubmit}>submit</button>
+          {/* <button onClick={handleSubmit}>submit</button> */}
           {err && <p>{err}</p>}
         </form>
       </div>
-      <LicenseLoginLogPage selectedDate={selectedDate} />
+      <LicenseLoginLogPage dateOption={dateOption} selectedDate={selectedDate} />
       <Helmet>
         <title> Log Report | Minimal UI </title>
       </Helmet>
@@ -330,14 +369,16 @@ export default function LicenseLoginReport({ setTableHead }) {
                   <TableBody>
                     {/* {filteredLicense.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => { */}
                     {newData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                      const { id, name, department, logdata } = row;
-                      const selectedUser = selected.indexOf(name) !== -1;
+                      // const { id, name, department, logdata } = row;
+                      const { licenseName, department, logdata } = row;
+
+                      const selectedLicense = selected.indexOf(licenseName) !== -1;
 
                       return (
-                        <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                        <TableRow hover key={licenseName} tabIndex={-1} role="checkbox" selected={selectedLicense}>
                           <TableCell align="left">
                             <Typography variant="subtitle2" noWrap>
-                              {name.slice(0, 6)}
+                              {licenseName.slice(0, 6)}
                             </Typography>
                           </TableCell>
 

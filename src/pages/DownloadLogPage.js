@@ -81,7 +81,7 @@ export default function DownloadLogPage() {
         </Grid>
         <br />
         <br />
-        <DefaultLogReport />
+        {/* <DefaultLogReport /> */}
       </Container>
     </>
   );

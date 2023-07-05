@@ -23,6 +23,7 @@ import { useCallback, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import { SelectChangeEvent } from '@mui/material/Select';
+import axios from 'axios';
 // component
 import Iconify from '../../../components/iconify';
 // import data
@@ -87,12 +88,28 @@ export default function UserListToolbarLicense({
   const onChange = (event) => {
     setSelectedOption(event.target.value);
     setDateOption(event.target.value);
+    setInputs((prev) => ({ ...prev, [event.target.name]: event.target.value }));
+    console.log('inputs: ', inputs);
   };
 
+  console.log('date format?: ', typeof selectedDate);
+
   const dateChange = (value) => {
-    setSelectedDate(dayjs(value.$d).format('YYYY-MM-DD')); // selectedDate를 설정해줌
-    PassSelectedDate(selectedDate); // selectedDate를 받는 function -> Report에서 호출할 것
-    // console.log('바뀐 날짜', dayjs(value.$d).format('YYYY-MM-DD'));
+    // setSelectedDate(dayjs(value.$d).format('YYYY-MM-DD')); // selectedDate를 설정해줌
+    // PassSelectedDate(dayjs(value.$d).format('YYYY-MM-DD')); // selectedDate를 받는 function -> Report에서 호출할 것
+    setSelectedDate(() => value.$d); // selectedDate를 설정해줌
+    PassSelectedDate(
+      // selectedOption === 'year'
+      //   ? selectedDate.toString().slice(0, 3)
+      //   : selectedOption === 'month'
+      //   ? selectedDate.toString().slice(0, 6)
+      //   : selectedDate
+      value.$d
+    ); // selectedDate를 받는 function -> Report에서 호출할 것
+    // console.log(event.target);
+
+    // handleChange(event);
+    console.log('바뀌니?', selectedDate, value.$d);
   };
 
   // const [personName, setPersonName] = useState([]);
@@ -108,6 +125,44 @@ export default function UserListToolbarLicense({
 
   const selected = LOGLIST.map((n) => n.name);
 
+  // 서버 연결하기
+
+  // License List 가져오기
+  const [licenseList, setLicenseList] = useState([]);
+
+  // 데이터 불러오기
+  const [inputs, setInputs] = useState({
+    search_type: 'day',
+    search_date: '2023-06-30',
+    lic_name: 'swepdm_cadeditorandweb',
+  });
+  const [err, setError] = useState(null);
+  const [res, setRes] = useState([
+    {
+      lic_name: 'swepdm_cadeditorandweb',
+      hold_qty: '13',
+      log_data: [0, 0, 0, 0, 0, 0, 0, 1, 6, 7, 7, 6, 6, 6, 4, 4, 4, 5, 5, 5, 4, 2, 1, 0],
+    },
+  ]);
+
+  // const handleChange = async (e) => {
+  //   console.log('event', e);
+  //   setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+  //   e.preventDefault();
+  //   try {
+  //     console.log('inputs==>', inputs);
+
+  //     const url = `/logs/loginuser?search_type=${inputs.search_type}&search_date=${inputs.search_date}&lic_name=${inputs.lic_name}`;
+  //     const res = await axios.get(url, inputs);
+  //     setRes(res);
+
+  //     console.log(res.data);
+  //   } catch (err) {
+  //     setError(err.response.data);
+  //   }
+  // };
+
   const [licenseName, setLicenseName] = useState(selected);
   const licenseChange = (event) => {
     const {
@@ -118,8 +173,11 @@ export default function UserListToolbarLicense({
       // On autofill we get a stringified value.
       typeof value === 'string' ? value.split(',') : value
     );
+    onFilterLicense(typeof value === 'string' ? value.split(',') : value);
     // console.log('setLicensename', event.target.value);
     // console.log('setLicensename222', typeof value === 'string' ? value.split(',') : value);
+    console.log(event.target);
+    // handleChange();
   };
   console.log('license', licenseName);
 
@@ -127,37 +185,48 @@ export default function UserListToolbarLicense({
     console.log('checked: ', checked);
     if (checked) {
       setLicenseName(selected);
+      onFilterLicense(selected);
+      // handleChange();
       console.log('yes checked: ', licenseName);
       console.log('yes length:', licenseName.filter((license) => license !== 'all').length);
     } else {
       setLicenseName([]);
+      onFilterLicense([]);
+      // handleChange();
       console.log('no checked: ', licenseName);
       console.log('no length:', licenseName.filter((license) => license !== 'all').length);
     }
     console.log('checked2: ', checked);
-    onFilterLicense(licenseName);
-    // FilterLicense(licenseName);
+    // onFilterLicense(licenseName);
   };
 
   const checkSingle = (checked, value) => {
     if (checked) {
       setLicenseName((prev) => [...prev, value]);
-      console.log(
-        'licenseName yes',
-        licenseName.filter((license) => license !== 'all')
-      );
+      onFilterLicense((prev) => [...prev, value]);
+      // handleChange();
+      console.log(inputs);
+      // console.log(
+      //   'licenseName yes',
+      //   licenseName.filter((license) => license !== 'all')
+      // );
     } else {
       setLicenseName(licenseName.filter((el) => el !== value));
-      console.log(
-        'licenseName else',
-        licenseName.filter((license) => license !== 'all')
-      );
+      onFilterLicense(licenseName.filter((el) => el !== value));
+      // handleChange();
+      console.log(inputs);
+
+      // console.log(
+      //   'licenseName else',
+      //   licenseName.filter((license) => license !== 'all')
+      // );
     }
-    onFilterLicense(licenseName);
+    // onFilterLicense(licenseName);
   };
 
   // filterLicense = licenseName;
   // console.log('filterLicense: ', filterLicense);
+  console.log('toolbar: ', res);
 
   return (
     <StyledRoot
@@ -172,7 +241,7 @@ export default function UserListToolbarLicense({
         {/* 날짜 검색 옵션 */}
         <div>
           <FormControl sx={{ m: 2, minWidth: 120, ml: 'auto' }}>
-            <InputLabel id="demo-simple-select-standard-label">날짜 옵션</InputLabel>
+            <InputLabel id="demo-simple-select-standard-label">검색 구분</InputLabel>
             <Select
               labelId="demo-simple-select-standard-label"
               id="demo-simple-select-standard"
@@ -180,6 +249,7 @@ export default function UserListToolbarLicense({
               onChange={onChange}
               label="dateOption"
               defaultValue={selectedOption}
+              name="search_type"
             >
               <MenuItem value="day">일 단위</MenuItem>
               <MenuItem value="month">월 단위</MenuItem>
@@ -191,7 +261,7 @@ export default function UserListToolbarLicense({
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
           <DatePicker
             sx={{ width: 180, m: 2 }}
-            label={selectedOption === 'year' ? '년 단위' : selectedOption === 'month' ? '월 단위' : '일 단위'}
+            label="검색 날짜"
             openTo={selectedOption === 'year' ? 'year' : selectedOption === 'month' ? 'month' : 'day'}
             views={
               selectedOption === 'year'
@@ -203,9 +273,17 @@ export default function UserListToolbarLicense({
             minDate={dayjs('2015-01-01')}
             maxDate={dayjs()}
             // defaultValue={dayjs()}
-            format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY/MM' : 'YYYY/MM/DD'}
-            value={dayjs(selectedDate)}
+            format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD'}
+            value={
+              // selectedOption === 'year'
+              //   ? selectedDate.slice(0, 3)
+              //   : selectedOption === 'month'
+              //   ? selectedDate.slice(0, 6)
+              //   : selectedDate
+              dayjs(selectedDate)
+            }
             onChange={dateChange}
+            name="search_date"
           />
         </LocalizationProvider>
         {/* 라이선스 선택 */}
@@ -221,8 +299,9 @@ export default function UserListToolbarLicense({
               input={<OutlinedInput label="라이선스" />}
               renderValue={(selected) => selected.join(', ')}
               MenuProps={MenuProps}
+              name="lic_name"
             >
-              <MenuItem key="all" value="all">
+              <MenuItem key="all" value="all" onClick={(event) => checkAll(event.target.checked)}>
                 <Checkbox
                   checked={licenseName.filter((license) => license !== 'all').length === selected.length}
                   value="모두 선택"
@@ -241,7 +320,10 @@ export default function UserListToolbarLicense({
           </FormControl>
         </div>
       </Box>
-      <Box sx={{ m: 3 }}>단위 : {selectedOption === 'year' ? '월' : selectedOption === 'month' ? '일' : '시'}</Box>
+      {/* <Box sx={{ m: 3 }}>
+        단위 : {selectedOption === 'year' ? '월' : selectedOption === 'month' ? '일' : '시'}
+        <br />
+      </Box> */}
     </StyledRoot>
   );
 }

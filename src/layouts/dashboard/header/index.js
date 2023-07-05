@@ -15,8 +15,13 @@ const HEADER_MOBILE = 64;
 
 const HEADER_DESKTOP = 92;
 
-const StyledRoot = styled(AppBar)(({ theme }) => ({
-  ...bgBlur({ color: theme.palette.background.default }),
+// const isDesktop = useResponsive('up', 'lg');
+
+// const StyledRoot = styled(AppBar)(({ theme }) => ({
+const StyledRoot = styled(AppBar)(({ isDesktop }) => ({
+  // ...bgBlur({ color: theme.palette.background.default }),
+  // background: theme.palette.background.default,
+  background: 'transparent',
   boxShadow: 'none',
   // [theme.breakpoints.up('lg')]: {
   //   // width: `calc(100% - ${NAV_WIDTH + 1}px)`,

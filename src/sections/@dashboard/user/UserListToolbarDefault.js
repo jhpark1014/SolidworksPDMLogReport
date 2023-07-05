@@ -109,80 +109,62 @@ export default function UserListToolbarDefault({ numSelected, filterName, onFilt
         }),
       }}
     >
-      <div>
-        <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-          <InputLabel id="demo-simple-select-standard-label">날짜 검색</InputLabel>
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
-            value={selectedOption}
-            onChange={dateOptionChange}
-            label="dateOption"
-            defaultValue="month"
-            selected={selectedOption}
-          >
-            {/* <MenuItem value="">
+      <Box sx={{ display: 'flex', justifyContent: 'left' }}>
+        <div>
+          <FormControl sx={{ m: 2, minWidth: 120, ml: 'auto' }}>
+            <InputLabel id="demo-simple-select-standard-label">검색 구분</InputLabel>
+            <Select
+              labelId="demo-simple-select-standard-label"
+              id="demo-simple-select-standard"
+              value={selectedOption}
+              onChange={dateOptionChange}
+              label="dateOption"
+              defaultValue="month"
+              selected={selectedOption}
+            >
+              {/* <MenuItem value="">
               <em>날짜 검색 옵션을 선택해주세요</em>
             </MenuItem> */}
-            <MenuItem value="month">월 단위</MenuItem>
-            <MenuItem value="year">년 단위</MenuItem>
-          </Select>
-        </FormControl>
-      </div>
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
-        <DatePicker
-          // localeText={koKR}
-          label={selectedOption === 'month' ? '월 단위' : '년 단위'}
-          openTo={selectedOption === 'month' ? 'month' : 'year'}
-          views={selectedOption === 'month' ? ['month', 'year'] : ['year']}
-          sx={{ width: 180, ml: 2 }}
-          minDate={dayjs('2015-01-01')}
-          maxDate={dayjs()}
-          format={selectedOption === 'month' ? 'YYYY/MM' : 'YYYY'}
-          defaultValue={dayjs()}
-        />
-      </LocalizationProvider>
-      <div>
-        <FormControl sx={{ m: 1, width: 300 }}>
-          <InputLabel id="demo-multiple-checkbox-label">사용자</InputLabel>
-          <Select
-            labelId="demo-multiple-checkbox-label"
-            id="demo-multiple-checkbox"
-            multiple
-            value={personName}
-            onChange={nameChange}
-            input={<OutlinedInput label="사용자" />}
-            renderValue={(selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip key={value} label={value} />
-                ))}
-              </Box>
-            )}
-            MenuProps={MenuProps}
-          >
-            {selected.map((name) => (
-              <MenuItem key={name} value={name}>
-                <Checkbox checked={personName.indexOf(name) > -1} />
-                <ListItemText primary={name} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </div>
-      <StyledSearch
-        value={filterName}
-        onChange={onFilterName}
-        placeholder="Search user..."
-        startAdornment={
-          <InputAdornment position="start">
-            <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
-          </InputAdornment>
-        }
-        sx={{
-          ml: 'auto',
-        }}
-      />
+              <MenuItem value="month">월 단위</MenuItem>
+              <MenuItem value="year">년 단위</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
+          <DatePicker
+            sx={{ width: 180, m: 2 }}
+            label="검색 날짜"
+            openTo={selectedOption === 'month' ? 'month' : 'year'}
+            views={selectedOption === 'month' ? ['month', 'year'] : ['year']}
+            minDate={dayjs('2015-01-01')}
+            maxDate={dayjs()}
+            format={selectedOption === 'month' ? 'YYYY/MM' : 'YYYY'}
+            defaultValue={dayjs()}
+          />
+        </LocalizationProvider>
+        <div>
+          <FormControl sx={{ m: 2, width: 300 }}>
+            <InputLabel id="demo-multiple-checkbox-label">사용자</InputLabel>
+            <Select
+              labelId="demo-multiple-checkbox-label"
+              id="demo-multiple-checkbox"
+              multiple
+              value={personName}
+              onChange={nameChange}
+              input={<OutlinedInput label="사용자" />}
+              renderValue={(selected) => selected.join(', ')}
+              MenuProps={MenuProps}
+            >
+              {selected.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={personName.indexOf(name) > -1} />
+                  <ListItemText primary={name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+      </Box>
     </StyledRoot>
   );
 }

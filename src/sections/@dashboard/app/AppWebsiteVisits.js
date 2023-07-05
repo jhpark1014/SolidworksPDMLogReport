@@ -9,9 +9,9 @@ import { useChart } from '../../../components/chart';
 
 AppWebsiteVisits.propTypes = {
   title: PropTypes.string,
-  subheader: PropTypes.string,
+  subheader: PropTypes.array,
   chartData: PropTypes.array.isRequired,
-  chartLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
+  // chartLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default function AppWebsiteVisits({ title, subheader, chartLabels, chartData, ...other }) {
@@ -19,7 +19,7 @@ export default function AppWebsiteVisits({ title, subheader, chartLabels, chartD
     plotOptions: { bar: { columnWidth: '16%' } },
     fill: { type: chartData.map((i) => i.fill) },
     labels: chartLabels,
-    xaxis: { type: 'datetime' },
+    xaxis: { type: 'string' },
     tooltip: {
       shared: true,
       intersect: false,
