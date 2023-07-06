@@ -16,12 +16,14 @@ AppWebsiteVisits.propTypes = {
 };
 
 export default function AppWebsiteVisits({ title, subheader, chartLabels, chartData, ...other }) {
+  console.log(other);
   const theme = useTheme();
   const chartOptions = useChart({
     plotOptions: { bar: { columnWidth: '16%' } },
     fill: { type: chartData.map((i) => i.fill) },
-    labels: chartLabels,
-    xaxis: { type: 'string' },
+    labels: chartLabels,    
+    xaxis: other.xaxis,
+    yaxis: other.yaxis,
     tooltip: {
       shared: true,
       intersect: false,
@@ -38,7 +40,7 @@ export default function AppWebsiteVisits({ title, subheader, chartLabels, chartD
 
   return (
     <Card {...other}>
-      <CardHeader title={title} titleTypographyProps={{variant: "h3"}} subheader={subheader} />
+      <CardHeader title={title} titleTypographyProps={{variant: "h4"}} subheader={subheader} subheaderTypographyProps={{variant: "h7"}} />
 
       <Box sx={{ p: 3, pb: 1 }} dir="ltr">
         <ReactApexChart type="line" series={chartData} options={chartOptions} height={364} />
