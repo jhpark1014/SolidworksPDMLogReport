@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 // @mui
 import { styled } from '@mui/material/styles';
-import { Box, Stack, AppBar, Toolbar, IconButton } from '@mui/material';
+import { Box, AppBar, Toolbar, IconButton } from '@mui/material';
 // utils
 import { bgBlur } from '../../../utils/cssStyles';
 // components
@@ -13,20 +13,14 @@ const NAV_WIDTH = 280;
 
 const HEADER_MOBILE = 64;
 
-const HEADER_DESKTOP = 92;
-
-// const isDesktop = useResponsive('up', 'lg');
+const HEADER_DESKTOP = 0;
 
 const StyledRoot = styled(AppBar)(({ theme }) => ({
-  // const StyledRoot = styled(AppBar)(({ isDesktop }) => ({
   ...bgBlur({ color: theme.palette.background.default }),
-  // background: theme.palette.background.default,
-  // background: 'transparent',
   boxShadow: 'none',
-  // [theme.breakpoints.up('lg')]: {
-  //   // width: `calc(100% - ${NAV_WIDTH + 1}px)`,
-  //   width: 100,
-  // },
+  [theme.breakpoints.up('lg')]: {
+    width: `calc(100% - ${NAV_WIDTH + 1}px)`,
+  },
 }));
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
