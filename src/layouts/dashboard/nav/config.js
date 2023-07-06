@@ -12,16 +12,16 @@ const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ 
 // const svgIcon = (name) => <SvgIcon>{name}</SvgIcon>;
 
 const navConfig = [
-  {
-    title: 'dashboard',
-    path: '/dashboard/app',
-    icon: icon('ic_analytics'),
-  },
-  {
-    title: 'Dashboard2',
-    path: '/dashboard/dashboard2',
-    icon: icon('ic_log'),
-  },
+  // {
+  //   title: 'dashboard',
+  //   path: '/dashboard/app',
+  //   icon: icon('ic_analytics'),
+  // },
+  // {
+  //   title: 'Dashboard2',
+  //   path: '/dashboard/dashboard2',
+  //   icon: icon('ic_log'),
+  // },
   {
     title: '다운로드 로그',
     path: '/dashboard/downloadlog',
@@ -47,21 +47,21 @@ const navConfig = [
     path: '/dashboard/userlog',
     icon: icon('ic_user'),
   },
-  {
-    title: 'Log Report',
-    path: '/dashboard/logreport',
-    icon: icon('ic_log'),
-  },
-  {
-    title: 'Log Report2',
-    path: '/dashboard/logreport2',
-    icon: icon('ic_log'),
-  },
-  {
-    title: 'Users',
-    path: '/dashboard/user',
-    icon: icon('ic_user'),
-  },
+  // {
+  //   title: 'Log Report',
+  //   path: '/dashboard/logreport',
+  //   icon: icon('ic_log'),
+  // },
+  // {
+  //   title: 'Log Report2',
+  //   path: '/dashboard/logreport2',
+  //   icon: icon('ic_log'),
+  // },
+  // {
+  //   title: 'Users',
+  //   path: '/dashboard/user',
+  //   icon: icon('ic_user'),
+  // },
   // {
   //   title: 'product',
   //   path: '/dashboard/products',

@@ -9,7 +9,6 @@ import { useState, useMemo } from 'react';
 import {
   Card,
   Table,
-  Stack,
   Paper,
   Popover,
   Checkbox,
@@ -29,7 +28,7 @@ import {
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { UserListHead, UserListToolbarUsers } from '../sections/@dashboard/user';
+import { UserListHead, UserListToolbarLoginLog } from '../sections/@dashboard/user';
 // mock
 import LOGLIST from '../_mock/logdata';
 
@@ -239,7 +238,7 @@ export default function UserLoginReport() {
       <ThemeProvider theme={themeWithLocale}>
         <Container maxWidth="false" disableGutters>
           <Card>
-            <UserListToolbarUsers
+            <UserListToolbarLoginLog
               numSelected={selected.length}
               filterName={filterName}
               onFilterName={handleFilterByName}
