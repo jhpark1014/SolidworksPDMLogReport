@@ -3,7 +3,6 @@ import ReactApexChart from 'react-apexcharts';
 // @mui
 import { Card, CardHeader, Box } from '@mui/material';
 // components
-import { useTheme } from '@emotion/react';
 import { useChart } from '../../../components/chart';
 
 // ----------------------------------------------------------------------
@@ -16,8 +15,6 @@ AppWebsiteVisits.propTypes = {
 };
 
 export default function AppWebsiteVisits({ title, subheader, chartLabels, chartData, ...other }) {
-  console.log(other);
-  const theme = useTheme();
   const chartOptions = useChart({
     plotOptions: { bar: { columnWidth: '16%' } },
     fill: { type: chartData.map((i) => i.fill) },
