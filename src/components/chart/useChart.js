@@ -36,7 +36,6 @@ export default function useChart(options) {
       theme.palette.success.darker,
       theme.palette.info.dark,
       theme.palette.info.darker,
-      // '#2E93fA', '#2E93fA', '#66DA26', '#66DA26',
     ],
 
     // Chart
@@ -203,10 +202,6 @@ export default function useChart(options) {
       },
     ],
   };
-
-  // console.log("baseOptions==>", baseOptions);
-  // console.log("options==>", options);
-  // console.log("merge==>", merge(baseOptions, options));
 
   return merge(baseOptions, options);
 }
