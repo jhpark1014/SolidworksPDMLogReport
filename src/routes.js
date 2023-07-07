@@ -9,10 +9,9 @@ import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
 import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
-import DashboardAppPage2 from './pages/DashboardAppPage2';
 import DownloadLogPage from './pages/DownloadLogPage';
-import LogReportPage from './pages/LogReportPage';
-import LogReportPage2 from './pages/LogReportPage2';
+import NewCreateLogPage from './pages/NewCreateLogPage';
+import VersionUpLogPage from './pages/VersionUpLogPage';
 import UserLoginLogPage from './pages/UserLoginLogPage';
 import LicenseLoginLogPage from './pages/LicenseLoginLogPage';
 
@@ -24,14 +23,13 @@ export default function Router() {
       path: '/dashboard',
       element: <DashboardLayout />,
       children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
+        { element: <Navigate to="/dashboard/downloadlog" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
         { path: 'downloadlog', element: <DownloadLogPage /> },
+        { path: 'newcreate', element: <NewCreateLogPage /> },
+        { path: 'versionup', element: <VersionUpLogPage /> },
         { path: 'licenselog', element: <LicenseLoginLogPage /> },
-        { path: 'userlog', element: <UserLoginLogPage /> },
-        { path: 'dashboard2', element: <DashboardAppPage2 /> },
-        { path: 'logreport', element: <LogReportPage /> },
-        { path: 'logreport2', element: <LogReportPage2 /> },
+        { path: 'userlog', element: <UserLoginLogPage /> },        
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
@@ -44,7 +42,7 @@ export default function Router() {
     {
       element: <SimpleLayout />,
       children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
+        { element: <Navigate to="/dashboard/downloadlog" />, index: true },
         { path: '404', element: <Page404 /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],

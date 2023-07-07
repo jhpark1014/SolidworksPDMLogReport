@@ -11,17 +11,7 @@ import SvgColor from '../../../components/svg-color';
 const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />;
 // const svgIcon = (name) => <SvgIcon>{name}</SvgIcon>;
 
-const navConfig = [
-  // {
-  //   title: 'dashboard',
-  //   path: '/dashboard/app',
-  //   icon: icon('ic_analytics'),
-  // },
-  // {
-  //   title: 'Dashboard2',
-  //   path: '/dashboard/dashboard2',
-  //   icon: icon('ic_log'),
-  // },
+const navConfig = [  
   {
     title: '다운로드 로그',
     path: '/dashboard/downloadlog',
@@ -29,12 +19,12 @@ const navConfig = [
   },
   {
     title: '신규등록 로그',
-    path: '/dashboard/downloadlog',
+    path: '/dashboard/newcreate',
     icon: <HowToRegIcon />,
   },
   {
     title: '버전업 로그',
-    path: '/dashboard/downloadlog',
+    path: '/dashboard/versionup',
     icon: <UpdateIcon />,
   },
   {
@@ -48,14 +38,9 @@ const navConfig = [
     icon: icon('ic_user'),
   },
   // {
-  //   title: 'Log Report',
-  //   path: '/dashboard/logreport',
-  //   icon: icon('ic_log'),
-  // },
-  // {
-  //   title: 'Log Report2',
-  //   path: '/dashboard/logreport2',
-  //   icon: icon('ic_log'),
+  //   title: 'dashboard',
+  //   path: '/dashboard/app',
+  //   icon: icon('ic_analytics'),
   // },
   // {
   //   title: 'Users',
