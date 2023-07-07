@@ -5,28 +5,30 @@ import { AppWebsiteVisits } from '../sections/@dashboard/app';
 
 // ----------------------------------------------------------------------
 
-export default function DownloadLogPage(values) {
-  return (
-    <div>
-      <Container maxWidth="false" disableGutters>
-        <Grid item xs={12} md={12} lg={12}>
-          <AppWebsiteVisits
-            title={values.title}
-            subheader={values.subTitle}
-            chartLabels={values.chartLabels.map((row) => {
-              return row.label;
-            })}
-            chartData={values.chartDatas.map((row) => {
-              return {
-                name: row.username,
-                type: 'line',
-                fill: 'solid',
-                data: row.logdata,
-              };
-            })}
-          />
-        </Grid>
-      </Container>
-    </div>
+export default function DownloadLogChartPage(values) {  
+  return (        
+    <Container maxWidth="false" disableGutters>
+      <Grid item xs={12} md={6} lg={12}>
+        <AppWebsiteVisits
+          title={values.title}
+          subheader={values.subTitle}        
+          chartLabels={
+            values.chartLabels.map((row)=>(row.label))
+          }
+          chartData={
+            values.chartDatas.map((row)=>(                
+              {
+                  name: row.username,
+                  type: 'line',
+                  fill: 'solid',
+                  data: row.logdata,
+              }
+            ))
+          }            
+          xaxis={{title: {text:`날짜 (${values.xLabel})`}}}
+          yaxis={{title: {text:'수량 (건)'}}}
+        />
+      </Grid>
+    </Container>
   );
 }

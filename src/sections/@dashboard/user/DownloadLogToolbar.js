@@ -39,7 +39,8 @@ const MenuProps = {
 
 // ----------------------------------------------------------------------
 
-UserListToolbarDefault.propTypes = {
+DownloadLogToolbar.propTypes = {
+  sParam: PropTypes.string,
   numSelected: PropTypes.number,
   onSearchType: PropTypes.func,
   onSearchDate: PropTypes.func,
@@ -47,7 +48,7 @@ UserListToolbarDefault.propTypes = {
   onLogDatas: PropTypes.func,  
 };
 
-export default function UserListToolbarDefault({ numSelected, onSearchType, onSearchDate, onSearchUser, onLogDatas }) {  
+export default function DownloadLogToolbar({ sParam, numSelected, onSearchType, onSearchDate, onSearchUser, onLogDatas }) {  
   const today = dayjs();
   const dateString = today.format("YYYY-MM"); // 오늘 날짜(년-월) 리턴
 
@@ -57,7 +58,16 @@ export default function UserListToolbarDefault({ numSelected, onSearchType, onSe
 
   // server 에서 resopnse 데이터 가져오기
   const callLogData =  async (searchType, searchDate, searchUser) => {
-    const url = `/logs/download?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
+    let url = ``;    
+    if (sParam === "download")
+      url = `/logs/download?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;    
+    else if (sParam === "newcreate")
+      url = `/logs/newcreate?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;    
+    else
+      url = `/logs/versionup?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;        
+
+    console.log("url==>", url);
+    
     const res = await axios.get(url);
     
     onSearchType(searchType);
@@ -66,16 +76,7 @@ export default function UserListToolbarDefault({ numSelected, onSearchType, onSe
     
     onLogDatas(res.data);
   };
-
-  // type별 형식에 맞는 날짜 리턴
-  function getSearchDate(searchType, year, month, day) {
-    return (
-      searchType === "day" ? `${year}-${month}-${day}` 
-       : searchType === "month" ? `${year}-${month}` 
-       : `${year}`
-    )
-  };
-  
+ 
   // type 변경 시 type별 형식에 맞는 날짜 리턴
   const getSearchDateForChangeType = (searchType, searchDate) => {
     const date = dayjs(searchDate);
@@ -155,10 +156,10 @@ export default function UserListToolbarDefault({ numSelected, onSearchType, onSe
             sx={{ width: 180, m: 2 }}
             label="검색 날짜"
             openTo={searchType === 'month' ? 'month' : 'year'}
-            views={searchType === 'month' ? ['month', 'year'] : ['year']}
+            views={searchType === 'month' ? ['year', 'month'] : ['year']}
             minDate={dayjs('2015-01-01')}
             maxDate={dayjs()}
-            format={searchType === 'month' ? 'YYYY/MM' : 'YYYY'}
+            format={searchType === 'month' ? 'YYYY-MM' : 'YYYY'}
             defaultValue={dayjs()}            
             onAccept={(newValue) => handleSearchDate(newValue)}            
           />

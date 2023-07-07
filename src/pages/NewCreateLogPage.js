@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import DownloadLogChartPage from './DownloadLogChartPage';
 import DownloadLogTablePage from './DownloadLogTablePage';
 
-export default function DownloadLogPage() {  
+export default function NewCreateLogPage() {  
   const [searchType, setSearchType] = useState('');  // 검색 구분
   const [searchDate, setSearchDate] = useState('');       // 검색 날짜
   const [searchUser, setSearchUser] = useState('');       // 검색 사용자
@@ -24,11 +24,11 @@ export default function DownloadLogPage() {
   return (
     <>
       <Helmet>
-        <title>다운로드 로그</title>
+        <title>신규등록 로그</title>
       </Helmet>
     
       <DownloadLogChartPage 
-        title={`다운로드 로그`}
+        title={`신규등록 로그`}
         subTitle={`${searchType==='month'?'월':'연'}, ${searchDate}, ${searchUser}`}
         xLabel={`${searchType==='month'?'일':'월'}`}
         chartDatas={logDatas} 
@@ -36,7 +36,7 @@ export default function DownloadLogPage() {
       />
       <br />
       <DownloadLogTablePage 
-        sParam={'download'}
+        sParam={'newcreate'}
         onSearchType={setSearchType}
         onSearchDate={setSearchDate}
         onSearchUser={setSearchUser}
