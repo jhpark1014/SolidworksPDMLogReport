@@ -61,7 +61,7 @@ const MenuProps = {
 // ----------------------------------------------------------------------
 
 UserListToolbarLoginLog.propTypes = {
-  numSelected: PropTypes.number,
+  // numSelected: PropTypes.number,
   pageType: PropTypes.string,
   onSearchOption: PropTypes.func,
   onDateOption: PropTypes.func,
@@ -69,13 +69,14 @@ UserListToolbarLoginLog.propTypes = {
 };
 
 export default function UserListToolbarLoginLog({
-  numSelected,
+  // numSelected,
   pageType,
   onSearchOption,
   onDateOption, // 선택한 날짜 넘겨주는 function
   onLicenseOption,
   onLogDatas,
 }) {
+  // console.log('무한루프툴바', pageType);
   const today = dayjs();
   const todayString = today.format('YYYY-MM-DD'); // 오늘 날짜(년-월) 리턴
   const [selectedOption, setSelectedSearch] = useState('day'); // 날짜 검색 옵션
@@ -91,20 +92,26 @@ export default function UserListToolbarLoginLog({
     console.log('license list url', url);
 
     if (res.data.length === 0) {
+      // 보유 라이선스 없음
       setLicenseList([]);
       setLicenseName([]);
-      setSelectedLicense('All');
+      setSelectedLicense('');
       console.log('empty');
     } else {
       setLicenseList(res.data);
       setLicenseName(['All', ...res.data.map((license) => license.lic_id)]);
-      setSelectedLicense('All');
+      console.log(selectedLicense, 'selectedlicense');
+      if (selectedLicense.length === 0) {
+        console.log('if절');
+        setSelectedLicense('All');
+      }
+      console.log(selectedLicense, '확인용');
     }
   };
 
   // server 에서 response 데이터 가져오기
   const callLogData = async (pageType, searchType, searchDate, selectedLicense) => {
-    const res = [];
+    // const res = [];
     if (pageType === 'license') {
       const url = `/logs/loginlicense?search_type=${searchType}&search_date=${searchDate}&lic_id=${selectedLicense}`;
       console.log('log data url_license', url);
@@ -157,6 +164,10 @@ export default function UserListToolbarLoginLog({
       callLicenseList(type, searchDate);
       callLogData(pageType, type, searchDate, selectedLicense);
 
+      // const loadLicenseList = () => {callLicenseList(type, searchDate)}
+      // // callLogData(pageType, type, searchDate, selectedLicense);
+      // useEffect()
+
       console.log(
         'option change selectedOption: ',
         e.target.value,
@@ -180,8 +191,14 @@ export default function UserListToolbarLoginLog({
       setSelectedDate(() => searchDate); // selectedDate를 설정해줌
       // setDateOption(searchDate); // selectedDate를 받는 function -> Report에서 호출할 것
 
-      callLicenseList(selectedOption, searchDate);
-      callLogData(pageType, selectedOption, searchDate, selectedLicense);
+      // callLicenseList(selectedOption, searchDate).then(
+      //   callLogData(pageType, selectedOption, searchDate, selectedLicense)
+      // );
+
+      await callLicenseList(selectedOption, searchDate);
+      console.log('여기');
+      console.log(selectedLicense, '확인용2');
+      await callLogData(pageType, selectedOption, searchDate, selectedLicense);
 
       console.log(
         'date change selectedOption: ',
@@ -234,7 +251,7 @@ export default function UserListToolbarLoginLog({
   };
 
   console.log('왜이려', licenseList, licenseName, selectedLicense);
-  console.log('pagetype', pageType);
+  // console.log('pagetype', pageType);
 
   // MULTIPLE SELECT일 때 쓰는 함수들
   // const checkAll = (checked) => {
@@ -272,12 +289,12 @@ export default function UserListToolbarLoginLog({
 
   return (
     <StyledRoot
-      sx={{
-        ...(numSelected > 0 && {
-          color: 'primary.main',
-          bgcolor: 'primary.lighter',
-        }),
-      }}
+    // sx={{
+    //   ...(numSelected > 0 && {
+    //     color: 'primary.main',
+    //     bgcolor: 'primary.lighter',
+    //   }),
+    // }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'left' }}>
         {/* 날짜 검색 옵션 */}

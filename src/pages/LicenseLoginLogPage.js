@@ -22,7 +22,6 @@ import {
 } from '@mui/material';
 import { useTheme } from '@emotion/react';
 import { koKR } from '@mui/material/locale';
-import dayjs from 'dayjs';
 // components
 // import Label from '../components/label';
 import Scrollbar from '../components/scrollbar';
@@ -159,17 +158,16 @@ function getTableHead(searchType) {
 }
 
 export default function LicenseLoginLogPage() {
+  // console.log('무한루프라이선스');
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('name');
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selected, setSelected] = useState([]);
 
   const [searchType, setSearchType] = useState('day'); // 검색 구분
   const [searchDate, setSearchDate] = useState(''); // 검색 날짜
   const [searchLicense, setSearchLicense] = useState(''); // 검색 사용자
   const [logDatas, setLogDatas] = useState([]);
-  // const [filterLicense, setFilterLicense] = useState(res.map((n) => n.lic_name));
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -197,137 +195,112 @@ export default function LicenseLoginLogPage() {
   //   console.log('뭔데', filterLicense);
   // };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - LOGLIST.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - logDatas.length) : 0;
   const isNotFound = !logDatas.length && !!logDatas;
 
   // 한국어 Grid
   const theme = useTheme();
   const themeWithLocale = useMemo(() => createTheme(theme, koKR), [koKR, theme]);
 
-  // Toolbar에서 날짜 검색 옵션 불러오기
-  const [searchOption, setSearchOption] = useState('day');
-  const [selectedDate, PassSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
-  // console.log('searchType', searchType);
-  // console.log('selected date', selectedDate);
-  // console.log('report filter license', filterLicense);
-
-  console.log('logDatas==>', logDatas);
-  console.log('log report page', searchOption, selectedDate, logDatas);
-
-  // 필터링 된 그리드에 보여질 새 데이터
-  // const newData = applyLicenseFilter(LOGLIST, filterLicense);
-  // const newData = applyLicenseFilter(res, filterLicense);
-
-  // console.log('newdata: ', newData);
+  // console.log('logDatas==>', logDatas);
+  // console.log('log report page', searchOption, selectedDate, logDatas);
 
   return (
     <>
-      <Container maxWidth="false" disableGutters>
-        <LicenseLoginChartPage
-          title={'로그인 로그 (라이선스)'}
-          subtitle={`${
-            searchType === 'day' ? '일' : searchType === 'month' ? '월' : '연'
-          }, ${searchDate}, ${searchLicense}`}
-          chartDatas={logDatas}
-          chartLabels={getTableHead(searchType)}
-        />
-        <Helmet>
-          <title> Log Report | Minimal UI </title>
-        </Helmet>
+      <Helmet>
+        <title>'로그인 로그 (라이선스)'</title>
+      </Helmet>
 
-        <ThemeProvider theme={themeWithLocale}>
-          <Container maxWidth="false" disableGutters>
-            <Card>
-              <UserListToolbarLoginLog
-                numSelected={selected.length}
-                pageType="license"
-                onSearchOption={setSearchType}
-                onDateOption={setSearchDate}
-                onLicenseOption={setSearchLicense}
-                onLogDatas={setLogDatas}
-              />
+      {/* <Container maxWidth="false" disableGutters> */}
+      <LicenseLoginChartPage
+        title={'로그인 로그 (라이선스)'}
+        subtitle={`${
+          searchType === 'day' ? '일' : searchType === 'month' ? '월' : '연'
+        }, ${searchDate}, ${searchLicense}`}
+        chartDatas={logDatas}
+        chartLabels={getTableHead(searchType)}
+      />
 
-              <Scrollbar>
-                <TableContainer>
-                  <Table>
-                    <UserListHeadNotSort headLabel={TABLE_HEAD.concat(getTableHead(searchType))} />
-                    <TableBody>
-                      {/* {filteredLicense.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => { */}
-                      {logDatas.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                        // const { id, name, department, logdata } = row;
-                        const { id, licname, holdqty, logdata } = row;
+      <ThemeProvider theme={themeWithLocale}>
+        {/* <Container maxWidth="false" disableGutters> */}
+        <Card>
+          <UserListToolbarLoginLog
+            pageType="license"
+            onSearchOption={setSearchType}
+            onDateOption={setSearchDate}
+            onLicenseOption={setSearchLicense}
+            onLogDatas={setLogDatas}
+          />
 
-                        const selectedLicense = selected.indexOf(licname) !== -1;
+          <Scrollbar>
+            <TableContainer sx={{ minWidth: 800 }}>
+              <Table>
+                <UserListHeadNotSort headLabel={TABLE_HEAD.concat(getTableHead(searchType))} />
+                <TableBody>
+                  {logDatas.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                    const { id, licname, holdqty, logdata } = row;
 
-                        return (
-                          <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedLicense}>
-                            <TableCell align="left">
-                              <Typography variant="subtitle2" noWrap>
-                                {licname}
-                              </Typography>
-                            </TableCell>
+                    return (
+                      <TableRow hover key={id} tabIndex={-1}>
+                        <TableCell align="left">
+                          <Typography variant="subtitle2" noWrap>
+                            {licname}
+                          </Typography>
+                        </TableCell>
 
-                            <TableCell align="left">
-                              <Typography variant="subtitle2" noWrap>
-                                {holdqty}
-                              </Typography>
-                            </TableCell>
+                        <TableCell align="left">
+                          <Typography variant="subtitle2" noWrap>
+                            {holdqty}
+                          </Typography>
+                        </TableCell>
 
-                            {logdata.map((data, idx) => (
-                              <TableCell key={idx} align="center" value={data}>
-                                {data}
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        );
-                      })}
-                      {emptyRows > 0 && (
-                        <TableRow style={{ height: 53 * emptyRows }}>
-                          <TableCell colSpan={6} />
-                        </TableRow>
-                      )}
-                    </TableBody>
-
-                    {isNotFound && (
-                      <TableBody>
-                        <TableRow>
-                          <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                            <Paper
-                              sx={{
-                                textAlign: 'center',
-                              }}
-                            >
-                              <Typography variant="h6" paragraph>
-                                Not found
-                              </Typography>
-
-                              <Typography variant="h6" paragraph>
-                                데이터가 없습니다.
-                                <br />
-                                검색 조건을 다시 입력해 주세요.
-                              </Typography>
-                            </Paper>
+                        {logdata.map((data, idx) => (
+                          <TableCell key={idx} align="left" value={data}>
+                            {data}
                           </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    )}
-                  </Table>
-                </TableContainer>
-              </Scrollbar>
+                        ))}
+                      </TableRow>
+                    );
+                  })}
+                  {emptyRows > 0 && (
+                    <TableRow style={{ height: 53 * emptyRows }}>
+                      <TableCell colSpan={6} />
+                    </TableRow>
+                  )}
+                </TableBody>
 
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
-                component="div"
-                count={LOGLIST.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
-            </Card>
-          </Container>
-        </ThemeProvider>
-      </Container>
+                {isNotFound && (
+                  <TableBody>
+                    <TableRow>
+                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                        <Paper sx={{ textAlign: 'center' }}>
+                          <Typography variant="h6" paragraph>
+                            데이터가 없습니다.
+                            <br />
+                            검색 조건을 다시 입력해 주세요.
+                          </Typography>
+                        </Paper>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                )}
+              </Table>
+            </TableContainer>
+          </Scrollbar>
+
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={logDatas.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Card>
+        {/* </Container> */}
+      </ThemeProvider>
+      {/* </Container> */}
     </>
   );
 }

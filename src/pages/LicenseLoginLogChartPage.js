@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
+import PropTypes from 'prop-types';
 // @mui
-import { useTheme } from '@mui/material/styles';
+import { responsiveFontSizes, useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 // sections
@@ -19,14 +20,24 @@ import {
 
 // ----------------------------------------------------------------------
 
+LicenseLoginChartPage.propTypes = {
+  title: PropTypes.string,
+  subtitle: PropTypes.string,
+  chartLabels: PropTypes.array,
+  chartDatas: PropTypes.array,
+};
+
+function holdQtyArray(holdqty, data) {
+  const dataLength = data.length;
+  const array = new Array(dataLength).fill(holdqty);
+  console.log('array', array);
+  return array;
+}
+
 export default function LicenseLoginChartPage({ title, subtitle, chartLabels, chartDatas }) {
   const theme = useTheme();
   return (
     <>
-      <Typography variant="h4" sx={{ mb: 5 }}>
-        {/* Solidworks PDM Log Report */}
-        로그인 로그 (라이선스)
-      </Typography>
       <Grid item xs={12} md={12} lg={24}>
         <AppWebsiteVisits
           title={title}
@@ -36,12 +47,24 @@ export default function LicenseLoginChartPage({ title, subtitle, chartLabels, ch
           })}
           chartData={chartDatas.map((row) => {
             return {
-              name: row.username,
+              name: row.licname,
               type: 'line',
               fill: 'solid',
               data: row.logdata,
             };
           })}
+          xaxis={{
+            title: {
+              style: { fontSize: '12px', fontFamily: '굴림체' },
+              text: subtitle[0] === '일' ? '시간 (시)' : subtitle[0] === '월' ? '날짜 (일)' : '날짜 (월)',
+            },
+            // axisTicks: { show: true },
+          }}
+          yaxis={{
+            title: { text: '수량 (건)', style: { fontSize: '12px', fontFamily: '굴림체' } },
+            decimalsInFloat: 0,
+            lines: { show: false },
+          }}
         />
       </Grid>
       <br />

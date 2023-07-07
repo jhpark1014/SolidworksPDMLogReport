@@ -33,7 +33,7 @@ const TABLE_HEAD = [
   { id: 'department', label: '부서', alignRight: false },
 ];
 
-const TABLE_HEAD_YEAR = [  
+const TABLE_HEAD_YEAR = [
   { id: '1', label: '1', alignRight: false },
   { id: '2', label: '2', alignRight: false },
   { id: '3', label: '3', alignRight: false },
@@ -45,10 +45,10 @@ const TABLE_HEAD_YEAR = [
   { id: '9', label: '9', alignRight: false },
   { id: '10', label: '10', alignRight: false },
   { id: '11', label: '11', alignRight: false },
-  { id: '12', label: '12', alignRight: false },  
+  { id: '12', label: '12', alignRight: false },
 ];
 
-const TABLE_HEAD_MONTH = [  
+const TABLE_HEAD_MONTH = [
   { id: '1', label: '1', alignRight: false },
   { id: '2', label: '2', alignRight: false },
   { id: '3', label: '3', alignRight: false },
@@ -79,23 +79,22 @@ const TABLE_HEAD_MONTH = [
   { id: '28', label: '28', alignRight: false },
   { id: '29', label: '29', alignRight: false },
   { id: '30', label: '30', alignRight: false },
-  { id: '31', label: '31', alignRight: false },  
+  { id: '31', label: '31', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
 
 function getTableHead(searchType) {
-  return (searchType === "month" ? TABLE_HEAD_MONTH : TABLE_HEAD_YEAR);
+  return searchType === 'month' ? TABLE_HEAD_MONTH : TABLE_HEAD_YEAR;
 }
 
 export default function DefaultLogReport() {
-
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchType, setSearchType] = useState('month');  // 검색 구분
-  const [searchDate, setSearchDate] = useState('');  // 검색 날짜
-  const [searchUser, setSearchUser] = useState('');  // 검색 사용자
-  const [logDatas, setLogDatas] = useState([]);           // server 처리 결과
+  const [searchType, setSearchType] = useState('month'); // 검색 구분
+  const [searchDate, setSearchDate] = useState(''); // 검색 날짜
+  const [searchUser, setSearchUser] = useState(''); // 검색 사용자
+  const [logDatas, setLogDatas] = useState([]); // server 처리 결과
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -110,7 +109,7 @@ export default function DefaultLogReport() {
 
   const theme = useTheme();
   const themeWithLocale = useMemo(() => createTheme(theme, koKR), [koKR, theme]);
-  
+
   const isNotFound = !logDatas.length;
 
   return (
@@ -121,11 +120,11 @@ export default function DefaultLogReport() {
 
       {/* <Typography variant="h4" sx={{ mb: 5 }}>다운로드 로그</Typography> */}
 
-      <DownloadLogChartPage 
+      <DownloadLogChartPage
         title={`다운로드 로그`}
-        subTitle={`${searchType==='month'?'월':'연'}, ${searchDate}, ${searchUser}`}
-        chartDatas={logDatas} 
-        chartLabels={getTableHead(searchType)} 
+        subTitle={`${searchType === 'month' ? '월' : '연'}, ${searchDate}, ${searchUser}`}
+        chartDatas={logDatas}
+        chartLabels={getTableHead(searchType)}
       />
       <br />
       <ThemeProvider theme={themeWithLocale}>
@@ -141,25 +140,29 @@ export default function DefaultLogReport() {
             <Scrollbar>
               <TableContainer sx={{ minWidth: 800 }}>
                 <Table>
-                  <UserListHeadNotSort
-                    headLabel={TABLE_HEAD.concat(getTableHead(searchType))}                                                                         
-                  />
+                  <UserListHeadNotSort headLabel={TABLE_HEAD.concat(getTableHead(searchType))} />
                   <TableBody>
                     {logDatas.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                       const { id, username, department, logdata } = row;
-                      
+
                       return (
                         <TableRow hover key={id} tabIndex={-1}>
                           <TableCell align="left">
-                            <Typography variant="subtitle2" noWrap>{username}</Typography>
+                            <Typography variant="subtitle2" noWrap>
+                              {username}
+                            </Typography>
                           </TableCell>
 
                           <TableCell align="left">
-                            <Typography variant="subtitle2" noWrap>{department}</Typography>
+                            <Typography variant="subtitle2" noWrap>
+                              {department}
+                            </Typography>
                           </TableCell>
 
                           {logdata.map((data, idx) => (
-                            <TableCell key={idx} align="left" value={data}>{data}</TableCell>
+                            <TableCell key={idx} align="left" value={data}>
+                              {data}
+                            </TableCell>
                           ))}
                         </TableRow>
                       );
@@ -176,11 +179,12 @@ export default function DefaultLogReport() {
                     <TableBody>
                       <TableRow>
                         <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                          <Paper sx={{textAlign: 'center',}}>
+                          <Paper sx={{ textAlign: 'center' }}>
                             <Typography variant="h6" paragraph>
-                              데이터가 없습니다.<br />
+                              데이터가 없습니다.
+                              <br />
                               검색 조건을 다시 입력해 주세요.
-                            </Typography>                            
+                            </Typography>
                           </Paper>
                         </TableCell>
                       </TableRow>
