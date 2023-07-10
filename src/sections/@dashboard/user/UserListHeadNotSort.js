@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 // @mui
-import { Box, Checkbox, TableRow, TableCell, TableHead, TableSortLabel } from '@mui/material';
+import { Box, Checkbox, TableRow, TableCell, TableHead, TableSortLabel, Typography } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ export default function UserListHead({
             key={headCell.id}
             align={headCell.alignRight ? 'right' : 'left'}
           >
-              {headCell.label}            
+              <Typography variant="subtitle2" noWrap>{headCell.label}</Typography>
           </TableCell>
         ))}
       </TableRow>

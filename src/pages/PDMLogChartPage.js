@@ -5,7 +5,7 @@ import { AppWebsiteVisits } from '../sections/@dashboard/app';
 
 // ----------------------------------------------------------------------
 
-export default function DownloadLogChartPage(values) {  
+export default function PDMLogChartPage(values) {  
   return (        
     <Container maxWidth="false" disableGutters>
       <Grid item xs={12} md={6} lg={12}>

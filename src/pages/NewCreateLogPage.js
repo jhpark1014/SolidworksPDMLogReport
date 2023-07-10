@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 // sections
-import DownloadLogChartPage from './DownloadLogChartPage';
-import DownloadLogTablePage from './DownloadLogTablePage';
+import PDMLogChartPage from './PDMLogChartPage';
+import PDMLogTablePage from './PDMLogTablePage';
 
 export default function NewCreateLogPage() {  
   const [searchType, setSearchType] = useState('');  // 검색 구분
@@ -27,7 +27,7 @@ export default function NewCreateLogPage() {
         <title>신규등록 로그</title>
       </Helmet>
     
-      <DownloadLogChartPage 
+      <PDMLogChartPage 
         title={`신규등록 로그`}
         subTitle={`${searchType==='month'?'월':'연'}, ${searchDate}, ${searchUser}`}
         xLabel={`${searchType==='month'?'일':'월'}`}
@@ -35,7 +35,7 @@ export default function NewCreateLogPage() {
         chartLabels={tableHead} 
       />
       <br />
-      <DownloadLogTablePage 
+      <PDMLogTablePage 
         sParam={'newcreate'}
         onSearchType={setSearchType}
         onSearchDate={setSearchDate}

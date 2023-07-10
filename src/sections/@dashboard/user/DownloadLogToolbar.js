@@ -9,6 +9,7 @@ import {
   Select,
   MenuItem,
   Box,
+  OutlinedInput,
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -41,20 +42,35 @@ const MenuProps = {
 
 DownloadLogToolbar.propTypes = {
   sParam: PropTypes.string,
-  numSelected: PropTypes.number,
+  onIsLoding: PropTypes.func,
   onSearchType: PropTypes.func,
   onSearchDate: PropTypes.func,
   onSearchUser: PropTypes.func,
   onLogDatas: PropTypes.func,  
 };
 
-export default function DownloadLogToolbar({ sParam, numSelected, onSearchType, onSearchDate, onSearchUser, onLogDatas }) {  
+export default function DownloadLogToolbar({ sParam, onIsLoding, onSearchType, onSearchDate, onSearchUser, onLogDatas }) {  
   const today = dayjs();
   const dateString = today.format("YYYY-MM"); // 오늘 날짜(년-월) 리턴
 
   const [searchType, setSearchType] = useState('month');
   const [searchDate, setSearchDate] = useState(dateString);
   const [searchUser, setSearchUser] = useState('All');
+  const [userList, setUserList] = useState([]);
+
+  // server에서 user List 가져오기
+  const callUserList = async (searchType, searchDate) => {
+    const url = `/logs/userlist?search_type=${searchType}&search_date=${searchDate}`;
+    const res = await axios.get(url);
+    
+    if (res.data.length === 0) {      
+      setUserList([]);            
+      console.log('empty');
+    } else {
+      const users = [{user_id: 'All', user_name: 'All'}].concat(res.data);
+      setUserList(users);      
+    }
+  };
 
   // server 에서 resopnse 데이터 가져오기
   const callLogData =  async (searchType, searchDate, searchUser) => {
@@ -70,11 +86,12 @@ export default function DownloadLogToolbar({ sParam, numSelected, onSearchType, 
     
     const res = await axios.get(url);
     
+    onIsLoding(false);
     onSearchType(searchType);
     onSearchDate(searchDate);
     onSearchUser(searchUser);
     
-    onLogDatas(res.data);
+    onLogDatas(res.data);    
   };
  
   // type 변경 시 type별 형식에 맞는 날짜 리턴
@@ -89,6 +106,7 @@ export default function DownloadLogToolbar({ sParam, numSelected, onSearchType, 
 
   // 초기 화면 셋팅
   useEffect(() => {
+    callUserList(searchType, searchDate);
     callLogData(searchType, searchDate, searchUser);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -122,17 +140,33 @@ export default function DownloadLogToolbar({ sParam, numSelected, onSearchType, 
     callLogData(searchType, date, searchUser);
   };
   
-  const nameChange = (event) => {
+  const userChange = (event) => {
 
-    console.log("event.target.value", event.target.value);
-    const {
-      target: { value },
-    } = event;
-    setSearchUser(value);
+    console.log("event.target", event.target);
+    
+
+    event.preventDefault();
+    try {
+      const {
+        target: { value },
+      } = event;
+      setSearchUser(value);
+      
+      console.log('user==>', value);
+
+      const date = getSearchDateForChangeType(searchType, searchDate);
+
+      console.log('date==>', date);
+
+      callLogData(searchType, date, value);      
+
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
-    <StyledRoot sx={{...(numSelected > 0 && {color: 'primary.main', bgcolor: 'primary.lighter',}),}}>
+    <StyledRoot>
       <Box sx={{ display: 'flex', justifyContent: 'left' }}>
         <div>
           <FormControl sx={{ m: 2, minWidth: 120, ml: 'auto' }}>
@@ -166,17 +200,20 @@ export default function DownloadLogToolbar({ sParam, numSelected, onSearchType, 
         </LocalizationProvider>
         <div>
           <FormControl sx={{ m: 2, width: 300 }}>
+            <InputLabel id="demo-multiple-checkbox-label">사용자</InputLabel>
             <Select
               id="searchUser"
+              labelId="demo-multiple-checkbox-label"
               single
               value={searchUser}
-              onChange={nameChange}
+              onChange={userChange}
               MenuProps={MenuProps}
               defaultValue="All"
+              input={<OutlinedInput label="사용자" />}
             >
-              {USERS.map((value) => (
-                <MenuItem key={value.userid} value={value.username}>
-                  {value.username}
+              {userList.map((value) => (
+                <MenuItem key={value.user_id} value={value.user_id}>
+                  {value.user_name}
                 </MenuItem>
               ))}
             </Select>
