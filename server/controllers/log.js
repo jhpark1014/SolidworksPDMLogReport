@@ -8,45 +8,47 @@ async function getLogData(tableName, req) {
   const user_id = req.query.user_id;   
 
   try {                 
-    const pool = await db;      
-    const result = await pool
-      .request()                  
-      .input('SEARCH_TYPE', searchtype)
-      .input('SEARCH_DATE', searchdate)
-      .input('USER_ID', user_id)
-      //.output('TOTAL', 0)
-      .execute('dbo.' + tableName)
-      .then((result) => {
-        const result_data = {
-          //total: result.output.TOTAL,
-          result: result.recordset,
-        };            
-        return result_data;
-      })
-      .catch((err) => {
-        console.log('err', err);
-      });                  
-
-    const reault_data = result.result; 
-
-    reault_data.forEach((data, idx) => {
-      let logdata = new Object() ;
-      
-      logdata.id = idx;        
-      logdata.userid = data.user_id;        
-      logdata.username = data.user_name;        
-      logdata.department = data.department;
-      //console.log("data==>", data);
-
-      logdata.logdata = Object.values(JSON.parse(
-        JSON.stringify(data, (key, value) => {                      
-          const ret = (typeof value !== "object") ? ((isNaN(parseInt(key))) ? undefined : value) : value;
-          return ret;            
+    if (user_id !== '') {        
+      const pool = await db;      
+      const result = await pool
+        .request()                  
+        .input('SEARCH_TYPE', searchtype)
+        .input('SEARCH_DATE', searchdate)
+        .input('USER_ID', user_id)
+        //.output('TOTAL', 0)
+        .execute('dbo.' + tableName)
+        .then((result) => {
+          const result_data = {
+            //total: result.output.TOTAL,
+            result: result.recordset,
+          };            
+          return result_data;
         })
-      ));
+        .catch((err) => {
+          console.log('err', err);
+        });                  
 
-      arr_result[idx] = logdata;
-    });       
+      const reault_data = result.result; 
+
+      reault_data.forEach((data, idx) => {
+        let logdata = new Object() ;
+        
+        logdata.id = idx;        
+        logdata.userid = data.user_id;        
+        logdata.username = data.user_name;        
+        logdata.department = data.department;
+        //console.log("data==>", data);
+
+        logdata.logdata = Object.values(JSON.parse(
+          JSON.stringify(data, (key, value) => {                      
+            const ret = (typeof value !== "object") ? ((isNaN(parseInt(key))) ? undefined : value) : value;
+            return ret;            
+          })
+        ));
+
+        arr_result[idx] = logdata;
+      });    
+    }   
   } catch (err) {
     console.log(err);
   }
@@ -74,13 +76,13 @@ export const versionupList = async (req,res)=>{
 
 // 로그인 로그(사용자)
 export const loginuserList = async (req,res)=>{
+  let arr_result = [];  // 결과값 저장
   const searchtype = req.query.search_type;
   const searchdate = req.query.search_date;
   const lic_id = req.query.lic_id;    
   try {          
-    let arr_result = [];  // 결과값 저장
-
     if (lic_id !== '') {
+
       const pool = await db;      
       const result = await pool
         .request()                  
@@ -141,15 +143,14 @@ export const loginuserList = async (req,res)=>{
 }
 
 // 로그인 로그(라이선스), /logs/loginlicense
-export const loginlicenseList = async (req,res) => {
-  //res.json("loginlicenseList from controller");
+export const loginlicenseList = async (req,res) => {  
+  let arr_result = [];  // 결과값 저장
   const searchtype = req.query.search_type;
   const searchdate = req.query.search_date;
   const lic_id = req.query.lic_id;    
   try {       
-    let arr_result = [];  // 결과값 저장
-
     if (lic_id !== '') {
+
       const pool = await db;      
       const result = await pool
         .request()                  
