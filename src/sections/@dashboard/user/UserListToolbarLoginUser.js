@@ -60,35 +60,35 @@ const MenuProps = {
 
 // ----------------------------------------------------------------------
 
-UserListToolbarLoginLog.propTypes = {
+UserListToolbarLoginUser.propTypes = {
   // numSelected: PropTypes.number,
-  pageType: PropTypes.string,
+  // pageType: PropTypes.string,
   onSearchOption: PropTypes.func,
   onDateOption: PropTypes.func,
   onLicenseOption: PropTypes.func,
 };
 
-export default function UserListToolbarLoginLog({
+export default function UserListToolbarLoginUser({
   // numSelected,
-  pageType,
   onSearchOption,
   onDateOption, // 선택한 날짜 넘겨주는 function
   onLicenseOption,
   onLogDatas,
 }) {
-  // console.log('무한루프툴바', pageType);
+  console.log('Rendering 됨');
   const today = dayjs();
   const todayString = today.format('YYYY-MM-DD'); // 오늘 날짜(년-월) 리턴
   const [selectedOption, setSelectedSearch] = useState('day'); // 날짜 검색 옵션
   const [selectedDate, setSelectedDate] = useState(todayString); // 검색할 날짜
-  const [licenseList, setLicenseList] = useState([]); // 선택 날짜에서의 License List 목록
-  const [licenseName, setLicenseName] = useState([]); // License List의 license 이름들만
-  const [selectedLicense, setSelectedLicense] = useState(pageType === 'license' ? 'All' : ''); // select에 보여질 license 이름
+  const [licenseList, setLicenseList] = useState(['']); // 선택 날짜에서의 License List 목록
+  const [licenseName, setLicenseName] = useState(['']); // License List의 license 이름들만
+  const [selectedLicense, setSelectedLicense] = useState(''); // select에 보여질 license 이름
+  const [loading, setLoading] = useState(false);
 
   // const [selectedLicense, setSelectedLicense] = useState(pageType === 'license' ? 'All' : licenseName[0]); // select에 보여질 license 이름
 
   // server에서 License List 가져오기
-  const callLicenseList = async (pageType, searchType, searchDate) => {
+  const callLicenseList = async (searchType, searchDate) => {
     const url = `/logs/licenselist?search_type=${searchType}&search_date=${searchDate}`;
     const res = await axios.get(url);
     console.log('license list url', url);
@@ -101,37 +101,28 @@ export default function UserListToolbarLoginLog({
       console.log('empty');
     } else {
       setLicenseList(res.data);
-      if (pageType === 'license') {
-        // 라이선스 로그일때는 All이 있음
-        setLicenseName(['All', ...res.data.map((license) => license.lic_id)]);
-        console.log(selectedLicense, 'selectedlicense');
-        if (selectedLicense.length === 0) {
-          console.log('if절');
-          setSelectedLicense('All');
-        }
-        console.log(selectedLicense, '확인용');
+      setLicenseName(res.data.map((license) => license.lic_id));
+      console.log('else', licenseList, licenseName, selectedLicense);
+      // 전에 비었을 시 default는 첫번째
+      if (selectedLicense.length === 0) {
+        console.log('if절');
+        setSelectedLicense(res.data[0].lic_id);
       } else {
+        console.log(selectedLicense, '확인용');
         // 사용자 로그일때는 All이 없음
-        setLicenseName(res.data.map((license) => license.lic_id));
-        setSelectedLicense(licenseName[0]);
+        // setSelectedLicense(res.data[0].lic_id);
       }
     }
   };
 
   // server 에서 response 데이터 가져오기
-  const callLogData = async (pageType, searchType, searchDate, selectedLicense) => {
+  const callLogData = async (searchType, searchDate, selectedLicense) => {
+    console.log('calllogdata');
     // const res = [];
-    if (pageType === 'license') {
-      const url = `/logs/loginlicense?search_type=${searchType}&search_date=${searchDate}&lic_id=${selectedLicense}`;
-      console.log('log data url_license', url);
-      const res = await axios.get(url);
-      onLogDatas(res.data);
-    } else {
-      const url = `/logs/loginuser?search_type=${searchType}&search_date=${searchDate}&lic_id=${selectedLicense}`;
-      const res = await axios.get(url);
-      onLogDatas(res.data);
-      console.log('log data url_user', url);
-    }
+    const url = `/logs/loginuser?search_type=${searchType}&search_date=${searchDate}&lic_id=${selectedLicense}`;
+    console.log('log data url_user', url);
+    const res = await axios.get(url);
+    onLogDatas(res.data);
 
     onSearchOption(searchType);
     onDateOption(searchDate);
@@ -153,11 +144,24 @@ export default function UserListToolbarLoginLog({
       : `${date.format('YYYY')}`;
   };
 
+  // useEffect(() => {
+  //   setLoading(true);
+  //   console.log('changed', selectedLicense, loading);
+  // }, [selectedLicense]);
+
+  // useEffect(() => {
+  //   setSelectedLicense(licenseName[0]);
+  //   console.log('ㅁㄴ이ㅏ러', licenseList, licenseName, selectedLicense);
+  // }, [selectedLicense]);ㅑ
+
   // 초기 값 주기
   useEffect(() => {
-    callLicenseList(pageType, selectedOption, selectedDate);
-    callLogData(pageType, selectedOption, selectedDate, selectedLicense);
-  }, []);
+    async function initialState() {
+      await callLicenseList(selectedOption, selectedDate);
+      await callLogData(selectedOption, selectedDate, selectedLicense);
+    }
+    initialState();
+  }, [selectedLicense]);
 
   // 날짜 검색 옵션 바꿀 시
   const optionChange = async (e) => {
@@ -170,8 +174,8 @@ export default function UserListToolbarLoginLog({
       const searchDate = getSearchDateForChangeType(type, selectedDate);
       console.log('searchDate', searchDate, selectedDate);
 
-      callLicenseList(pageType, type, searchDate);
-      callLogData(pageType, type, searchDate, selectedLicense);
+      callLicenseList(type, searchDate);
+      callLogData(type, searchDate, selectedLicense);
 
       // const loadLicenseList = () => {callLicenseList(type, searchDate)}
       // // callLogData(pageType, type, searchDate, selectedLicense);
@@ -204,10 +208,10 @@ export default function UserListToolbarLoginLog({
       //   callLogData(pageType, selectedOption, searchDate, selectedLicense)
       // );
 
-      await callLicenseList(pageType, selectedOption, searchDate);
+      await callLicenseList(selectedOption, searchDate);
       console.log('여기');
       console.log(selectedLicense, '확인용2');
-      await callLogData(pageType, selectedOption, searchDate, selectedLicense);
+      await callLogData(selectedOption, searchDate, selectedLicense);
 
       console.log(
         'date change selectedOption: ',
@@ -236,7 +240,7 @@ export default function UserListToolbarLoginLog({
 
       const searchDate = getSearchDateForChangeType(selectedOption, selectedDate);
 
-      callLogData(pageType, selectedOption, searchDate, license);
+      callLogData(selectedOption, searchDate, license);
 
       console.log(
         'license change selectedOption: ',
@@ -350,8 +354,8 @@ export default function UserListToolbarLoginLog({
               labelId="demo-multiple-checkbox-label"
               id="demo-multiple-checkbox"
               // multiple
-              // value={selectedLicense}
-              value={licenseName[0]}
+              value={selectedLicense}
+              // value={licenseName[0]}
               onChange={licenseChange}
               input={<OutlinedInput label="라이선스" />}
               // renderValue={(selected) => selected.join(', ')}

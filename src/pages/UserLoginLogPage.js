@@ -28,7 +28,7 @@ import {
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { UserListHeadNotSort, UserListToolbarLoginLog } from '../sections/@dashboard/user';
+import { UserListHeadNotSort, UserListToolbarLoginUser } from '../sections/@dashboard/user';
 import UserLoginChartPage from './UserLoginChartPage';
 // mock
 import LOGLIST from '../_mock/logdata';
@@ -176,8 +176,8 @@ export default function UserLoginLogPage() {
       <ThemeProvider theme={themeWithLocale}>
         <Container maxWidth="false" disableGutters>
           <Card>
-            <UserListToolbarLoginLog
-              pageType="user"
+            <UserListToolbarLoginUser
+              // pageType="user"
               onSearchOption={setSearchType}
               onDateOption={setSearchDate}
               onLicenseOption={setSearchLicense}

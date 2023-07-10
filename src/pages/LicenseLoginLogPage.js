@@ -26,7 +26,7 @@ import { koKR } from '@mui/material/locale';
 // import Label from '../components/label';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { UserListHeadNotSort, UserListToolbarLoginLog } from '../sections/@dashboard/user';
+import { UserListHeadNotSort, UserListToolbarLoginLicense } from '../sections/@dashboard/user';
 import LicenseLoginChartPage from './LicenseLoginLogChartPage';
 // mock
 import LOGLIST from '../_mock/logdata';
@@ -158,7 +158,6 @@ function getTableHead(searchType) {
 }
 
 export default function LicenseLoginLogPage() {
-  // console.log('무한루프라이선스');
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('name');
@@ -224,8 +223,8 @@ export default function LicenseLoginLogPage() {
       <ThemeProvider theme={themeWithLocale}>
         {/* <Container maxWidth="false" disableGutters> */}
         <Card>
-          <UserListToolbarLoginLog
-            pageType="license"
+          <UserListToolbarLoginLicense
+            // pageType="license"
             onSearchOption={setSearchType}
             onDateOption={setSearchDate}
             onLicenseOption={setSearchLicense}

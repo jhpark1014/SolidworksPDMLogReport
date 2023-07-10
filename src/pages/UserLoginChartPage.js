@@ -25,6 +25,8 @@ import UserLoginReport from './UserLoginLogPage';
 
 export default function UserLoginLogChartPage({ title, subtitle, chartLabels, chartDatas }) {
   const theme = useTheme();
+  // console.log('차트출력');
+
   return (
     <>
       <Container maxWidth="false" disableGutters>
