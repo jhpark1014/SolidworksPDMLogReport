@@ -25,7 +25,6 @@ import UserLoginReport from './UserLoginLogPage';
 
 export default function UserLoginLogChartPage({ title, subtitle, chartLabels, chartDatas }) {
   const theme = useTheme();
-  console.log('무한루프차트');
   return (
     <>
       <Container maxWidth="false" disableGutters>
@@ -48,9 +47,17 @@ export default function UserLoginLogChartPage({ title, subtitle, chartLabels, ch
               };
             })}
             xaxis={{
-              title: { text: subtitle[0] === '일' ? '시간(시)' : subtitle[0] === '월' ? '날짜(일)' : '날짜(월)' },
+              style: { fontSize: '12px', fontFamily: '굴림체' },
+              title: { text: subtitle[0] === '일' ? '시간 (시)' : subtitle[0] === '월' ? '날짜 (일)' : '날짜 (월)' },
             }}
-            yaxis={{ title: { text: '횟수' } }}
+            yaxis={{
+              title: { text: '수량 (건)', style: { fontSize: '12px', fontFamily: '굴림체' } },
+              labels: {
+                formatter: (val) => {
+                  return val.toFixed(0);
+                },
+              },
+            }}
           />
         </Grid>
         <br />

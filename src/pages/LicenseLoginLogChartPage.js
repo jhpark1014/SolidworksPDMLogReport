@@ -62,8 +62,13 @@ export default function LicenseLoginChartPage({ title, subtitle, chartLabels, ch
           }}
           yaxis={{
             title: { text: '수량 (건)', style: { fontSize: '12px', fontFamily: '굴림체' } },
-            decimalsInFloat: 0,
+            // decimalsInFloat: 0,
             lines: { show: false },
+            labels: {
+              formatter: (val) => {
+                return val.toFixed(0);
+              },
+            },
           }}
         />
       </Grid>

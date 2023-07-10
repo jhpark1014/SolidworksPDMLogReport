@@ -29,7 +29,7 @@ export default function AppWebsiteVisits({ title, subheader, chartLabels, chartD
           if (typeof y !== 'undefined') {
             return `${y.toFixed(0)} 건`;
           }
-          return y;
+          return y.toFixed(0);
         },
       },
     },

@@ -83,10 +83,12 @@ export default function UserListToolbarLoginLog({
   const [selectedDate, setSelectedDate] = useState(todayString); // 검색할 날짜
   const [licenseList, setLicenseList] = useState([]); // 선택 날짜에서의 License List 목록
   const [licenseName, setLicenseName] = useState([]); // License List의 license 이름들만
-  const [selectedLicense, setSelectedLicense] = useState('All'); // select에 보여질 license 이름
+  const [selectedLicense, setSelectedLicense] = useState(pageType === 'license' ? 'All' : ''); // select에 보여질 license 이름
+
+  // const [selectedLicense, setSelectedLicense] = useState(pageType === 'license' ? 'All' : licenseName[0]); // select에 보여질 license 이름
 
   // server에서 License List 가져오기
-  const callLicenseList = async (searchType, searchDate) => {
+  const callLicenseList = async (pageType, searchType, searchDate) => {
     const url = `/logs/licenselist?search_type=${searchType}&search_date=${searchDate}`;
     const res = await axios.get(url);
     console.log('license list url', url);
@@ -99,13 +101,20 @@ export default function UserListToolbarLoginLog({
       console.log('empty');
     } else {
       setLicenseList(res.data);
-      setLicenseName(['All', ...res.data.map((license) => license.lic_id)]);
-      console.log(selectedLicense, 'selectedlicense');
-      if (selectedLicense.length === 0) {
-        console.log('if절');
-        setSelectedLicense('All');
+      if (pageType === 'license') {
+        // 라이선스 로그일때는 All이 있음
+        setLicenseName(['All', ...res.data.map((license) => license.lic_id)]);
+        console.log(selectedLicense, 'selectedlicense');
+        if (selectedLicense.length === 0) {
+          console.log('if절');
+          setSelectedLicense('All');
+        }
+        console.log(selectedLicense, '확인용');
+      } else {
+        // 사용자 로그일때는 All이 없음
+        setLicenseName(res.data.map((license) => license.lic_id));
+        setSelectedLicense(licenseName[0]);
       }
-      console.log(selectedLicense, '확인용');
     }
   };
 
@@ -146,7 +155,7 @@ export default function UserListToolbarLoginLog({
 
   // 초기 값 주기
   useEffect(() => {
-    callLicenseList(selectedOption, selectedDate);
+    callLicenseList(pageType, selectedOption, selectedDate);
     callLogData(pageType, selectedOption, selectedDate, selectedLicense);
   }, []);
 
@@ -161,7 +170,7 @@ export default function UserListToolbarLoginLog({
       const searchDate = getSearchDateForChangeType(type, selectedDate);
       console.log('searchDate', searchDate, selectedDate);
 
-      callLicenseList(type, searchDate);
+      callLicenseList(pageType, type, searchDate);
       callLogData(pageType, type, searchDate, selectedLicense);
 
       // const loadLicenseList = () => {callLicenseList(type, searchDate)}
@@ -195,7 +204,7 @@ export default function UserListToolbarLoginLog({
       //   callLogData(pageType, selectedOption, searchDate, selectedLicense)
       // );
 
-      await callLicenseList(selectedOption, searchDate);
+      await callLicenseList(pageType, selectedOption, searchDate);
       console.log('여기');
       console.log(selectedLicense, '확인용2');
       await callLogData(pageType, selectedOption, searchDate, selectedLicense);
@@ -250,9 +259,6 @@ export default function UserListToolbarLoginLog({
     // );
   };
 
-  console.log('왜이려', licenseList, licenseName, selectedLicense);
-  // console.log('pagetype', pageType);
-
   // MULTIPLE SELECT일 때 쓰는 함수들
   // const checkAll = (checked) => {
   //   if (checked) {
@@ -285,17 +291,8 @@ export default function UserListToolbarLoginLog({
     setSelectedLicense(event.target.value);
   };
 
-  // console.log('toolbar: ', res);
-
   return (
-    <StyledRoot
-    // sx={{
-    //   ...(numSelected > 0 && {
-    //     color: 'primary.main',
-    //     bgcolor: 'primary.lighter',
-    //   }),
-    // }}
-    >
+    <StyledRoot>
       <Box sx={{ display: 'flex', justifyContent: 'left' }}>
         {/* 날짜 검색 옵션 */}
         <div>
@@ -353,8 +350,8 @@ export default function UserListToolbarLoginLog({
               labelId="demo-multiple-checkbox-label"
               id="demo-multiple-checkbox"
               // multiple
-              // value={licenseName.filter((license) => license !== 'all')}
-              value={selectedLicense}
+              // value={selectedLicense}
+              value={licenseName[0]}
               onChange={licenseChange}
               input={<OutlinedInput label="라이선스" />}
               // renderValue={(selected) => selected.join(', ')}
