@@ -51,7 +51,6 @@ export default function AppWebsiteVisits({
       },
     },
     annotations: { yaxis: other.annotations2 },
-    max: { yMaximum },
   });
   // console.log('chartdata', chartData);
   // console.log('chartdata2', chartData2);
