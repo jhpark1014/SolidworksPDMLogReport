@@ -202,6 +202,7 @@ export default function useChart(options) {
       },
     ],
   };
+  // console.log(merge(baseOptions, options));
 
   return merge(baseOptions, options);
 }

@@ -62,7 +62,7 @@ const MenuProps = {
 
 UserListToolbarLoginLicense.propTypes = {
   // numSelected: PropTypes.number,
-  // pageType: PropTypes.string,
+  onIsLoading: PropTypes.func,
   onSearchOption: PropTypes.func,
   onDateOption: PropTypes.func,
   onLicenseOption: PropTypes.func,
@@ -70,7 +70,7 @@ UserListToolbarLoginLicense.propTypes = {
 
 export default function UserListToolbarLoginLicense({
   // numSelected,
-  // pageType,
+  onIsLoading,
   onSearchOption,
   onDateOption, // 선택한 날짜 넘겨주는 function
   onLicenseOption,
@@ -127,11 +127,14 @@ export default function UserListToolbarLoginLicense({
     const url = `/logs/loginlicense?search_type=${searchType}&search_date=${searchDate}&lic_id=${selectedLicense}`;
     console.log('log data url_license', url);
     const res = await axios.get(url);
-    onLogDatas(res.data);
+
+    onIsLoading(false);
 
     onSearchOption(searchType);
     onDateOption(searchDate);
     onLicenseOption(selectedLicense);
+
+    onLogDatas(res.data);
   };
 
   // type별 형식에 맞는 날짜 리턴

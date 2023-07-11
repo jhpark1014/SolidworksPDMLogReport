@@ -25,23 +25,34 @@ LicenseLoginChartPage.propTypes = {
   subtitle: PropTypes.string,
   chartLabels: PropTypes.array,
   chartDatas: PropTypes.array,
+  chartDatas2: PropTypes.array,
 };
-
-function holdQtyArray(holdqty, data) {
-  const dataLength = data.length;
-  const array = new Array(dataLength).fill(holdqty);
-  console.log('array', array);
-  return array;
-}
 
 export default function LicenseLoginChartPage({ title, subtitle, chartLabels, chartDatas }) {
   const theme = useTheme();
+
+  const generateRandomColor = () => {
+    const randomNumber = Math.floor(Math.random() * 0xcccccc);
+    // console.log(randomNumber.toString(16));
+    return `#${randomNumber.toString(16).padEnd(6, 'c')}`;
+  };
+  function generateRandomColorArray(data) {
+    const colors = new Array(data.length);
+    return Array.from(colors, () => generateRandomColor());
+  }
+  const randomColors = generateRandomColorArray(chartDatas);
+
+  const holdQtyList = chartDatas.map((row) => row.holdqty);
+  const maxHoldQty = Math.max(...holdQtyList) + 3;
+
   return (
     <>
       <Grid item xs={12} md={12} lg={24}>
         <AppWebsiteVisits
           title={title}
           subheader={subtitle}
+          // max={20}
+          // max={Math.max(...holdQtyList) + 3}
           chartLabels={chartLabels.map((row) => {
             return row.label;
           })}
@@ -51,6 +62,22 @@ export default function LicenseLoginChartPage({ title, subtitle, chartLabels, ch
               type: 'line',
               fill: 'solid',
               data: row.logdata,
+              color: randomColors[row.id],
+            };
+          })}
+          annotations2={chartDatas.map((row) => {
+            return {
+              y: row.holdqty,
+              borderColor: randomColors[row.id],
+              strokeDashArray: 5,
+              label: {
+                borderColor: randomColors[row.id],
+                style: {
+                  color: '#fff',
+                  background: randomColors[row.id],
+                },
+                text: `${row.licname} 보유 수량`,
+              },
             };
           })}
           xaxis={{
@@ -62,13 +89,12 @@ export default function LicenseLoginChartPage({ title, subtitle, chartLabels, ch
           }}
           yaxis={{
             title: { text: '수량 (건)', style: { fontSize: '12px', fontFamily: '굴림체' } },
-            // decimalsInFloat: 0,
-            lines: { show: false },
             labels: {
               formatter: (val) => {
                 return val.toFixed(0);
               },
             },
+            max: maxHoldQty,
           }}
         />
       </Grid>

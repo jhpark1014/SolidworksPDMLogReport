@@ -2,15 +2,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 // @mui
 import { styled } from '@mui/material/styles';
-import {
-  Toolbar,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Box,
-  OutlinedInput,
-} from '@mui/material';
+import { Toolbar, FormControl, InputLabel, Select, MenuItem, Box, OutlinedInput } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useEffect, useState } from 'react';
@@ -46,12 +38,19 @@ DownloadLogToolbar.propTypes = {
   onSearchType: PropTypes.func,
   onSearchDate: PropTypes.func,
   onSearchUser: PropTypes.func,
-  onLogDatas: PropTypes.func,  
+  onLogDatas: PropTypes.func,
 };
 
-export default function DownloadLogToolbar({ sParam, onIsLoding, onSearchType, onSearchDate, onSearchUser, onLogDatas }) {  
+export default function DownloadLogToolbar({
+  sParam,
+  onIsLoding,
+  onSearchType,
+  onSearchDate,
+  onSearchUser,
+  onLogDatas,
+}) {
   const today = dayjs();
-  const dateString = today.format("YYYY-MM"); // 오늘 날짜(년-월) 리턴
+  const dateString = today.format('YYYY-MM'); // 오늘 날짜(년-월) 리턴
 
   const [searchType, setSearchType] = useState('month');
   const [searchDate, setSearchDate] = useState(dateString);
@@ -62,46 +61,45 @@ export default function DownloadLogToolbar({ sParam, onIsLoding, onSearchType, o
   const callUserList = async (searchType, searchDate) => {
     const url = `/logs/userlist?search_type=${searchType}&search_date=${searchDate}`;
     const res = await axios.get(url);
-    
-    if (res.data.length === 0) {      
-      setUserList([]);            
+
+    if (res.data.length === 0) {
+      setUserList([]);
       console.log('empty');
     } else {
-      const users = [{user_id: 'All', user_name: 'All'}].concat(res.data);
-      setUserList(users);      
+      const users = [{ user_id: 'All', user_name: 'All' }].concat(res.data);
+      setUserList(users);
     }
   };
 
   // server 에서 resopnse 데이터 가져오기
-  const callLogData =  async (searchType, searchDate, searchUser) => {
-    let url = ``;    
-    if (sParam === "download")
-      url = `/logs/download?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;    
-    else if (sParam === "newcreate")
-      url = `/logs/newcreate?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;    
-    else
-      url = `/logs/versionup?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;        
+  const callLogData = async (searchType, searchDate, searchUser) => {
+    let url = ``;
+    if (sParam === 'download')
+      url = `/logs/download?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
+    else if (sParam === 'newcreate')
+      url = `/logs/newcreate?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
+    else url = `/logs/versionup?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
 
-    console.log("url==>", url);
-    
+    console.log('url==>', url);
+
     const res = await axios.get(url);
-    
+
     onIsLoding(false);
     onSearchType(searchType);
     onSearchDate(searchDate);
     onSearchUser(searchUser);
-    
-    onLogDatas(res.data);    
+
+    onLogDatas(res.data);
   };
- 
+
   // type 변경 시 type별 형식에 맞는 날짜 리턴
   const getSearchDateForChangeType = (searchType, searchDate) => {
     const date = dayjs(searchDate);
-    return (         
-      searchType === "day" ? `${date.format("YYYY-MM-DD")}` 
-       : searchType === "month" ? `${date.format("YYYY-MM")}` 
-       : `${date.format("YYYY")}`
-    )
+    return searchType === 'day'
+      ? `${date.format('YYYY-MM-DD')}`
+      : searchType === 'month'
+      ? `${date.format('YYYY-MM')}`
+      : `${date.format('YYYY')}`;
   };
 
   // 초기 화면 셋팅
@@ -112,38 +110,33 @@ export default function DownloadLogToolbar({ sParam, onIsLoding, onSearchType, o
   }, []);
 
   const handleSearchType = async (event) => {
-    
     const type = event.target.value;
 
     const date = getSearchDateForChangeType(type, searchDate);
 
     setSearchType(type);
 
-    console.log("searchType==>", type);     
-    console.log("searchDate==>", date);     
-    console.log("searchUser==>", searchUser);           
+    console.log('searchType==>', type);
+    console.log('searchDate==>', date);
+    console.log('searchUser==>', searchUser);
 
     callLogData(type, date, searchUser);
-    
   };
 
-  const handleSearchDate = async (newValue) => {  
-         
+  const handleSearchDate = async (newValue) => {
     const date = getSearchDateForChangeType(searchType, newValue.$d);
 
     setSearchDate(date);
 
-    console.log("handleSearchDate searchType==>", searchType);     
-    console.log("handleSearchDate searchDate==>", date);     
-    console.log("handleSearchDate searchUser==>", searchUser); 
-    
+    console.log('handleSearchDate searchType==>', searchType);
+    console.log('handleSearchDate searchDate==>', date);
+    console.log('handleSearchDate searchUser==>', searchUser);
+
     callLogData(searchType, date, searchUser);
   };
-  
-  const userChange = (event) => {
 
-    console.log("event.target", event.target);
-    
+  const userChange = (event) => {
+    console.log('event.target', event.target);
 
     event.preventDefault();
     try {
@@ -151,15 +144,14 @@ export default function DownloadLogToolbar({ sParam, onIsLoding, onSearchType, o
         target: { value },
       } = event;
       setSearchUser(value);
-      
+
       console.log('user==>', value);
 
       const date = getSearchDateForChangeType(searchType, searchDate);
 
       console.log('date==>', date);
 
-      callLogData(searchType, date, value);      
-
+      callLogData(searchType, date, value);
     } catch (err) {
       console.log(err);
     }
@@ -194,8 +186,8 @@ export default function DownloadLogToolbar({ sParam, onIsLoding, onSearchType, o
             minDate={dayjs('2015-01-01')}
             maxDate={dayjs()}
             format={searchType === 'month' ? 'YYYY-MM' : 'YYYY'}
-            defaultValue={dayjs()}            
-            onAccept={(newValue) => handleSearchDate(newValue)}            
+            defaultValue={dayjs()}
+            onAccept={(newValue) => handleSearchDate(newValue)}
           />
         </LocalizationProvider>
         <div>

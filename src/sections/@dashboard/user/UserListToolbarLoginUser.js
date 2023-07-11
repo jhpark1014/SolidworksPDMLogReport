@@ -62,7 +62,7 @@ const MenuProps = {
 
 UserListToolbarLoginUser.propTypes = {
   // numSelected: PropTypes.number,
-  // pageType: PropTypes.string,
+  onIsLoading: PropTypes.func,
   onSearchOption: PropTypes.func,
   onDateOption: PropTypes.func,
   onLicenseOption: PropTypes.func,
@@ -70,6 +70,7 @@ UserListToolbarLoginUser.propTypes = {
 
 export default function UserListToolbarLoginUser({
   // numSelected,
+  onIsLoading,
   onSearchOption,
   onDateOption, // 선택한 날짜 넘겨주는 function
   onLicenseOption,
@@ -83,7 +84,6 @@ export default function UserListToolbarLoginUser({
   const [licenseList, setLicenseList] = useState(['']); // 선택 날짜에서의 License List 목록
   const [licenseName, setLicenseName] = useState(['']); // License List의 license 이름들만
   const [selectedLicense, setSelectedLicense] = useState(''); // select에 보여질 license 이름
-  const [loading, setLoading] = useState(false);
 
   // const [selectedLicense, setSelectedLicense] = useState(pageType === 'license' ? 'All' : licenseName[0]); // select에 보여질 license 이름
 
@@ -124,6 +124,7 @@ export default function UserListToolbarLoginUser({
     const res = await axios.get(url);
     onLogDatas(res.data);
 
+    onIsLoading(false);
     onSearchOption(searchType);
     onDateOption(searchDate);
     onLicenseOption(selectedLicense);
@@ -143,11 +144,6 @@ export default function UserListToolbarLoginUser({
       ? `${date.format('YYYY-MM')}`
       : `${date.format('YYYY')}`;
   };
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   console.log('changed', selectedLicense, loading);
-  // }, [selectedLicense]);
 
   // useEffect(() => {
   //   setSelectedLicense(licenseName[0]);

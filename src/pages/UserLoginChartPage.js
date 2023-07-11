@@ -25,7 +25,19 @@ import UserLoginReport from './UserLoginLogPage';
 
 export default function UserLoginLogChartPage({ title, subtitle, chartLabels, chartDatas }) {
   const theme = useTheme();
-  // console.log('차트출력');
+  const generateRandomColor = () => {
+    const randomNumber = Math.floor(Math.random() * 0xcccccc);
+    // console.log(randomNumber.toString(16));
+    return `#${randomNumber.toString(16).padEnd(6, 'c')}`;
+  };
+  function generateRandomColorArray(data) {
+    const colors = new Array(data.length);
+    return Array.from(colors, () => generateRandomColor());
+  }
+  const randomColors = generateRandomColorArray(chartDatas);
+
+  const holdQtyList = chartDatas.map((row) => row.holdqty);
+  const maxHoldQty = Math.max(...holdQtyList) + 3;
 
   return (
     <>
@@ -46,6 +58,22 @@ export default function UserLoginLogChartPage({ title, subtitle, chartLabels, ch
                 type: 'line',
                 fill: 'solid',
                 data: row.logdata,
+                color: randomColors[row.id],
+              };
+            })}
+            annotations2={chartDatas.map((row) => {
+              // console.log('holdqty', row.holdqty);
+              return {
+                y: row.holdqty,
+                borderColor: randomColors[row.id],
+                label: {
+                  borderColor: randomColors[row.id],
+                  style: {
+                    color: '#fff',
+                    background: randomColors[row.id],
+                  },
+                  text: `${row.username} 보유 수량`,
+                },
               };
             })}
             xaxis={{
@@ -59,6 +87,7 @@ export default function UserLoginLogChartPage({ title, subtitle, chartLabels, ch
                   return val.toFixed(0);
                 },
               },
+              max: maxHoldQty,
             }}
           />
         </Grid>
