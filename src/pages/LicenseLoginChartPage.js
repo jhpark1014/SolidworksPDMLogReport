@@ -25,7 +25,6 @@ LicenseLoginChartPage.propTypes = {
   subtitle: PropTypes.string,
   chartLabels: PropTypes.array,
   chartDatas: PropTypes.array,
-  chartDatas2: PropTypes.array,
 };
 
 export default function LicenseLoginChartPage({ title, subtitle, chartLabels, chartDatas }) {
@@ -51,8 +50,6 @@ export default function LicenseLoginChartPage({ title, subtitle, chartLabels, ch
         <AppWebsiteVisits
           title={title}
           subheader={subtitle}
-          // max={20}
-          // max={Math.max(...holdQtyList) + 3}
           chartLabels={chartLabels.map((row) => {
             return row.label;
           })}

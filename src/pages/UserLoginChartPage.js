@@ -61,21 +61,6 @@ export default function UserLoginLogChartPage({ title, subtitle, chartLabels, ch
                 color: randomColors[row.id],
               };
             })}
-            annotations2={chartDatas.map((row) => {
-              // console.log('holdqty', row.holdqty);
-              return {
-                y: row.holdqty,
-                borderColor: randomColors[row.id],
-                label: {
-                  borderColor: randomColors[row.id],
-                  style: {
-                    color: '#fff',
-                    background: randomColors[row.id],
-                  },
-                  text: `${row.username} 보유 수량`,
-                },
-              };
-            })}
             xaxis={{
               style: { fontSize: '12px', fontFamily: '굴림체' },
               title: { text: subtitle[0] === '일' ? '시간 (시)' : subtitle[0] === '월' ? '날짜 (일)' : '날짜 (월)' },

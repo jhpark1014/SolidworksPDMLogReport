@@ -11,30 +11,13 @@ AppWebsiteVisits.propTypes = {
   title: PropTypes.string,
   subheader: PropTypes.string,
   chartData: PropTypes.array.isRequired,
-  chartData2: PropTypes.array,
   chartLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-export default function AppWebsiteVisits({
-  title,
-  subheader,
-  chartLabels,
-  chartData,
-  chartData2,
-  // annotations,
-  ...other
-}) {
-  // console.log('chartdata', chartData);
-  // console.log('chartdata2', chartData2);
-  console.log('annotations', other.annotations2);
-  // if (chartData2) {
-  //   chartData = chartData.map((data, idx) => [...data, chartData2[idx]]);
-
-  // }
+export default function AppWebsiteVisits({ title, subheader, chartLabels, chartData, ...other }) {
   const chartOptions = useChart({
     plotOptions: { bar: { columnWidth: '16%' } },
     fill: { type: chartData.map((i) => i.fill) },
-    // stroke: { dashArray: [0, 0, 0, 0, 5, 5, 5, 5] },
     labels: chartLabels,
     xaxis: other.xaxis,
     yaxis: other.yaxis,
@@ -53,7 +36,6 @@ export default function AppWebsiteVisits({
     annotations: { yaxis: other.annotations2 },
   });
   // console.log('chartdata', chartData);
-  // console.log('chartdata2', chartData2);
 
   return (
     <Card {...other}>

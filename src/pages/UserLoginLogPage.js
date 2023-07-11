@@ -38,7 +38,7 @@ import LOGLIST from '../_mock/logdata';
 // Table Headers
 const TABLE_HEAD = [
   { id: 'userName', label: '사용자', alignRight: false },
-  { id: 'holdQty', label: '보유 수량', alignRight: false },
+  { id: 'department', label: '부서', alignRight: false },
 ];
 
 const TABLE_HEAD_YEAR = [
