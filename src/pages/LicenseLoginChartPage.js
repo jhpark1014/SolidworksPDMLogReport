@@ -43,6 +43,8 @@ export default function LicenseLoginChartPage({ title, subtitle, chartLabels, ch
 
   const holdQtyList = chartDatas.map((row) => row.holdqty);
   const maxHoldQty = Math.max(...holdQtyList) + 3;
+  console.log('chartdata', chartDatas);
+  console.log('ymax', holdQtyList, maxHoldQty);
 
   return (
     <>
@@ -82,7 +84,6 @@ export default function LicenseLoginChartPage({ title, subtitle, chartLabels, ch
               style: { fontSize: '12px', fontFamily: '굴림체' },
               text: subtitle[0] === '일' ? '시간 (시)' : subtitle[0] === '월' ? '날짜 (일)' : '날짜 (월)',
             },
-            // axisTicks: { show: true },
           }}
           yaxis={{
             title: { text: '수량 (건)', style: { fontSize: '12px', fontFamily: '굴림체' } },

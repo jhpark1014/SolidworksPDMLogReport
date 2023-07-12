@@ -6,6 +6,7 @@ import { AppWebsiteVisits } from '../sections/@dashboard/app';
 // ----------------------------------------------------------------------
 
 export default function PDMLogChartPage(values) {
+  console.log('pdm chart renderingg', values);
   return (
     <Container maxWidth="false" disableGutters>
       <Grid item xs={12} md={6} lg={12}>

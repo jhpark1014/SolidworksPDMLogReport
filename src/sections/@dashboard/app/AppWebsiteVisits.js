@@ -35,7 +35,7 @@ export default function AppWebsiteVisits({ title, subheader, chartLabels, chartD
     },
     annotations: { yaxis: other.annotations2 },
   });
-  // console.log('chartdata', chartData);
+  console.log('label', chartLabels);
 
   return (
     <Card {...other}>

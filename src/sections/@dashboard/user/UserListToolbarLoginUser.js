@@ -76,7 +76,6 @@ export default function UserListToolbarLoginUser({
   onLicenseOption,
   onLogDatas,
 }) {
-  
   const today = dayjs();
   const todayString = today.format('YYYY-MM-DD'); // 오늘 날짜(년-월) 리턴
   const [selectedOption, setSelectedSearch] = useState('day'); // 날짜 검색 옵션
@@ -91,31 +90,32 @@ export default function UserListToolbarLoginUser({
   const callLicenseList = async (searchType, searchDate) => {
     const url = `/logs/licenselist?search_type=${searchType}&search_date=${searchDate}`;
     const res = await axios.get(url);
-    
+
     const lics = [];
     if (res.data.length === 0) {
       setLicenseList(lics);
-    } else {                              
+    } else {
       setLicenseList(lics.concat(res.data));
-      if (selectedLicense.length === 0) setSelectedLicense(res.data[0].lic_id);
+      setSelectedLicense(() => res.data[0].lic_id);
     }
+    // return res.data[0].lic_id;
 
     // if (res.data.length === 0) {
     //   // 보유 라이선스 없음
     //   setLicenseList([]);
     //   setLicenseName([]);
     //   setSelectedLicense('');
-      
+
     // } else {
     //   setLicenseList(res.data);
     //   setLicenseName(res.data.map((license) => license.lic_id));
-      
+
     //   // 전에 비었을 시 default는 첫번째
     //   if (selectedLicense.length === 0) {
-      
+
     //     setSelectedLicense(res.data[0].lic_id);
     //   } else {
-      
+
     //     // 사용자 로그일때는 All이 없음
     //     // setSelectedLicense(res.data[0].lic_id);
     //   }
@@ -124,10 +124,9 @@ export default function UserListToolbarLoginUser({
 
   // server 에서 response 데이터 가져오기
   const callLogData = async (searchType, searchDate, selectedLicense) => {
-    
     // const res = [];
     const url = `/logs/loginuser?search_type=${searchType}&search_date=${searchDate}&lic_id=${selectedLicense}`;
-    
+
     const res = await axios.get(url);
     onLogDatas(res.data);
 
@@ -168,8 +167,9 @@ export default function UserListToolbarLoginUser({
 
   useEffect(() => {
     callLicenseList(selectedOption, selectedDate);
+    // console.log('selectedd', selectedLicense);
     callLogData(selectedOption, selectedDate, selectedLicense);
-    
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -182,7 +182,6 @@ export default function UserListToolbarLoginUser({
       // setSearchOption(type);
 
       const searchDate = getSearchDateForChangeType(type, selectedDate);
-      
 
       callLicenseList(type, searchDate);
       callLogData(type, searchDate, selectedLicense);
@@ -190,7 +189,6 @@ export default function UserListToolbarLoginUser({
       // const loadLicenseList = () => {callLicenseList(type, searchDate)}
       // // callLogData(pageType, type, searchDate, selectedLicense);
       // useEffect()
-
     } catch (err) {
       console.log(err);
     }
@@ -210,8 +208,6 @@ export default function UserListToolbarLoginUser({
 
       callLicenseList(selectedOption, searchDate);
       callLogData(selectedOption, searchDate, selectedLicense);
-
-      
     } catch (err) {
       console.log(err);
     }
@@ -223,12 +219,10 @@ export default function UserListToolbarLoginUser({
     try {
       const license = e.target.value;
       setSelectedLicense(license);
-      
 
       const searchDate = getSearchDateForChangeType(selectedOption, selectedDate);
 
       callLogData(selectedOption, searchDate, license);
-
     } catch (err) {
       console.log(err);
     }
