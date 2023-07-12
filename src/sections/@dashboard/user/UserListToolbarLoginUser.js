@@ -18,8 +18,6 @@ import { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import axios from 'axios';
-// import data
-import LOGLIST from '../../../_mock/logdata';
 
 // ----------------------------------------------------------------------
 
