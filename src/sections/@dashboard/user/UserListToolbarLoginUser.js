@@ -82,7 +82,7 @@ export default function UserListToolbarLoginUser({
   const [selectedLicense, setSelectedLicense] = useState(''); // select에 보여질 license 이름
 
   // const [selectedLicense, setSelectedLicense] = useState(pageType === 'license' ? 'All' : licenseName[0]); // select에 보여질 license 이름
-// server에서 License List 가져오기
+  // server에서 License List 가져오기
   async function callLicenseList(searchType, searchDate) {
     const url = `/logs/licenselist?search_type=${searchType}&search_date=${searchDate}`;
     const res = await axios.get(url);
