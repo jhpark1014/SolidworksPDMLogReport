@@ -72,7 +72,6 @@ export default function UserListToolbarLoginUser({
   onLicenseOption,
   onLogDatas,
 }) {
-  
   const today = dayjs();
   const todayString = today.format('YYYY-MM-DD'); // 오늘 날짜(년-월) 리턴
   const [selectedOption, setSelectedSearch] = useState('day'); // 날짜 검색 옵션
@@ -143,7 +142,7 @@ export default function UserListToolbarLoginUser({
     }
 
     const url = `/logs/loginuser?search_type=${searchType}&search_date=${searchDate}&lic_id=${selectedLicense}`;
-    
+
     const res = await axios.get(url);
     onLogDatas(res.data);
 
@@ -196,14 +195,12 @@ export default function UserListToolbarLoginUser({
       // setSearchOption(type);
 
       const searchDate = getSearchDateForChangeType(type, selectedDate);
-      
 
       callLogData(type, searchDate, selectedLicense);
 
       // const loadLicenseList = () => {callLicenseList(type, searchDate)}
       // // callLogData(pageType, type, searchDate, selectedLicense);
       // useEffect()
-
     } catch (err) {
       console.log(err);
     }
@@ -222,8 +219,6 @@ export default function UserListToolbarLoginUser({
       // );
 
       callLogData(selectedOption, searchDate, selectedLicense);
-
-      
     } catch (err) {
       console.log(err);
     }
@@ -239,7 +234,6 @@ export default function UserListToolbarLoginUser({
       const searchDate = getSearchDateForChangeType(selectedOption, selectedDate);
 
       callLogData(selectedOption, searchDate, license);
-
     } catch (err) {
       console.log(err);
     }
