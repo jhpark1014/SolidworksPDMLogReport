@@ -8,18 +8,14 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Checkbox,
-  ListItemText,
   Box,
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import axios from 'axios';
-// import data
-import LOGLIST from '../../../_mock/logdata';
 
 // ----------------------------------------------------------------------
 
@@ -86,46 +82,66 @@ export default function UserListToolbarLoginUser({
   const [selectedLicense, setSelectedLicense] = useState(''); // select에 보여질 license 이름
 
   // const [selectedLicense, setSelectedLicense] = useState(pageType === 'license' ? 'All' : licenseName[0]); // select에 보여질 license 이름
-
-  // server에서 License List 가져오기
-  const callLicenseList = async (searchType, searchDate) => {
+// server에서 License List 가져오기
+  async function callLicenseList(searchType, searchDate) {
     const url = `/logs/licenselist?search_type=${searchType}&search_date=${searchDate}`;
     const res = await axios.get(url);
     
-    const lics = [];
-    if (res.data.length === 0) {
-      setLicenseList(lics);
-    } else {                              
-      setLicenseList(lics.concat(res.data));
-      if (selectedLicense.length === 0) setSelectedLicense(res.data[0].lic_id);
-    }
+    return res.data;
+  }
 
-    // if (res.data.length === 0) {
-    //   // 보유 라이선스 없음
-    //   setLicenseList([]);
-    //   setLicenseName([]);
-    //   setSelectedLicense('');
+
+
+  // const callLicenseList = async (searchType, searchDate) => {
+  //   const url = `/logs/licenselist?search_type=${searchType}&search_date=${searchDate}`;
+  //   const res = await axios.get(url);
+    
+  //   const lics = [];
+  //   if (res.data.length === 0) {
+  //     setLicenseList(lics);
+  //   } else {                              
+  //     setLicenseList(lics.concat(res.data));
+  //     console.log("selectedLicense.==>",selectedLicense.length);
+  //     if (selectedLicense.length === 0) {
+  //       console.log("res.data[0].lic_id.==>",res.data[0].lic_id);
+  //       setSelectedLicense(res.data[0].lic_id);
+  //       firstLicense = res.data[0].lic_id;
+  //     }
       
-    // } else {
-    //   setLicenseList(res.data);
-    //   setLicenseName(res.data.map((license) => license.lic_id));
+  //   }
+
+  //   // if (res.data.length === 0) {
+  //   //   // 보유 라이선스 없음
+  //   //   setLicenseList([]);
+  //   //   setLicenseName([]);
+  //   //   setSelectedLicense('');
       
-    //   // 전에 비었을 시 default는 첫번째
-    //   if (selectedLicense.length === 0) {
+  //   // } else {
+  //   //   setLicenseList(res.data);
+  //   //   setLicenseName(res.data.map((license) => license.lic_id));
       
-    //     setSelectedLicense(res.data[0].lic_id);
-    //   } else {
+  //   //   // 전에 비었을 시 default는 첫번째
+  //   //   if (selectedLicense.length === 0) {
       
-    //     // 사용자 로그일때는 All이 없음
-    //     // setSelectedLicense(res.data[0].lic_id);
-    //   }
-    // }
-  };
+  //   //     setSelectedLicense(res.data[0].lic_id);
+  //   //   } else {
+      
+  //   //     // 사용자 로그일때는 All이 없음
+  //   //     // setSelectedLicense(res.data[0].lic_id);
+  //   //   }
+  //   // }
+  // };
 
   // server 에서 response 데이터 가져오기
   const callLogData = async (searchType, searchDate, selectedLicense) => {
-    
-    // const res = [];
+        
+    const lics = await callLicenseList(searchType, searchDate);
+    setLicenseList(lics);
+    if (lics.length > 0 && selectedLicense.length === 0) {
+      selectedLicense = lics[0].lic_id;
+      setSelectedLicense(lics[0].lic_id);  
+    }
+
     const url = `/logs/loginuser?search_type=${searchType}&search_date=${searchDate}&lic_id=${selectedLicense}`;
     
     const res = await axios.get(url);
@@ -166,10 +182,8 @@ export default function UserListToolbarLoginUser({
   //   initialState();
   // }, [selectedLicense]);
 
-  useEffect(() => {
-    callLicenseList(selectedOption, selectedDate);
+  useEffect(() => {    
     callLogData(selectedOption, selectedDate, selectedLicense);
-    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -184,7 +198,6 @@ export default function UserListToolbarLoginUser({
       const searchDate = getSearchDateForChangeType(type, selectedDate);
       
 
-      callLicenseList(type, searchDate);
       callLogData(type, searchDate, selectedLicense);
 
       // const loadLicenseList = () => {callLicenseList(type, searchDate)}
@@ -208,7 +221,6 @@ export default function UserListToolbarLoginUser({
       //   callLogData(pageType, selectedOption, searchDate, selectedLicense)
       // );
 
-      callLicenseList(selectedOption, searchDate);
       callLogData(selectedOption, searchDate, selectedLicense);
 
       
@@ -218,12 +230,11 @@ export default function UserListToolbarLoginUser({
   };
 
   // 검색할 라이선스를 바꿀 시
-  const licenseChange = async (e) => {
+  const licenseChange = async (e) => {    
     e.preventDefault();
     try {
       const license = e.target.value;
       setSelectedLicense(license);
-      
 
       const searchDate = getSearchDateForChangeType(selectedOption, selectedDate);
 
@@ -336,7 +347,7 @@ export default function UserListToolbarLoginUser({
               onChange={licenseChange}
               input={<OutlinedInput label="라이선스" />}
               // renderValue={(selected) => selected.join(', ')}
-              MenuProps={MenuProps}
+              MenuProps={MenuProps}              
             >
               {/* <MenuItem key="all" value="all" onClick={(event) => checkAll(event.target.checked)}>
                 <Checkbox
