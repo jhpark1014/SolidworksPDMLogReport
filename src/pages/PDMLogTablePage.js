@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 // @mui
 import {
+  Link,
   Card,
   Table,
   Paper,
@@ -16,7 +17,7 @@ import {
 // components
 import Scrollbar from '../components/scrollbar';
 // sections
-import { DownloadLogToolbar, UserListHeadNotSort } from '../sections/@dashboard/user';
+import { PDMLogToolbar, LogListHead } from '../sections/@dashboard/log';
 
 // ----------------------------------------------------------------------
 
@@ -124,7 +125,7 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
   return (    
     <Container maxWidth="false" disableGutters>
       <Card>
-        <DownloadLogToolbar
+        <PDMLogToolbar
           sParam={sParam}
           onIsLoding={setIsLoding}
           onSearchType={setSearchType}
@@ -136,7 +137,7 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
         <Scrollbar>
           <TableContainer sx={{ minWidth: 800 }}>
             <Table>
-              <UserListHeadNotSort
+              <LogListHead
                 headLabel={tableHeadAll}                                                                         
               />
               <TableBody>
@@ -146,7 +147,9 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
                   return (
                     <TableRow hover key={id} tabIndex={-1}>
                       <TableCell align="left">
-                        <Typography variant="subtitle2" noWrap>{username}</Typography>
+                        <Typography variant="subtitle2" noWrap>
+                          <Link to="/downloadlog">{username}</Link>
+                        </Typography>
                       </TableCell>
 
                       <TableCell align="left">
@@ -183,7 +186,7 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
             </Table>
           </TableContainer>
         </Scrollbar>
-
+        
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
@@ -192,6 +195,7 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="max row"
         />
       </Card>
     </Container>    

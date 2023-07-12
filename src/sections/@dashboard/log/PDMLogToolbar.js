@@ -8,7 +8,6 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
-import USERS from '../../../_mock/users';
 
 // ----------------------------------------------------------------------
 
@@ -32,7 +31,7 @@ const MenuProps = {
 
 // ----------------------------------------------------------------------
 
-DownloadLogToolbar.propTypes = {
+PDMLogToolbar.propTypes = {
   sParam: PropTypes.string,
   onIsLoding: PropTypes.func,
   onSearchType: PropTypes.func,
@@ -41,7 +40,7 @@ DownloadLogToolbar.propTypes = {
   onLogDatas: PropTypes.func,
 };
 
-export default function DownloadLogToolbar({
+export default function PDMLogToolbar({
   sParam,
   onIsLoding,
   onSearchType,
@@ -62,12 +61,11 @@ export default function DownloadLogToolbar({
     const url = `/logs/userlist?search_type=${searchType}&search_date=${searchDate}`;
     const res = await axios.get(url);
 
+    const users = [{ user_id: 'All', user_name: 'All' }];
     if (res.data.length === 0) {
-      setUserList([]);
-      console.log('empty');
-    } else {
-      const users = [{ user_id: 'All', user_name: 'All' }].concat(res.data);
       setUserList(users);
+    } else {
+      setUserList(users.concat(res.data));
     }
   };
 
@@ -78,9 +76,8 @@ export default function DownloadLogToolbar({
       url = `/logs/download?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
     else if (sParam === 'newcreate')
       url = `/logs/newcreate?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
-    else url = `/logs/versionup?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
-
-    console.log('url==>', url);
+    else 
+      url = `/logs/versionup?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
 
     const res = await axios.get(url);
 
@@ -116,10 +113,7 @@ export default function DownloadLogToolbar({
 
     setSearchType(type);
 
-    console.log('searchType==>', type);
-    console.log('searchDate==>', date);
-    console.log('searchUser==>', searchUser);
-
+    callUserList(type, date);
     callLogData(type, date, searchUser);
   };
 
@@ -128,10 +122,7 @@ export default function DownloadLogToolbar({
 
     setSearchDate(date);
 
-    console.log('handleSearchDate searchType==>', searchType);
-    console.log('handleSearchDate searchDate==>', date);
-    console.log('handleSearchDate searchUser==>', searchUser);
-
+    callUserList(searchType, date);
     callLogData(searchType, date, searchUser);
   };
 
@@ -145,11 +136,7 @@ export default function DownloadLogToolbar({
       } = event;
       setSearchUser(value);
 
-      console.log('user==>', value);
-
       const date = getSearchDateForChangeType(searchType, searchDate);
-
-      console.log('date==>', date);
 
       callLogData(searchType, date, value);
     } catch (err) {
@@ -187,7 +174,7 @@ export default function DownloadLogToolbar({
             maxDate={dayjs()}
             format={searchType === 'month' ? 'YYYY-MM' : 'YYYY'}
             defaultValue={dayjs()}
-            onAccept={(newValue) => handleSearchDate(newValue)}
+            onAccept={handleSearchDate}
           />
         </LocalizationProvider>
         <div>
@@ -197,7 +184,7 @@ export default function DownloadLogToolbar({
               id="searchUser"
               labelId="demo-multiple-checkbox-label"
               single
-              value={searchUser}
+              value={userList.length === 1 ? 'All' : searchUser}
               onChange={userChange}
               MenuProps={MenuProps}
               defaultValue="All"

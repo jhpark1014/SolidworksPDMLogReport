@@ -76,7 +76,7 @@ export default function UserListToolbarLoginLicense({
   onLicenseOption,
   onLogDatas,
 }) {
-  console.log('Rendering 됨');
+  
   const today = dayjs();
   const todayString = today.format('YYYY-MM-DD'); // 오늘 날짜(년-월) 리턴
   const [selectedOption, setSelectedSearch] = useState('day'); // 날짜 검색 옵션
@@ -91,28 +91,35 @@ export default function UserListToolbarLoginLicense({
   // server에서 License List 가져오기
   const callLicenseList = async (searchType, searchDate) => {
     const url = `/logs/licenselist?search_type=${searchType}&search_date=${searchDate}`;
+    
     const res = await axios.get(url);
-    console.log('license list url', url);
-
+    
+    const lics = [{ lic_id: 'All', lic_name: 'All' }];
     if (res.data.length === 0) {
-      // 보유 라이선스 없음
-      setLicenseList([]);
-      setLicenseName([]);
-      setSelectedLicense('');
-      console.log('empty');
-    } else {
-      // 라이선스 있음
-      setLicenseList(res.data);
-      // console.log('else');
-      setLicenseName(['All', ...res.data.map((license) => license.lic_id)]);
-      console.log('else', licenseList, licenseName, selectedLicense);
-      // 전에 비었을 시 default All
-      if (selectedLicense.length === 0) {
-        console.log('if절');
-        setSelectedLicense('All');
-      }
-      console.log(selectedLicense, '확인용');
+      setLicenseList(lics);
+    } else {      
+      setLicenseList(lics.concat(res.data));
     }
+    
+    // if (res.data.length === 0) {
+    //   // 보유 라이선스 없음
+    //   setLicenseList([]);
+    //   setLicenseName([]);
+    //   setSelectedLicense('');
+      
+    // } else {
+    //   // 라이선스 있음
+    //   setLicenseList(res.data);
+    //   // console.log('else');      
+    //   setLicenseName(['All', ...res.data.map((license) => license.lic_id)]);
+      
+    //   // 전에 비었을 시 default All
+    //   if (selectedLicense.length === 0) {
+      
+    //     setSelectedLicense('All');
+    //   }
+      
+    // }
   };
 
   // useEffect(() => {
@@ -122,12 +129,12 @@ export default function UserListToolbarLoginLicense({
 
   // server 에서 response 데이터 가져오기
   const callLogData = async (searchType, searchDate, selectedLicense) => {
-    console.log('calllogdata');
+    
     // const res = [];
     const url = `/logs/loginlicense?search_type=${searchType}&search_date=${searchDate}&lic_id=${selectedLicense}`;
-    console.log('log data url_license', url);
+    
     const res = await axios.get(url);
-
+    
     onIsLoading(false);
 
     onSearchOption(searchType);
@@ -157,14 +164,20 @@ export default function UserListToolbarLoginLicense({
   //   console.log('changed', selectedLicense, loading);
   // }, [selectedLicense]);
 
-  // 초기 값 주기
+  // // 초기 값 주기
+  // useEffect(() => {
+  //   async function initialState() {
+  //     await callLicenseList(selectedOption, selectedDate);
+  //     await callLogData(selectedOption, selectedDate, selectedLicense);
+  //   }
+  //   initialState();
+  // }, [selectedLicense]);
+
   useEffect(() => {
-    async function initialState() {
-      await callLicenseList(selectedOption, selectedDate);
-      await callLogData(selectedOption, selectedDate, selectedLicense);
-    }
-    initialState();
-  }, [selectedLicense]);
+    callLicenseList(selectedOption, selectedDate);
+    callLogData(selectedOption, selectedDate, selectedLicense);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 날짜 검색 옵션 바꿀 시
   const optionChange = async (e) => {
@@ -175,7 +188,7 @@ export default function UserListToolbarLoginLicense({
       // setSearchOption(type);
 
       const searchDate = getSearchDateForChangeType(type, selectedDate);
-      console.log('searchDate', searchDate, selectedDate);
+      
 
       callLicenseList(type, searchDate);
       callLogData(type, searchDate, selectedLicense);
@@ -184,16 +197,7 @@ export default function UserListToolbarLoginLicense({
       // // callLogData(pageType, type, searchDate, selectedLicense);
       // useEffect()
 
-      console.log(
-        'option change selectedOption: ',
-        e.target.value,
-        'selectedDate: ',
-        searchDate,
-        'licenseName: ',
-        licenseName,
-        'selectedLicense',
-        selectedLicense
-      );
+      
     } catch (err) {
       console.log(err);
     }
@@ -211,23 +215,11 @@ export default function UserListToolbarLoginLicense({
       //   callLogData(pageType, selectedOption, searchDate, selectedLicense)
       // );
 
-      await callLicenseList(selectedOption, searchDate);
-      console.log('여기');
-      console.log(selectedLicense, '확인용2');
-      await callLogData(selectedOption, searchDate, selectedLicense);
+      callLicenseList(selectedOption, searchDate);
+      
+      
+      callLogData(selectedOption, searchDate, selectedLicense);
 
-      console.log(
-        'date change selectedOption: ',
-        selectedOption,
-        'selectedDate: ',
-        searchDate,
-        'licenselist',
-        licenseList,
-        'licenses: ',
-        licenseName,
-        'selectedLicense',
-        selectedLicense
-      );
     } catch (err) {
       console.log(err);
     }
@@ -239,22 +231,12 @@ export default function UserListToolbarLoginLicense({
     try {
       const license = e.target.value;
       setSelectedLicense(license);
-      console.log('license::::', license);
+
 
       const searchDate = getSearchDateForChangeType(selectedOption, selectedDate);
 
       callLogData(selectedOption, searchDate, license);
 
-      console.log(
-        'license change selectedOption: ',
-        e.target.value,
-        'selectedDate: ',
-        selectedDate,
-        'licenseName: ',
-        licenseName,
-        'selectedLicense',
-        selectedLicense
-      );
     } catch (err) {
       console.log(err);
     }
@@ -351,31 +333,23 @@ export default function UserListToolbarLoginLicense({
         {/* 라이선스 선택 */}
         <div>
           <FormControl sx={{ m: 2.5, width: 300 }}>
-            <InputLabel id="demo-multiple-checkbox-label">라이선스</InputLabel>
+            <InputLabel id="demo-multiple-checkbox-label">라이선스</InputLabel>            
             <Select
               sx={{ height: 56 }}
               labelId="demo-multiple-checkbox-label"
               id="demo-multiple-checkbox"
               // multiple
-              value={selectedLicense}
+              value={licenseList.length===1 ? 'All' : selectedLicense}
               // value={licenseName[0]}
               onChange={licenseChange}
               input={<OutlinedInput label="라이선스" />}
               // renderValue={(selected) => selected.join(', ')}
               MenuProps={MenuProps}
+              defaultValue="All"
             >
-              {/* <MenuItem key="all" value="all" onClick={(event) => checkAll(event.target.checked)}>
-                <Checkbox
-                  checked={licenseName.filter((license) => license !== 'all').length === selected.length}
-                  value="모두 선택"
-                  onChange={(event) => checkAll(event.target.checked)}
-                />
-                <ListItemText primary="모두 선택" />
-              </MenuItem> */}
-              {licenseName.map((license) => (
-                <MenuItem key={license} value={license} onClick={checkSingle}>
-                  {/* <Checkbox checked={license.includes(license)} value={license} /> */}
-                  <ListItemText primary={license} />
+              {licenseList.map((value) => (
+                <MenuItem key={value.lic_id} value={value.lic_id}>
+                  {value.lic_name}
                 </MenuItem>
               ))}
             </Select>

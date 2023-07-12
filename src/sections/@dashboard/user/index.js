@@ -4,4 +4,3 @@ export { default as UserListToolbar } from './UserListToolbar';
 export { default as UserListToolbarDefault } from './UserListToolbarDefault';
 export { default as UserListToolbarLoginLicense } from './UserListToolbarLoginLicense';
 export { default as UserListToolbarLoginUser } from './UserListToolbarLoginUser';
-export { default as DownloadLogToolbar } from './DownloadLogToolbar';
