@@ -148,7 +148,7 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
                     <TableRow hover key={id} tabIndex={-1}>
                       <TableCell align="left">
                         <Typography variant="subtitle2" noWrap>
-                          <Link to="/downloadlog">{username}</Link>
+                          {username}
                         </Typography>
                       </TableCell>
 

@@ -143,7 +143,7 @@ export const loginuserList = async (req,res)=>{
 }
 
 // 로그인 로그(라이선스), /logs/loginlicense
-export const loginlicenseList = async (req,res) => {  
+export const loginlicenseList = async (req,res) => {    
   let arr_result = [];  // 결과값 저장
   const searchtype = req.query.search_type;
   const searchdate = req.query.search_date;
@@ -169,7 +169,7 @@ export const loginlicenseList = async (req,res) => {
         .catch((err) => {
           console.log('err', err);
         });                  
-
+      
       const reault_data = result.result;                
 
       reault_data.forEach((data, idx) => {
@@ -232,6 +232,7 @@ export const licenseList = async (req,res) => {
 // 사용자 리스트
 export const userList = async (req,res) => {
   //res.json("userList from controller");
+  const logtype = req.query.log_type;
   const searchtype = req.query.search_type;
   const searchdate = req.query.search_date;
       
@@ -239,6 +240,7 @@ export const userList = async (req,res) => {
     const pool = await db;      
     const result = await pool
       .request()                  
+      .input('LOG_TYPE', logtype)
       .input('SEARCH_TYPE', searchtype)
       .input('SEARCH_DATE', searchdate)      
       //.output('TOTAL', 0)

@@ -58,7 +58,7 @@ export default function PDMLogToolbar({
 
   // server에서 user List 가져오기
   const callUserList = async (searchType, searchDate) => {
-    const url = `/logs/userlist?search_type=${searchType}&search_date=${searchDate}`;
+    const url = `/logs/userlist?log_type=${sParam}&search_type=${searchType}&search_date=${searchDate}`;
     const res = await axios.get(url);
 
     const users = [{ user_id: 'All', user_name: 'All' }];
@@ -71,17 +71,11 @@ export default function PDMLogToolbar({
 
   // server 에서 resopnse 데이터 가져오기
   const callLogData = async (searchType, searchDate, searchUser) => {
-    let url = ``;
-    if (sParam === 'download')
-      url = `/logs/download?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
-    else if (sParam === 'newcreate')
-      url = `/logs/newcreate?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
-    else 
-      url = `/logs/versionup?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
-
+    const url = `/logs/${sParam}?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;    
     const res = await axios.get(url);
 
     onIsLoding(false);
+
     onSearchType(searchType);
     onSearchDate(searchDate);
     onSearchUser(searchUser);
