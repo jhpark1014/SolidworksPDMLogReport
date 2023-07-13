@@ -23,9 +23,9 @@ export default function Router() {
       path: '/dashboard',
       element: <DashboardLayout />,
       children: [
-        { element: <Navigate to="/dashboard/downloadlog" />, index: true },
+        { element: <Navigate to="/dashboard/download" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
-        { path: 'downloadlog', element: <DownloadLogPage /> },
+        { path: 'download', element: <DownloadLogPage /> },
         { path: 'newcreate', element: <NewCreateLogPage /> },
         { path: 'versionup', element: <VersionUpLogPage /> },
         { path: 'licenselog', element: <LicenseLoginLogPage /> },
@@ -42,7 +42,7 @@ export default function Router() {
     {
       element: <SimpleLayout />,
       children: [
-        { element: <Navigate to="/dashboard/downloadlog" />, index: true },
+        { element: <Navigate to="/dashboard/download" />, index: true },
         { path: '404', element: <Page404 /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],

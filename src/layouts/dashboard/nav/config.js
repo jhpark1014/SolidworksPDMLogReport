@@ -14,7 +14,7 @@ const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ 
 const navConfig = [  
   {
     title: '다운로드 로그',
-    path: '/dashboard/downloadlog',
+    path: '/dashboard/download',
     icon: <DownloadIcon />,
   },
   {
