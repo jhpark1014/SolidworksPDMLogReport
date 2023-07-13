@@ -21,7 +21,7 @@ export default function PDMLogPage({logType, logName}) {
   return (
     <>
       <Helmet>
-        <title>logName</title>
+        <title>{logName}</title>
       </Helmet>
 
       <PDMLogChartPage
