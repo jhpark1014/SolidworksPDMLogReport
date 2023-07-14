@@ -11,14 +11,18 @@ AppWebsiteVisits.propTypes = {
   title: PropTypes.string,
   subheader: PropTypes.string,
   chartData: PropTypes.array.isRequired,
-  chartLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
+  chartData2: PropTypes.array,
+  // chartLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-export default function AppWebsiteVisits({ title, subheader, chartLabels, chartData, ...other }) {
+export default function AppWebsiteVisits({ title, subheader, chartLabels, chartData, chartData2, ...other }) {
+  if (chartData2) {
+    chartData = chartData.concat(chartData2);
+  }
   const chartOptions = useChart({
     plotOptions: { bar: { columnWidth: '16%' } },
     fill: { type: chartData.map((i) => i.fill) },
-    labels: chartLabels,
+    // labels: chartLabels,
     xaxis: other.xaxis,
     yaxis: other.yaxis,
     tooltip: {
@@ -33,9 +37,19 @@ export default function AppWebsiteVisits({ title, subheader, chartLabels, chartD
         },
       },
     },
-    annotations: { yaxis: other.annotations2 },
+    stroke: other.stroke,
+    legend: {
+      // position: 'right',
+      // horizontalAlign: 'center',
+      formatter: other.legendformatter,
+      markers: other.legendmarker,
+    },
+    // dataLabels: {
+    //   enabled: true,
+    //   formatter: other.datalabelformatter,
+    // },
+    annotations: { points: other.annotations2 },
   });
-  // console.log('chartdata', chartData);
 
   return (
     <Card {...other}>
