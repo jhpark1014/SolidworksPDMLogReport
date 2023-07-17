@@ -68,7 +68,26 @@ export default function LoginChartPage({ title, subtitle, chartLabels, chartData
     }
     return Array.from(colors, () => generateRandomColor());
   }
-  const randomColors = generateRandomColorArray(chartDatas);
+  // const randomColors = generateRandomColorArray(chartDatas);
+  
+  const randomColors = 
+  [
+    theme.palette.primary.main,        
+    theme.palette.error.main,
+    theme.palette.warning.main,
+    theme.palette.info.main,
+    theme.palette.success.main,
+    theme.palette.primary.dark,        
+    theme.palette.error.dark,
+    theme.palette.warning.dark,
+    theme.palette.info.dark,
+    theme.palette.success.dark,
+    theme.palette.primary.light,            
+    theme.palette.error.light,
+    theme.palette.warning.light,
+    theme.palette.info.light,
+    theme.palette.success.light,    
+  ];
 
   function generateHoldQtyArray(holdqty, chartLabels) {
     return new Array(chartLabels.length).fill(holdqty);
