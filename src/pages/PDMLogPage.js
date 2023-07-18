@@ -11,12 +11,15 @@ PDMLogPage.propTypes = {
   logName: PropTypes.string,
 };
 
-export default function PDMLogPage({logType, logName}) {  
-  const [searchType, setSearchType] = useState('');       // 검색 구분
-  const [searchDate, setSearchDate] = useState('');       // 검색 날짜
-  const [searchUser, setSearchUser] = useState('');       // 검색 사용자
-  const [logDatas, setLogDatas] = useState([]);           // server 처리 결과
-  const [tableHead, setTabelHead] = useState([]);         // 테이블 칼럼
+export default function PDMLogPage({ logType, logName }) {
+  const [searchType, setSearchType] = useState(''); // 검색 구분
+  const [searchDate, setSearchDate] = useState(''); // 검색 날짜
+  const [searchUser, setSearchUser] = useState(''); // 검색 사용자
+  const [logDatas, setLogDatas] = useState([]); // server 처리 결과
+  const [tableHead, setTableHead] = useState([]); // 테이블 칼럼
+
+  console.log('searchDatepage', searchDate);
+  // console.log('table', tableHead);
 
   return (
     <>
@@ -25,20 +28,20 @@ export default function PDMLogPage({logType, logName}) {
       </Helmet>
 
       <PDMLogChartPage
-        title = {logName}
-        subTitle = {`${searchType === 'month' ? '월' : '연'}, ${searchDate}, ${searchUser}`}
-        xLabel = {`${searchType === 'month' ? '일' : '월'}`}
-        chartDatas = {logDatas}
-        chartLabels = {tableHead}
+        title={logName}
+        subTitle={`${searchType === 'month' ? '월' : '연'}, ${searchDate}, ${searchUser}`}
+        xLabel={`${searchType === 'month' ? '일' : '월'}`}
+        chartDatas={logDatas}
+        chartLabels={tableHead}
       />
       <br />
       <PDMLogTablePage
-        sParam = {logType}
-        onSearchType = {setSearchType}
-        onSearchDate = {setSearchDate}
-        onSearchUser = {setSearchUser}
-        onLogDatas = {setLogDatas}
-        onTableHead = {setTabelHead}
+        sParam={logType}
+        onSearchType={setSearchType}
+        onSearchDate={setSearchDate}
+        onSearchUser={setSearchUser}
+        onLogDatas={setLogDatas}
+        onTableHead={setTableHead}
       />
     </>
   );

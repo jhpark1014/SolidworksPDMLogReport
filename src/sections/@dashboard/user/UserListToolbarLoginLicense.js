@@ -18,8 +18,6 @@ import { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import axios from 'axios';
-// import data
-import LOGLIST from '../../../_mock/logdata';
 
 // ----------------------------------------------------------------------
 
@@ -85,7 +83,7 @@ export default function UserListToolbarLoginLicense({
   const [selectedLicense, setSelectedLicense] = useState('All'); // select에 보여질 license 이름
   const [loading, setLoading] = useState(false);
 
-  // const [selectedLicense, setSelectedLicense] = useState(pageType === 'license' ? 'All' : licenseName[0]); // select에 보여질 license 이름
+  console.log('searchDateToolbar', selectedDate);
 
   // server에서 License List 가져오기
   const callLicenseList = async (searchType, searchDate) => {
@@ -114,11 +112,6 @@ export default function UserListToolbarLoginLicense({
     onLogDatas(res.data);
   };
 
-  // type별 형식에 맞는 날짜 리턴
-  function getSearchDate(searchType, year, month, day) {
-    return searchType === 'day' ? `${year}-${month}-${day}` : searchType === 'month' ? `${year}-${month}` : `${year}`;
-  }
-
   // type 변경 시 type별 형식에 맞는 날짜 리턴
   const getSearchDateForChangeType = (searchType, searchDate) => {
     const date = dayjs(searchDate);
@@ -128,20 +121,6 @@ export default function UserListToolbarLoginLicense({
       ? `${date.format('YYYY-MM')}`
       : `${date.format('YYYY')}`;
   };
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   console.log('changed', selectedLicense, loading);
-  // }, [selectedLicense]);
-
-  // // 초기 값 주기
-  // useEffect(() => {
-  //   async function initialState() {
-  //     await callLicenseList(selectedOption, selectedDate);
-  //     await callLogData(selectedOption, selectedDate, selectedLicense);
-  //   }
-  //   initialState();
-  // }, [selectedLicense]);
 
   useEffect(() => {
     callLicenseList(selectedOption, selectedDate);
@@ -161,10 +140,6 @@ export default function UserListToolbarLoginLicense({
 
       callLicenseList(type, searchDate);
       callLogData(type, searchDate, selectedLicense);
-
-      // const loadLicenseList = () => {callLicenseList(type, searchDate)}
-      // // callLogData(pageType, type, searchDate, selectedLicense);
-      // useEffect()
     } catch (err) {
       console.log(err);
     }
@@ -178,12 +153,7 @@ export default function UserListToolbarLoginLicense({
       setSelectedDate(() => searchDate); // selectedDate를 설정해줌
       // setDateOption(searchDate); // selectedDate를 받는 function -> Report에서 호출할 것
 
-      // callLicenseList(selectedOption, searchDate).then(
-      //   callLogData(pageType, selectedOption, searchDate, selectedLicense)
-      // );
-
       callLicenseList(selectedOption, searchDate);
-
       callLogData(selectedOption, searchDate, selectedLicense);
     } catch (err) {
       console.log(err);
@@ -280,14 +250,7 @@ export default function UserListToolbarLoginLicense({
             maxDate={dayjs()}
             // defaultValue={dayjs()}
             format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD'}
-            value={
-              // selectedOption === 'year'
-              //   ? selectedDate.slice(0, 3)
-              //   : selectedOption === 'month'
-              //   ? selectedDate.slice(0, 6)
-              //   : selectedDate
-              dayjs(selectedDate)
-            }
+            value={dayjs(selectedDate)}
             onAccept={dateChange}
           />
         </LocalizationProvider>

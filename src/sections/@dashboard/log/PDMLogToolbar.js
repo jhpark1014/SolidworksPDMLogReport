@@ -11,6 +11,27 @@ import 'dayjs/locale/ko';
 
 // ----------------------------------------------------------------------
 
+// Table Headers
+const TABLE_HEAD = [
+  { id: 'licenseName', label: '라이선스', alignRight: false },
+  { id: 'holdQty', label: '보유 수량', alignRight: false },
+];
+
+const TABLE_HEAD_YEAR = [
+  { id: '1', label: '1월', alignRight: false },
+  { id: '2', label: '2월', alignRight: false },
+  { id: '3', label: '3월', alignRight: false },
+  { id: '4', label: '4월', alignRight: false },
+  { id: '5', label: '5월', alignRight: false },
+  { id: '6', label: '6월', alignRight: false },
+  { id: '7', label: '7월', alignRight: false },
+  { id: '8', label: '8월', alignRight: false },
+  { id: '9', label: '9월', alignRight: false },
+  { id: '10', label: '10월', alignRight: false },
+  { id: '11', label: '11월', alignRight: false },
+  { id: '12', label: '12월', alignRight: false },
+];
+
 const StyledRoot = styled(Toolbar)(({ theme }) => ({
   height: 96,
   display: 'flex',
@@ -31,22 +52,39 @@ const MenuProps = {
 
 // ----------------------------------------------------------------------
 
+function getMonthTableHead(searchDate) {
+  const date = dayjs(searchDate);
+  // console.log('searchdatepdm', searchDate);
+  const dayInMonth = new Date(date.format('YYYY'), date.format('MM'), 0).getDate();
+  const TABLE_HEAD_MONTH = new Array(dayInMonth);
+  for (let i = 1; i < dayInMonth + 1; i += 1) {
+    TABLE_HEAD_MONTH[i - 1] = { id: i, label: `${i}일`, alignRight: false };
+  }
+  return TABLE_HEAD_MONTH;
+}
+
+function getTableHead(searchType, searchDate) {
+  return searchType === 'month' ? getMonthTableHead(searchDate) : TABLE_HEAD_YEAR;
+}
+
 PDMLogToolbar.propTypes = {
   sParam: PropTypes.string,
-  onIsLoding: PropTypes.func,
+  onIsloading: PropTypes.func,
   onSearchType: PropTypes.func,
   onSearchDate: PropTypes.func,
   onSearchUser: PropTypes.func,
   onLogDatas: PropTypes.func,
+  onTableHead: PropTypes.func,
 };
 
 export default function PDMLogToolbar({
   sParam,
-  onIsLoding,
+  onIsloading,
   onSearchType,
   onSearchDate,
   onSearchUser,
   onLogDatas,
+  onTableHead,
 }) {
   const today = dayjs();
   const dateString = today.format('YYYY-MM'); // 오늘 날짜(년-월) 리턴
@@ -55,6 +93,11 @@ export default function PDMLogToolbar({
   const [searchDate, setSearchDate] = useState(dateString);
   const [searchUser, setSearchUser] = useState('All');
   const [userList, setUserList] = useState([]);
+  // const [tableHead, setTableHead] = useState([]);
+
+  const callTableHead = async (searchType, searchDate) => {
+    onTableHead(getTableHead(searchType, searchDate));
+  };
 
   // server에서 user List 가져오기
   const callUserList = async (searchType, searchDate) => {
@@ -69,12 +112,12 @@ export default function PDMLogToolbar({
     }
   };
 
-  // server 에서 resopnse 데이터 가져오기
+  // server 에서 response 데이터 가져오기
   const callLogData = async (searchType, searchDate, searchUser) => {
-    const url = `/logs/${sParam}?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;    
+    const url = `/logs/${sParam}?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
     const res = await axios.get(url);
 
-    onIsLoding(false);
+    onIsloading(false);
 
     onSearchType(searchType);
     onSearchDate(searchDate);
@@ -97,15 +140,16 @@ export default function PDMLogToolbar({
   useEffect(() => {
     callUserList(searchType, searchDate);
     callLogData(searchType, searchDate, searchUser);
+    callTableHead(searchType, searchDate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearchType = async (event) => {
     const type = event.target.value;
-
     const date = getSearchDateForChangeType(type, searchDate);
 
     setSearchType(type);
+    callTableHead(type, searchDate);
 
     callUserList(type, date);
     callLogData(type, date, searchUser);
@@ -115,14 +159,14 @@ export default function PDMLogToolbar({
     const date = getSearchDateForChangeType(searchType, newValue.$d);
 
     setSearchDate(date);
+    callTableHead(searchType, date);
 
     callUserList(searchType, date);
     callLogData(searchType, date, searchUser);
   };
 
   const userChange = (event) => {
-    console.log('event.target', event.target);
-
+    // console.log('event.target', event.target);
     event.preventDefault();
     try {
       const {
@@ -131,7 +175,6 @@ export default function PDMLogToolbar({
       setSearchUser(value);
 
       const date = getSearchDateForChangeType(searchType, searchDate);
-
       callLogData(searchType, date, value);
     } catch (err) {
       console.log(err);
@@ -167,7 +210,8 @@ export default function PDMLogToolbar({
             minDate={dayjs('2015-01-01')}
             maxDate={dayjs()}
             format={searchType === 'month' ? 'YYYY-MM' : 'YYYY'}
-            defaultValue={dayjs()}
+            // defaultValue={dayjs()}
+            value={dayjs(searchDate)}
             onAccept={handleSearchDate}
           />
         </LocalizationProvider>

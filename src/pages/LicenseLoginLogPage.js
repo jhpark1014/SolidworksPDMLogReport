@@ -122,6 +122,7 @@ const TABLE_HEAD_DAY = [
 
 function getMonthTableHead(searchDate) {
   const date = dayjs(searchDate);
+  console.log('licensesearchdate', searchDate);
   const dayInMonth = new Date(date.format('YYYY'), date.format('MM'), 0).getDate();
   const TABLE_HEAD_MONTH = new Array(dayInMonth);
   for (let i = 1; i < dayInMonth + 1; i += 1) {
@@ -149,6 +150,7 @@ export default function LicenseLoginLogPage() {
   const [searchLicense, setSearchLicense] = useState(''); // 검색 사용자
   const [logDatas, setLogDatas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  console.log('searchdate', searchDate);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -180,6 +182,8 @@ export default function LicenseLoginLogPage() {
 
   const tableHead = getTableHead(searchType, searchDate);
   const tableHeadAll = TABLE_HEAD.concat(tableHead);
+
+  console.log('tableheadall', tableHeadAll);
 
   // 한국어 Grid
   const theme = useTheme();
@@ -215,7 +219,7 @@ export default function LicenseLoginLogPage() {
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
-                <UserListHeadNotSort headLabel={TABLE_HEAD.concat(getTableHead(searchType, searchDate))} />
+                <UserListHeadNotSort headLabel={tableHeadAll} />
                 <TableBody>
                   {logDatas.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     const { id, licname, holdqty, logdata } = row;
@@ -274,6 +278,7 @@ export default function LicenseLoginLogPage() {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="max row"
           />
         </Card>
         {/* </Container> */}

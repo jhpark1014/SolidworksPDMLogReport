@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { responsiveFontSizes, useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
+import dotenv from 'dotenv';
 // sections
 import {
   AppTasks,
@@ -17,8 +18,9 @@ import {
   AppConversionRates,
 } from '../sections/@dashboard/app';
 
-// sections
+dotenv.config();
 
+const showHoldQty = process.env.LIC_HOLD_QTY;
 // ----------------------------------------------------------------------
 
 LoginChartPage.propTypes = {
@@ -69,24 +71,23 @@ export default function LoginChartPage({ title, subtitle, chartLabels, chartData
     return Array.from(colors, () => generateRandomColor());
   }
   // const randomColors = generateRandomColorArray(chartDatas);
-  
-  const randomColors = 
-  [
-    theme.palette.primary.main,        
+
+  const randomColors = [
+    theme.palette.primary.main,
     theme.palette.error.main,
     theme.palette.warning.main,
     theme.palette.info.main,
     theme.palette.success.main,
-    theme.palette.primary.dark,        
+    theme.palette.primary.dark,
     theme.palette.error.dark,
     theme.palette.warning.dark,
     theme.palette.info.dark,
     theme.palette.success.dark,
-    theme.palette.primary.light,            
+    theme.palette.primary.light,
     theme.palette.error.light,
     theme.palette.warning.light,
     theme.palette.info.light,
-    theme.palette.success.light,    
+    theme.palette.success.light,
   ];
 
   function generateHoldQtyArray(holdqty, chartLabels) {
@@ -136,7 +137,7 @@ export default function LoginChartPage({ title, subtitle, chartLabels, chartData
   // const maxHoldQty = Math.max(...holdQtyList);
   // const yMax = Math.max(maxData, maxHoldQty);
 
-  const chartData2 = generateChartData2(chartDatas);
+  const chartData2 = showHoldQty ? generateChartData2(chartDatas) : [];
   const pointAnnotation2 = generatePointAnnotation(chartData2);
 
   return (
