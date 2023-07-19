@@ -51,8 +51,6 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
   const [tableHead, setTableHead] = useState([]); // server 처리 결과
   const [isloading, setIsloading] = useState(true); // server 처리 결과
 
-  console.log('searchDateTable', searchDate);
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -96,7 +94,7 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
 
         <Scrollbar>
           <TableContainer sx={{ minWidth: 800 }}>
-            <Table>
+            <Table slot>
               <LogListHead headLabel={tableHeadAll} />
               <TableBody>
                 {logDatas.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {

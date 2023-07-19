@@ -18,6 +18,7 @@ import { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import axios from 'axios';
+import licnames from '../../../_mock/licnames';
 
 // ----------------------------------------------------------------------
 
@@ -83,8 +84,6 @@ export default function UserListToolbarLoginLicense({
   const [selectedLicense, setSelectedLicense] = useState('All'); // select에 보여질 license 이름
   const [loading, setLoading] = useState(false);
 
-  console.log('searchDateToolbar', selectedDate);
-
   // server에서 License List 가져오기
   const callLicenseList = async (searchType, searchDate) => {
     const url = `/logs/licenselist?search_type=${searchType}&search_date=${searchDate}`;
@@ -94,6 +93,13 @@ export default function UserListToolbarLoginLicense({
     if (res.data.length === 0) {
       setLicenseList(lics);
     } else {
+      res.data.map((row) => {
+        return licnames.forEach((lic) => {
+          if (row.lic_id === lic.lic_id) {
+            row.lic_name = lic.lic_name;
+          }
+        });
+      });
       setLicenseList(lics.concat(res.data));
     }
   };
@@ -256,7 +262,7 @@ export default function UserListToolbarLoginLicense({
         </LocalizationProvider>
         {/* 라이선스 선택 */}
         <div>
-          <FormControl sx={{ m: 2.5, width: 300 }}>
+          <FormControl sx={{ m: 2.5, width: 420 }}>
             <InputLabel id="demo-multiple-checkbox-label">라이선스</InputLabel>
             <Select
               sx={{ height: 56 }}

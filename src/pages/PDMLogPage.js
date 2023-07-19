@@ -18,9 +18,6 @@ export default function PDMLogPage({ logType, logName }) {
   const [logDatas, setLogDatas] = useState([]); // server 처리 결과
   const [tableHead, setTableHead] = useState([]); // 테이블 칼럼
 
-  console.log('searchDatepage', searchDate);
-  // console.log('table', tableHead);
-
   return (
     <>
       <Helmet>

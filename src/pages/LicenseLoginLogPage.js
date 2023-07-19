@@ -35,10 +35,12 @@ import LOGLIST from '../_mock/logdata';
 // ----------------------------------------------------------------------
 
 // Table Headers
-const TABLE_HEAD = [
+const TABLE_HEAD_HOLDQTY = [
   { id: 'licenseName', label: '라이선스', alignRight: false },
   { id: 'holdQty', label: '보유 수량', alignRight: false },
 ];
+
+const TABLE_HEAD = [{ id: 'licenseName', label: '라이선스', alignRight: false }];
 
 const TABLE_HEAD_YEAR = [
   { id: '1', label: '1월', alignRight: false },
@@ -120,9 +122,10 @@ const TABLE_HEAD_DAY = [
 
 // applySortFilter(LOGLIST, getComparator(order, orderBy), filterLicense);
 
+const showHoldQty = process.env.REACT_APP_LIC_HOLD_QTY;
+
 function getMonthTableHead(searchDate) {
   const date = dayjs(searchDate);
-  console.log('licensesearchdate', searchDate);
   const dayInMonth = new Date(date.format('YYYY'), date.format('MM'), 0).getDate();
   const TABLE_HEAD_MONTH = new Array(dayInMonth);
   for (let i = 1; i < dayInMonth + 1; i += 1) {
@@ -150,7 +153,6 @@ export default function LicenseLoginLogPage() {
   const [searchLicense, setSearchLicense] = useState(''); // 검색 사용자
   const [logDatas, setLogDatas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  console.log('searchdate', searchDate);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -181,7 +183,7 @@ export default function LicenseLoginLogPage() {
   const isNotFound = !logDatas.length && !!logDatas;
 
   const tableHead = getTableHead(searchType, searchDate);
-  const tableHeadAll = TABLE_HEAD.concat(tableHead);
+  const tableHeadAll = showHoldQty === 'TRUE' ? TABLE_HEAD_HOLDQTY.concat(tableHead) : TABLE_HEAD.concat(tableHead);
 
   console.log('tableheadall', tableHeadAll);
 
@@ -232,11 +234,15 @@ export default function LicenseLoginLogPage() {
                           </Typography>
                         </TableCell>
 
-                        <TableCell align="left">
-                          <Typography variant="subtitle2" noWrap>
-                            {holdqty}
-                          </Typography>
-                        </TableCell>
+                        {showHoldQty === 'TRUE' ? (
+                          <TableCell align="left">
+                            <Typography variant="subtitle2" noWrap>
+                              {holdqty}
+                            </Typography>
+                          </TableCell>
+                        ) : (
+                          ''
+                        )}
 
                         {logdata.map((data, idx) => (
                           <TableCell key={idx} align="left" value={data}>

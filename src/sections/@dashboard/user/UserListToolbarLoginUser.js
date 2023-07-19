@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import axios from 'axios';
+// 라이선스 차트
+import licnames from '../../../_mock/licnames';
 
 // ----------------------------------------------------------------------
 
@@ -78,6 +80,13 @@ export default function UserListToolbarLoginUser({
     const url = `/logs/licenselist?search_type=${searchType}&search_date=${searchDate}`;
     const res = await axios.get(url);
 
+    res.data.map((row) => {
+      return licnames.forEach((lic) => {
+        if (row.lic_id === lic.lic_id) {
+          row.lic_name = lic.lic_name;
+        }
+      });
+    });
     return res.data;
   }
 
@@ -85,6 +94,7 @@ export default function UserListToolbarLoginUser({
   const callLogData = async (searchType, searchDate, selectedLicense) => {
     const lics = await callLicenseList(searchType, searchDate);
     setLicenseList(lics);
+    console.log('lics', lics);
     if (lics.length > 0 && selectedLicense.length === 0) {
       selectedLicense = lics[0].lic_id;
       setSelectedLicense(lics[0].lic_id);
@@ -285,7 +295,7 @@ export default function UserListToolbarLoginUser({
         </LocalizationProvider>
         {/* 라이선스 선택 */}
         <div>
-          <FormControl sx={{ m: 2.5, width: 300 }}>
+          <FormControl sx={{ m: 2.5, width: 350 }}>
             <InputLabel id="demo-multiple-checkbox-label">라이선스</InputLabel>
             <Select
               sx={{ height: 56 }}

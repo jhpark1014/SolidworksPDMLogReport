@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { responsiveFontSizes, useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
-import dotenv from 'dotenv';
 // sections
 import {
   AppTasks,
@@ -18,9 +17,7 @@ import {
   AppConversionRates,
 } from '../sections/@dashboard/app';
 
-dotenv.config();
-
-const showHoldQty = process.env.LIC_HOLD_QTY;
+const showHoldQty = process.env.REACT_APP_LIC_HOLD_QTY;
 // ----------------------------------------------------------------------
 
 LoginChartPage.propTypes = {
@@ -137,8 +134,9 @@ export default function LoginChartPage({ title, subtitle, chartLabels, chartData
   // const maxHoldQty = Math.max(...holdQtyList);
   // const yMax = Math.max(maxData, maxHoldQty);
 
-  const chartData2 = showHoldQty ? generateChartData2(chartDatas) : [];
+  const chartData2 = showHoldQty === 'TRUE' ? generateChartData2(chartDatas) : [];
   const pointAnnotation2 = generatePointAnnotation(chartData2);
+  console.log('chartdata2', showHoldQty, chartData2);
 
   return (
     <>

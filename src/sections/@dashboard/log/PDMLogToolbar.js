@@ -54,7 +54,6 @@ const MenuProps = {
 
 function getMonthTableHead(searchDate) {
   const date = dayjs(searchDate);
-  // console.log('searchdatepdm', searchDate);
   const dayInMonth = new Date(date.format('YYYY'), date.format('MM'), 0).getDate();
   const TABLE_HEAD_MONTH = new Array(dayInMonth);
   for (let i = 1; i < dayInMonth + 1; i += 1) {
