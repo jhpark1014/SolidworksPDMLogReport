@@ -29,8 +29,8 @@ import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHeadNotSort, UserListToolbarLoginLicense } from '../sections/@dashboard/user';
 import LoginChartPage from './LoginChartPage';
-// mock
-import LOGLIST from '../_mock/logdata';
+// 라이선스 이름 매핑 데이터
+import licnames from '../_mock/licnames';
 
 // ----------------------------------------------------------------------
 
@@ -123,6 +123,8 @@ const TABLE_HEAD_DAY = [
 // applySortFilter(LOGLIST, getComparator(order, orderBy), filterLicense);
 
 const showHoldQty = process.env.REACT_APP_LIC_HOLD_QTY;
+const excludeLicName = process.env.REACT_APP_EXCLUDE_LIC_NAME;
+const excludeLicArray = excludeLicName.trim().split(',');
 
 function getMonthTableHead(searchDate) {
   const date = dayjs(searchDate);
@@ -185,7 +187,25 @@ export default function LicenseLoginLogPage() {
   const tableHead = getTableHead(searchType, searchDate);
   const tableHeadAll = showHoldQty === 'TRUE' ? TABLE_HEAD_HOLDQTY.concat(tableHead) : TABLE_HEAD.concat(tableHead);
 
-  console.log('tableheadall', tableHeadAll);
+  // 예외 필터링 후 라이선스 실제 이름이 매칭된 로그데이터
+  const newLogDatas = (logDatas) => {
+    const licNameArray = logDatas.map((lic) => lic.licid);
+    excludeLicArray.forEach((data) => {
+      if (licNameArray.indexOf(data) !== -1) {
+        // console.log('dataname', data, licNameArray.indexOf(data));
+        logDatas.splice(licNameArray.indexOf(data), 1);
+        // console.log('neww', logDatas);
+      }
+    });
+    logDatas.map((row) => {
+      return licnames.forEach((lic) => {
+        if (row.licid === lic.lic_id) {
+          row.licname = lic.lic_name;
+        }
+      });
+    });
+    return logDatas;
+  };
 
   // 한국어 Grid
   const theme = useTheme();
@@ -223,35 +243,37 @@ export default function LicenseLoginLogPage() {
               <Table>
                 <UserListHeadNotSort headLabel={tableHeadAll} />
                 <TableBody>
-                  {logDatas.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, licname, holdqty, logdata } = row;
+                  {newLogDatas(logDatas)
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => {
+                      const { id, licname, holdqty, logdata } = row;
 
-                    return (
-                      <TableRow hover key={id} tabIndex={-1}>
-                        <TableCell align="left">
-                          <Typography variant="subtitle2" noWrap>
-                            {licname}
-                          </Typography>
-                        </TableCell>
-
-                        {showHoldQty === 'TRUE' ? (
+                      return (
+                        <TableRow hover key={id} tabIndex={-1}>
                           <TableCell align="left">
                             <Typography variant="subtitle2" noWrap>
-                              {holdqty}
+                              {licname}
                             </Typography>
                           </TableCell>
-                        ) : (
-                          ''
-                        )}
 
-                        {logdata.map((data, idx) => (
-                          <TableCell key={idx} align="left" value={data}>
-                            {data}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    );
-                  })}
+                          {showHoldQty === 'TRUE' ? (
+                            <TableCell align="left">
+                              <Typography variant="subtitle2" noWrap>
+                                {holdqty}
+                              </Typography>
+                            </TableCell>
+                          ) : (
+                            ''
+                          )}
+
+                          {logdata.map((data, idx) => (
+                            <TableCell key={idx} align="left" value={data}>
+                              {data}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      );
+                    })}
                   {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
                       <TableCell colSpan={6} />
@@ -279,7 +301,7 @@ export default function LicenseLoginLogPage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={logDatas.length}
+            count={newLogDatas(logDatas).length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

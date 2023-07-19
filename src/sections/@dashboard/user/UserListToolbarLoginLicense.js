@@ -57,6 +57,9 @@ const MenuProps = {
   autoFocus: false,
 };
 
+const excludeLicName = process.env.REACT_APP_EXCLUDE_LIC_NAME;
+const excludeLicArray = excludeLicName.trim().split(',');
+
 // ----------------------------------------------------------------------
 
 UserListToolbarLoginLicense.propTypes = {
