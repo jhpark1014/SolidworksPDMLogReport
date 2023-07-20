@@ -38,7 +38,8 @@ import LoginChartPage from './LoginChartPage';
 // Table Headers
 const TABLE_HEAD = [
   { id: 'userName', label: '사용자', alignRight: false },
-  { id: 'department', label: '부서', alignRight: false },
+  // { id: 'department', label: '부서', alignRight: false },
+  { id: 'pcname', label: '장치명', alignRight: false },
 ];
 
 const TABLE_HEAD_YEAR = [
@@ -179,7 +180,7 @@ export default function UserLoginLogPage() {
                   <UserListHeadNotSort headLabel={TABLE_HEAD.concat(getTableHead(searchType, searchDate))} />
                   <TableBody>
                     {logDatas.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                      const { id, username, holdqty, logdata } = row;
+                      const { id, username, department, pcname, logdata } = row;
 
                       return (
                         <TableRow hover key={id} tabIndex={-1}>
@@ -190,9 +191,15 @@ export default function UserLoginLogPage() {
                             </Typography>
                           </TableCell>
 
+                          {/* <TableCell align="left">
+                            <Typography variant="subtitle2" noWrap>
+                              {department}
+                            </Typography>
+                          </TableCell> */}
+
                           <TableCell align="left">
                             <Typography variant="subtitle2" noWrap>
-                              {holdqty}
+                              {pcname}
                             </Typography>
                           </TableCell>
 
