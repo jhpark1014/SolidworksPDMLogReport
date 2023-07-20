@@ -3,9 +3,9 @@ import {db} from "../db.js"
 // 다운로드, 신규등록, 버전업 공통 함수
 async function getLogData(tableName, req) {
   let arr_result = [];  // 결과값 저장
-  const searchtype = req.query.search_type;
-  const searchdate = req.query.search_date;
-  const user_id = req.query.user_id;   
+  const searchtype = req.body.search_type;
+  const searchdate = req.body.search_date;
+  const user_id = req.body.user_id;   
 
   try {                 
     if (user_id !== '') {        
@@ -56,10 +56,58 @@ async function getLogData(tableName, req) {
   return arr_result;
 }
 
+
+// 상세 다운로드, 신규등록, 버전업 공통 함수
+async function getDetailLogData(tableName, req) {
+  let arr_result = [];  // 결과값 저장  
+
+  const searchtype = req.body.search_type;
+  const searchdate = req.body.search_date;
+  const user_id = req.body.user_id;   
+
+  try {                 
+    if (user_id !== '') {        
+      const pool = await db;      
+      const result = await pool
+        .request()                          
+        .input('SEARCH_TYPE', searchtype)
+        .input('SEARCH_DATE', searchdate)
+        .input('USER_ID', user_id)
+        //.output('TOTAL', 0)
+        .execute('dbo.' + tableName)
+        .then((result) => {
+          const result_data = {
+            //total: result.output.TOTAL,
+            result: result.recordset,
+          };            
+          return result_data;
+        })
+        .catch((err) => {
+          console.log('err', err);
+        });                  
+
+      const reault_data = result.result; 
+      // console.log("reault_data==>", reault_data);
+    
+      reault_data.forEach((data, idx) => {
+        arr_result[idx] = data;
+      });    
+    }   
+  } catch (err) {
+    console.log(err);
+  }
+  console.log("arr_result==>", arr_result);
+  return arr_result;
+}
+
 // 다운로드 로그
-export const downloadList = async (req,res) => {
-  //res.json("downloadList from controller");
+export const downloadList = async (req,res) => {  
   res.json(await getLogData("SP_DOWNLOAD_LOG", req));
+}
+
+// 상세 다운로드 로그
+export const downloadDetailList = async (req,res) => {    
+  res.json(await getDetailLogData("SP_DOWNLOAD_DETAIL_LOG", req));
 }
 
 // 신규 등록 로그
@@ -68,10 +116,20 @@ export const newcreateList = async (req,res)=>{
     res.json(await getLogData("SP_NEWCREATE_LOG", req));
 }
 
+// 상세 신규 등록 로그
+export const newcreateDetailList = async (req,res) => {  
+  res.json(await getDetailLogData("SP_NEWCREATE_DETAIL_LOG", req));
+}
+
 // 버전업 로그
 export const versionupList = async (req,res)=>{
     //res.json("versionupList from controller");
     res.json(await getLogData("SP_VERSIONUP_LOG", req));
+}
+
+// 상세 버전업 로그
+export const versionupDetailList = async (req,res) => {  
+  res.json(await getDetailLogData("SP_VERSIONUP_DETAIL_LOG", req));
 }
 
 // 로그인 로그(사용자)

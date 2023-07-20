@@ -12,11 +12,6 @@ import 'dayjs/locale/ko';
 // ----------------------------------------------------------------------
 
 // Table Headers
-const TABLE_HEAD = [
-  { id: 'licenseName', label: '라이선스', alignRight: false },
-  { id: 'holdQty', label: '보유 수량', alignRight: false },
-];
-
 const TABLE_HEAD_YEAR = [
   { id: '1', label: '1월', alignRight: false },
   { id: '2', label: '2월', alignRight: false },
@@ -113,16 +108,31 @@ export default function PDMLogToolbar({
 
   // server 에서 response 데이터 가져오기
   const callLogData = async (searchType, searchDate, searchUser) => {
-    const url = `/logs/${sParam}?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
-    const res = await axios.get(url);
+    // const url = `/logs/${sParam}?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
+    // const res = await axios.get(url);
 
-    onIsloading(false);
+    const url = `/logs/${sParam}`;
+    const data = {
+        'search_type' : searchType,
+        'search_date' : searchDate,
+        'user_id' : searchUser,
+    };
+    const config = {"Content-Type": 'application/json'};
 
-    onSearchType(searchType);
-    onSearchDate(searchDate);
-    onSearchUser(searchUser);
+    await axios.post(url, data, config)
+        .then(res => {
+            // success
+            onIsloading(false);
 
-    onLogDatas(res.data);
+            onSearchType(searchType);
+            onSearchDate(searchDate);
+            onSearchUser(searchUser);
+        
+            onLogDatas(res.data);
+        }).catch(err => {
+            // error
+            console.log(err.response.data.message); // server error message
+        });  
   };
 
   // type 변경 시 type별 형식에 맞는 날짜 리턴

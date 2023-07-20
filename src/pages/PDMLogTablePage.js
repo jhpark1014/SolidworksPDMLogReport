@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 // @mui
-import {
-  Link,
+import {	   
   Card,
   Table,
   Paper,
@@ -14,11 +13,12 @@ import {
   TableContainer,
   TablePagination,
 } from '@mui/material';
-import dayjs from 'dayjs';
+						  
 // components
 import Scrollbar from '../components/scrollbar';
 // sections
 import { PDMLogToolbar, LogListHead } from '../sections/@dashboard/log';
+import PDMDetailLogPage from './PDMDetailLogPage';
 
 // ----------------------------------------------------------------------
 
@@ -38,9 +38,7 @@ PDMLogTablePage.propTypes = {
   onTableHead: PropTypes.func,
 };
 
-export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, onSearchUser, onLogDatas, onTableHead }) {
-  const today = dayjs();
-  const dateString = today.format('YYYY-MM'); // 오늘 날짜(년-월) 리턴
+export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, onSearchUser, onLogDatas, onTableHead }) {  
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -48,9 +46,9 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
   const [searchDate, setSearchDate] = useState(''); // 검색 날짜
   const [searchUser, setSearchUser] = useState(''); // 검색 사용자
   const [logDatas, setLogDatas] = useState([]); // server 처리 결과
-  const [tableHead, setTableHead] = useState([]); // server 처리 결과
-  const [isloading, setIsloading] = useState(true); // server 처리 결과
-
+  const [tableHead, setTableHead] = useState([]); // 테이블 컬럼
+  const [isloading, setIsloading] = useState(true); // 로딩
+  
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -62,22 +60,15 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - logDatas.length) : 0;
 
-  // const tableHead = getTableHead(searchType, searchDate);
-  // const tableHeadAll = TABLE_HEAD.concat(tableHead);
-
-  // console.log('tableheadall', tableHeadAll);
-
   const isNotFound = !logDatas.length;
+
+  const tableHeadAll = TABLE_HEAD.concat(tableHead);
 
   onSearchType(searchType);
   onSearchDate(searchDate);
   onSearchUser(searchUser);
   onLogDatas(logDatas);
   onTableHead(tableHead);
-
-  const tableHeadAll = TABLE_HEAD.concat(tableHead);
-
-  console.log('tablehead', tableHead);
 
   return (
     <Container maxWidth="false" disableGutters>
@@ -94,14 +85,14 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
 
         <Scrollbar>
           <TableContainer sx={{ minWidth: 800 }}>
-            <Table slot>
+            <Table>
               <LogListHead headLabel={tableHeadAll} />
               <TableBody>
                 {logDatas.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                  const { id, username, department, logdata } = row;
+                  const { userid, username, department, logdata } = row;
 
                   return (
-                    <TableRow hover key={id} tabIndex={-1}>
+                    <TableRow hover key={userid} tabIndex={-1}>
                       <TableCell align="left">
                         <Typography variant="subtitle2" noWrap>
                           {username}
@@ -116,7 +107,16 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
 
                       {logdata.map((data, idx) => (
                         <TableCell key={idx} align="left" value={data}>
-                          {data}
+                          {data===0?'-':(<PDMDetailLogPage                             
+                            data={{
+                              logusername : username,
+                              logdata : data
+                            }}
+                            sParam={sParam}                            
+                            searchType={searchType === "month" ? "day" : "month"}
+                            searchDate={searchDate.concat("-").concat(idx+1)}
+                            searchUser={userid}
+                          />)}
                         </TableCell>
                       ))}
                     </TableRow>
@@ -136,7 +136,7 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
                     <TableCell align="center" colSpan={tableHeadAll.length} sx={{ py: 3 }}>
                       <Paper sx={{ textAlign: 'center' }}>
                         <Typography variant="h6" paragraph>
-                          {isloading ? 'loading...' : '데이터가 없습니다. 검색 조건을 다시 입력해 주세요.'}
+                          {isloading ? 'Loading...' : '데이터가 없습니다. 검색 조건을 다시 입력해 주세요.'}
                         </Typography>
                       </Paper>
                     </TableCell>
@@ -157,7 +157,7 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage="max row"
         />
-      </Card>
+      </Card>      
     </Container>
   );
 }
