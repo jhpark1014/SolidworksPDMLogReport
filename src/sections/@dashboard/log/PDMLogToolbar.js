@@ -87,7 +87,9 @@ export default function PDMLogToolbar({
   const [searchDate, setSearchDate] = useState(dateString);
   const [searchUser, setSearchUser] = useState('All');
   const [userList, setUserList] = useState([]);
-  // const [tableHead, setTableHead] = useState([]);
+  
+  const excludeUserName = process.env.REACT_APP_EXCLUDE_USER_NAME;
+  const excludeUserArray = typeof excludeUserName === 'string' ? excludeUserName.trim().split(',') : '';
 
   const callTableHead = async (searchType, searchDate) => {
     onTableHead(getTableHead(searchType, searchDate));
@@ -95,27 +97,37 @@ export default function PDMLogToolbar({
 
   // server에서 user List 가져오기
   const callUserList = async (searchType, searchDate) => {
-    const url = `/logs/userlist?log_type=${sParam}&search_type=${searchType}&search_date=${searchDate}`;
-    const res = await axios.get(url);
-
-    const users = [{ user_id: 'All', user_name: 'All' }];
-    if (res.data.length === 0) {
-      setUserList(users);
-    } else {
-      setUserList(users.concat(res.data));
-    }
+    const url = `/logs/userlist`;
+    const data = {
+        'log_type' : sParam,
+        'search_type' : searchType,
+        'search_date' : searchDate,
+        'exc_user_id' : excludeUserArray,
+    };
+    const config = {"Content-Type": 'application/json'};
+    await axios.post(url, data, config)
+        .then(res => {
+            // success
+            const users = [{ user_id: 'All', user_name: 'All' }];
+            if (res.data.length === 0) {
+              setUserList(users);
+            } else {
+              setUserList(users.concat(res.data));
+            }
+        }).catch(err => {
+            // error
+            console.log(err.response.data.message); // server error message
+        });  
   };
 
   // server 에서 response 데이터 가져오기
   const callLogData = async (searchType, searchDate, searchUser) => {
-    // const url = `/logs/${sParam}?search_type=${searchType}&search_date=${searchDate}&user_id=${searchUser}`;
-    // const res = await axios.get(url);
-
     const url = `/logs/${sParam}`;
     const data = {
         'search_type' : searchType,
         'search_date' : searchDate,
         'user_id' : searchUser,
+        'exc_user_id' : excludeUserArray,
     };
     const config = {"Content-Type": 'application/json'};
 

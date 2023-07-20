@@ -6,7 +6,8 @@ async function getLogData(tableName, req) {
   const searchtype = req.body.search_type;
   const searchdate = req.body.search_date;
   const user_id = req.body.user_id;   
-
+  const excuserid = req.body.exc_user_id;
+  
   try {                 
     if (user_id !== '') {        
       const pool = await db;      
@@ -15,6 +16,7 @@ async function getLogData(tableName, req) {
         .input('SEARCH_TYPE', searchtype)
         .input('SEARCH_DATE', searchdate)
         .input('USER_ID', user_id)
+        .input('EXC_USER_ID', getExcludeData(excuserid))
         //.output('TOTAL', 0)
         .execute('dbo.' + tableName)
         .then((result) => {
@@ -36,8 +38,7 @@ async function getLogData(tableName, req) {
         logdata.id = idx;        
         logdata.userid = data.user_id;        
         logdata.username = data.user_name;        
-        logdata.department = data.department;
-        //console.log("data==>", data);
+        logdata.department = data.department;        
 
         logdata.logdata = Object.values(JSON.parse(
           JSON.stringify(data, (key, value) => {                      
@@ -87,7 +88,6 @@ async function getDetailLogData(tableName, req) {
         });                  
 
       const reault_data = result.result; 
-      // console.log("reault_data==>", reault_data);
     
       reault_data.forEach((data, idx) => {
         arr_result[idx] = data;
@@ -137,7 +137,9 @@ export const loginuserList = async (req,res)=>{
   let arr_result = [];  // 결과값 저장
   const searchtype = req.body.search_type;
   const searchdate = req.body.search_date;
-  const lic_id = req.body.lic_id;    
+  const lic_id = req.body.lic_id;     
+  const excuserid = req.body.exc_user_id;  
+  
   try {          
     if (lic_id !== '') {
 
@@ -146,7 +148,8 @@ export const loginuserList = async (req,res)=>{
         .request()                  
         .input('SEARCH_TYPE', searchtype)
         .input('SEARCH_DATE', searchdate)
-        .input('LIC_ID', lic_id)
+        .input('LIC_ID', lic_id)         
+        .input('EXC_USER_ID', getExcludeData(excuserid))      
         //.output('TOTAL', 0)
         .execute('dbo.SP_LOGIN_LOG_USER')
         .then((result) => {
@@ -169,7 +172,7 @@ export const loginuserList = async (req,res)=>{
         logdata.userid = data.user_id;        
         logdata.username = data.user_name;        
         logdata.department = data.department;
-        // console.log("data==>", data);
+        
         logdata.logdata = Object.values(JSON.parse(
           JSON.stringify(data, (key, value) => {
             const ret = (typeof value !== "object") ? ((isNaN(parseInt(key))) ? undefined : value) : value;
@@ -180,6 +183,7 @@ export const loginuserList = async (req,res)=>{
         arr_result[idx] = logdata;
       });      
     }
+    console.log("arr_result==>", arr_result);
     res.json(arr_result);
   } catch (err) {
     console.log(err);
@@ -192,6 +196,8 @@ export const loginlicenseList = async (req,res) => {
   const searchtype = req.body.search_type;
   const searchdate = req.body.search_date;
   const lic_id = req.body.lic_id;    
+  const exclicid = req.body.exc_lic_id;
+
   try {       
     if (lic_id !== '') {
 
@@ -201,6 +207,7 @@ export const loginlicenseList = async (req,res) => {
         .input('SEARCH_TYPE', searchtype)
         .input('SEARCH_DATE', searchdate)
         .input('LIC_ID', lic_id)
+        .input('EXC_LIC_ID', getExcludeData(exclicid))      
         //.output('TOTAL', 0)
         .execute('dbo.SP_LOGIN_LOG_LICENSE')
         .then((result) => {
@@ -233,25 +240,38 @@ export const loginlicenseList = async (req,res) => {
         arr_result[idx] = logdata;
       });      
     }
-
+    console.log("arr_result==>", arr_result);
     res.json(arr_result);
   } catch (err) {
     console.log(err);
   }
 }
 
+function getExcludeData(arr) {  
+  let result = "";  
+  arr.forEach((element) => {
+    result = result.concat("'").concat(element).concat("',");
+  })
+
+  if (result.length !== 0) result = result.substring(0, result.length - 1);  
+  return result
+}
+
+
 // 라이선스 리스트
 export const licenseList = async (req,res) => {
   //res.json("licenseList from controller");
   const searchtype = req.body.search_type;
   const searchdate = req.body.search_date;
-      
+  const exclicid = req.body.exc_lic_id;
+
   try {                 
     const pool = await db;      
     const result = await pool
       .request()                  
       .input('SEARCH_TYPE', searchtype)
       .input('SEARCH_DATE', searchdate)      
+      .input('EXC_LIC_ID', getExcludeData(exclicid))      
       //.output('TOTAL', 0)
       .execute('dbo.SP_LICENSE_LIST')
       .then((result) => {
@@ -266,12 +286,13 @@ export const licenseList = async (req,res) => {
       });                  
 
     const reault_data = result.result;                
-     
+    console.log("reault_data==>", reault_data);
     res.json(reault_data);
   } catch (err) {
     console.log(err);
   }
 }
+
 
 // 사용자 리스트
 export const userList = async (req,res) => {
@@ -279,7 +300,8 @@ export const userList = async (req,res) => {
   const logtype = req.body.log_type;
   const searchtype = req.body.search_type;
   const searchdate = req.body.search_date;
-      
+  const excuserid = req.body.exc_user_id;
+  
   try {                 
     const pool = await db;      
     const result = await pool
@@ -287,6 +309,7 @@ export const userList = async (req,res) => {
       .input('LOG_TYPE', logtype)
       .input('SEARCH_TYPE', searchtype)
       .input('SEARCH_DATE', searchdate)      
+      .input('EXC_USER_ID', getExcludeData(excuserid))      
       //.output('TOTAL', 0)
       .execute('dbo.SP_USER_LIST')
       .then((result) => {
@@ -301,7 +324,7 @@ export const userList = async (req,res) => {
       });                  
 
     const reault_data = result.result;                
-    
+    console.log("reault_data==>", reault_data);
     res.json(reault_data);
   } catch (err) {
     console.log(err);
