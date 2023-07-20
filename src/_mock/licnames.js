@@ -76,9 +76,6 @@ const licnames = [
     lic_name: 'Electrical Professional',
   },
   {
-    lic_id: 'snlcore',
-  },
-  {
     lic_id: 'solidworks',
     lic_name: 'SOLIDWORKS Standard',
   },

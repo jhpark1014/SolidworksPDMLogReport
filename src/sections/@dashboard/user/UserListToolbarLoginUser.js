@@ -48,6 +48,12 @@ const MenuProps = {
   autoFocus: false,
 };
 
+const excludeLicName = process.env.REACT_APP_EXCLUDE_LIC_NAME;
+const excludeLicArray = excludeLicName.trim().split(',');
+
+const excludeUserName = process.env.REACT_APP_EXCLUDE_USER_NAME;
+const excludeUserArray = excludeUserName.trim().split(',');
+
 // ----------------------------------------------------------------------
 
 UserListToolbarLoginUser.propTypes = {
@@ -59,7 +65,6 @@ UserListToolbarLoginUser.propTypes = {
 };
 
 export default function UserListToolbarLoginUser({
-  // numSelected,
   onIsLoading,
   onSearchOption,
   onDateOption, // 선택한 날짜 넘겨주는 function
@@ -76,19 +81,44 @@ export default function UserListToolbarLoginUser({
 
   // const [selectedLicense, setSelectedLicense] = useState(pageType === 'license' ? 'All' : licenseName[0]); // select에 보여질 license 이름
   // server에서 License List 가져오기
-  async function callLicenseList(searchType, searchDate) {
-    const url = `/logs/licenselist?search_type=${searchType}&search_date=${searchDate}`;
-    const res = await axios.get(url);
+  async function callLicenseList (searchType, searchDate) {
+    const lics = [{ lic_id: 'All', lic_name: 'All' }];
 
-    res.data.map((row) => {
-      return licnames.forEach((lic) => {
-        if (row.lic_id === lic.lic_id) {
-          row.lic_name = lic.lic_name;
-        }
+    const url = `/logs/licenselist`;
+    const data = {
+      search_type: searchType,
+      search_date: searchDate,
+    };
+    const config = { 'Content-Type': 'application/json' };
+
+    const result = await axios
+      .post(url, data, config)
+      .then((res) => {
+        // success
+        onIsLoading(false);
+        res.data.map((row) => {
+          return licnames.forEach((lic) => {
+            if (row.lic_id === lic.lic_id) {
+              row.lic_name = lic.lic_name;
+            }
+          });
+        });
+        
+        onSearchOption(searchType);
+        onDateOption(searchDate);
+        
+        setLicenseList(res.data);
+        console.log('response', res.data);
+        return res.data;
+      })
+      .catch((err) => {
+        // error
+        console.log(err.response.data.message); // server error message
       });
-    });
-    return res.data;
-  }
+
+    return result;
+
+  };
 
   // server 에서 response 데이터 가져오기
   const callLogData = async (searchType, searchDate, selectedLicense) => {
@@ -100,11 +130,31 @@ export default function UserListToolbarLoginUser({
       setSelectedLicense(lics[0].lic_id);
     }
 
-    const url = `/logs/loginuser?search_type=${searchType}&search_date=${searchDate}&lic_id=${selectedLicense}`;
-    console.log('log data url_user', url);
+    const url = `/logs/loginuser`;
+    const data = {
+      search_type: searchType,
+      search_date: searchDate,
+      lic_id: selectedLicense,
+    };
+    const config = { 'Content-Type': 'application/json' };
 
-    const res = await axios.get(url);
-    onLogDatas(res.data);
+    await axios
+      .post(url, data, config)
+      .then((res) => {
+        // success
+        onIsLoading(false);
+
+        onSearchOption(searchType);
+        onDateOption(searchDate);
+        onLicenseOption(selectedLicense);
+
+        onLogDatas(res.data);
+        console.log(res.data);
+      })
+      .catch((err) => {
+        // error
+        console.log(err.response.data.message); // server error message
+      });
 
     onIsLoading(false);
     onSearchOption(searchType);
@@ -121,15 +171,41 @@ export default function UserListToolbarLoginUser({
       setSelectedLicense(lics[0].lic_id);
     }
 
-    const url = `/logs/loginlicense?search_type=${searchType}&search_date=${searchDate}&lic_id=${selectedLicense}`;
-    console.log('chart data url_user', url);
+    const url = `/logs/loginlicense`;
+    const data = {
+      search_type: searchType,
+      search_date: searchDate,
+      lic_id: selectedLicense,
+    };
+    const config = { 'Content-Type': 'application/json' };
 
-    const res = await axios.get(url);
-    if (res.data.length !== 0) {
-      onChartDatas(res.data);
-    } else {
-      onChartDatas([]);
-    }
+    await axios
+      .post(url, data, config)
+      .then((res) => {
+        // success
+        onIsLoading(false);
+
+        res.data.map((row) => {
+          return licnames.forEach((lic) => {
+            if (row.licid === lic.lic_id) {
+              row.licname = lic.lic_name;
+            }
+          });
+        });
+        if (res.data.length !== 0) {
+          onChartDatas(res.data);
+        } else {
+          onChartDatas([]);
+        }
+
+        onSearchOption(searchType);
+        onDateOption(searchDate);
+        onLicenseOption(selectedLicense);
+      })
+      .catch((err) => {
+        // error
+        console.log(err.response.data.message); // server error message
+      });
 
     onSearchOption(searchType);
     onDateOption(searchDate);
@@ -180,8 +256,6 @@ export default function UserListToolbarLoginUser({
     try {
       const searchDate = getSearchDateForChangeType(selectedOption, value.$d);
       setSelectedDate(() => searchDate); // selectedDate를 설정해줌
-      // setDateOption(searchDate); // selectedDate를 받는 function -> Report에서 호출할 것
-
       callLogData(selectedOption, searchDate, selectedLicense);
       callChartData(selectedOption, searchDate, selectedLicense);
     } catch (err) {
