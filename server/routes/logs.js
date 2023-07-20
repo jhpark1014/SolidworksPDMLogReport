@@ -13,9 +13,9 @@ router.post("/newcreate", newcreateList);
 router.post("/newcreate/detail", newcreateDetailList);
 router.post("/versionup", versionupList);
 router.post("/versionup/detail", versionupDetailList);
-router.get("/loginuser", loginuserList);
-router.get("/loginlicense", loginlicenseList);
-router.get("/userlist", userList);
-router.get("/licenselist", licenseList);
+router.post("/loginuser", loginuserList);
+router.post("/loginlicense", loginlicenseList);
+router.post("/userlist", userList);
+router.post("/licenselist", licenseList);
 
 export default router

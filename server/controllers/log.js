@@ -135,9 +135,9 @@ export const versionupDetailList = async (req,res) => {
 // 로그인 로그(사용자)
 export const loginuserList = async (req,res)=>{
   let arr_result = [];  // 결과값 저장
-  const searchtype = req.query.search_type;
-  const searchdate = req.query.search_date;
-  const lic_id = req.query.lic_id;    
+  const searchtype = req.body.search_type;
+  const searchdate = req.body.search_date;
+  const lic_id = req.body.lic_id;    
   try {          
     if (lic_id !== '') {
 
@@ -172,20 +172,6 @@ export const loginuserList = async (req,res)=>{
         // console.log("data==>", data);
         logdata.logdata = Object.values(JSON.parse(
           JSON.stringify(data, (key, value) => {
-            // pivot 데이터를 배열에 담기
-
-            // 6/28 string이 아닌 값만 배열에 담기
-            // 만약 원하는 결과가 나오지 않으면 로직 다시 고민 필요...
-            // if (typeof value === "string") {
-            //   return undefined;
-            // }
-            // return value;
-
-            // 6/30 이렇게 변경
-            // 칼럼명이 숫자로 되어 있으면 배열에 담기
-            // 왜...?? 인지는 모르겠지만... 처음에 한번 value 가 전제 data 값을(object) 가져옴. 그 이후는 data의 개별 값 가져옴.
-            // 그래서 value가 "object" 일때 skip 함. console.log("value==>", value); // 이거 찍어보면 알수 있음.
-            // 원인을 찾으면 입력하기로 함
             const ret = (typeof value !== "object") ? ((isNaN(parseInt(key))) ? undefined : value) : value;
             return ret;            
           })
@@ -203,9 +189,9 @@ export const loginuserList = async (req,res)=>{
 // 로그인 로그(라이선스), /logs/loginlicense
 export const loginlicenseList = async (req,res) => {    
   let arr_result = [];  // 결과값 저장
-  const searchtype = req.query.search_type;
-  const searchdate = req.query.search_date;
-  const lic_id = req.query.lic_id;    
+  const searchtype = req.body.search_type;
+  const searchdate = req.body.search_date;
+  const lic_id = req.body.lic_id;    
   try {       
     if (lic_id !== '') {
 
@@ -257,8 +243,8 @@ export const loginlicenseList = async (req,res) => {
 // 라이선스 리스트
 export const licenseList = async (req,res) => {
   //res.json("licenseList from controller");
-  const searchtype = req.query.search_type;
-  const searchdate = req.query.search_date;
+  const searchtype = req.body.search_type;
+  const searchdate = req.body.search_date;
       
   try {                 
     const pool = await db;      
@@ -290,9 +276,9 @@ export const licenseList = async (req,res) => {
 // 사용자 리스트
 export const userList = async (req,res) => {
   //res.json("userList from controller");
-  const logtype = req.query.log_type;
-  const searchtype = req.query.search_type;
-  const searchdate = req.query.search_date;
+  const logtype = req.body.log_type;
+  const searchtype = req.body.search_type;
+  const searchdate = req.body.search_date;
       
   try {                 
     const pool = await db;      
