@@ -172,6 +172,7 @@ export const loginuserList = async (req,res)=>{
         logdata.userid = data.user_id;        
         logdata.username = data.user_name;        
         logdata.department = data.department;
+        logdata.pcname = data.pc_name;
         
         logdata.logdata = Object.values(JSON.parse(
           JSON.stringify(data, (key, value) => {
