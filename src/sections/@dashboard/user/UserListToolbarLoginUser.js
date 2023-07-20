@@ -88,6 +88,7 @@ export default function UserListToolbarLoginUser({
     const data = {
       search_type: searchType,
       search_date: searchDate,
+      exc_lic_id: excludeLicArray
     };
     const config = { 'Content-Type': 'application/json' };
 
@@ -108,7 +109,6 @@ export default function UserListToolbarLoginUser({
         onDateOption(searchDate);
         
         setLicenseList(res.data);
-        console.log('response', res.data);
         return res.data;
       })
       .catch((err) => {
@@ -124,7 +124,6 @@ export default function UserListToolbarLoginUser({
   const callLogData = async (searchType, searchDate, selectedLicense) => {
     const lics = await callLicenseList(searchType, searchDate);
     setLicenseList(lics);
-    console.log('lics', lics);
     if (lics.length > 0 && selectedLicense.length === 0) {
       selectedLicense = lics[0].lic_id;
       setSelectedLicense(lics[0].lic_id);
@@ -135,6 +134,7 @@ export default function UserListToolbarLoginUser({
       search_type: searchType,
       search_date: searchDate,
       lic_id: selectedLicense,
+      exc_user_id: excludeUserArray
     };
     const config = { 'Content-Type': 'application/json' };
 
@@ -176,6 +176,7 @@ export default function UserListToolbarLoginUser({
       search_type: searchType,
       search_date: searchDate,
       lic_id: selectedLicense,
+      exc_lic_id: excludeLicArray
     };
     const config = { 'Content-Type': 'application/json' };
 

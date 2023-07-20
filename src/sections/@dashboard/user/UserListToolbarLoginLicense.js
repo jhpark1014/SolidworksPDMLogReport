@@ -93,6 +93,7 @@ export default function UserListToolbarLoginLicense({
     const data = {
       search_type: searchType,
       search_date: searchDate,
+      exc_lic_id: excludeLicArray
     };
     const config = { 'Content-Type': 'application/json' };
 
@@ -127,6 +128,7 @@ export default function UserListToolbarLoginLicense({
       search_type: searchType,
       search_date: searchDate,
       lic_id: selectedLicense,
+      exc_lic_id: excludeLicArray
     };
     const config = { 'Content-Type': 'application/json' };
 
@@ -302,7 +304,7 @@ export default function UserListToolbarLoginLicense({
             value={dayjs(selectedDate)}
             onAccept={dateChange}
           />
-          {/* <DatePicker
+          <DatePicker
             disabled={rangeSearch}
             sx={{ width: 180, my: 2.5, mr: 2.5 }}
             label="검색 날짜"
@@ -320,7 +322,7 @@ export default function UserListToolbarLoginLicense({
             format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD'}
             value={dayjs(selectedDate)}
             onAccept={dateChange}
-          /> */}
+          />
         </LocalizationProvider>
         {/* 라이선스 선택 */}
         <div>
