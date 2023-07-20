@@ -32,8 +32,6 @@ import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHeadNotSort, UserListToolbarLoginUser } from '../sections/@dashboard/user';
 import LoginChartPage from './LoginChartPage';
-// mock
-import LOGLIST from '../_mock/logdata';
 
 // ----------------------------------------------------------------------
 
@@ -84,6 +82,8 @@ const TABLE_HEAD_DAY = [
   { id: '23', label: '23시', alignRight: false },
   { id: '24', label: '24시', alignRight: false },
 ];
+
+const userPCName = process.env.REACT_APP_USER_PC_NAME;
 
 // ----------------------------------------------------------------------
 
@@ -185,6 +185,7 @@ export default function UserLoginLogPage() {
                         <TableRow hover key={id} tabIndex={-1}>
                           <TableCell align="left">
                             <Typography variant="subtitle2" noWrap>
+                              {/* {userPCName === 'TRUE' ? pcName : username} */}
                               {username}
                             </Typography>
                           </TableCell>
@@ -235,6 +236,7 @@ export default function UserLoginLogPage() {
               page={page}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
+              labelRowsPerPage="max row"
             />
           </Card>
         </Container>

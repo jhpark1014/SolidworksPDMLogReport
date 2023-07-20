@@ -81,6 +81,7 @@ export default function UserListToolbarLoginLicense({
   const todayString = today.format('YYYY-MM-DD'); // 오늘 날짜(년-월) 리턴
   const [selectedOption, setSelectedSearch] = useState('day'); // 날짜 검색 옵션
   const [selectedDate, setSelectedDate] = useState(todayString); // 검색할 날짜
+  const [selectedEndDate, setSelectedEndDate] = useState(todayString); // 검색할 날짜
   const [licenseList, setLicenseList] = useState([]); // 선택 날짜에서의 License List 목록
   const [selectedLicense, setSelectedLicense] = useState('All'); // select에 보여질 license 이름
   const [rangeSearch, setRangeSearch] = useState(true);
@@ -93,7 +94,7 @@ export default function UserListToolbarLoginLicense({
     const data = {
       search_type: searchType,
       search_date: searchDate,
-      exc_lic_id: excludeLicArray
+      exc_lic_id: excludeLicArray,
     };
     const config = { 'Content-Type': 'application/json' };
 
@@ -128,7 +129,7 @@ export default function UserListToolbarLoginLicense({
       search_type: searchType,
       search_date: searchDate,
       lic_id: selectedLicense,
-      exc_lic_id: excludeLicArray
+      exc_lic_id: excludeLicArray,
     };
     const config = { 'Content-Type': 'application/json' };
 
@@ -288,7 +289,7 @@ export default function UserListToolbarLoginLicense({
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
           <DatePicker
             sx={{ width: 180, my: 2.5, ml: 2.5, mr: 1.5 }}
-            label="검색 날짜"
+            label="시작 날짜"
             openTo={selectedOption === 'year' ? 'year' : selectedOption === 'month' ? 'month' : 'day'}
             views={
               selectedOption === 'year'
@@ -307,7 +308,7 @@ export default function UserListToolbarLoginLicense({
           <DatePicker
             disabled={rangeSearch}
             sx={{ width: 180, my: 2.5, mr: 2.5 }}
-            label="검색 날짜"
+            label="종료 날짜"
             openTo={selectedOption === 'year' ? 'year' : selectedOption === 'month' ? 'month' : 'day'}
             views={
               selectedOption === 'year'
@@ -320,7 +321,7 @@ export default function UserListToolbarLoginLicense({
             maxDate={dayjs()}
             // defaultValue={dayjs()}
             format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD'}
-            value={dayjs(selectedDate)}
+            value={dayjs(selectedEndDate)}
             onAccept={dateChange}
           />
         </LocalizationProvider>
