@@ -242,7 +242,6 @@ export default function PDMLogToolbar({
             <Select
               id="searchUser"
               labelId="demo-multiple-checkbox-label"
-              single
               value={userList.length === 1 ? 'All' : searchUser}
               onChange={userChange}
               MenuProps={MenuProps}
