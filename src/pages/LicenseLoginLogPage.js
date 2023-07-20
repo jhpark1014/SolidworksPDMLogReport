@@ -124,7 +124,7 @@ const TABLE_HEAD_DAY = [
 
 const showHoldQty = process.env.REACT_APP_LIC_HOLD_QTY;
 const excludeLicName = process.env.REACT_APP_EXCLUDE_LIC_NAME;
-const excludeLicArray = excludeLicName.trim().split(',');
+const excludeLicArray = typeof excludeLicName === 'string' ? excludeLicName.trim().split(',') : '';
 
 function getMonthTableHead(searchDate) {
   const date = dayjs(searchDate);

@@ -49,10 +49,10 @@ const MenuProps = {
 };
 
 const excludeLicName = process.env.REACT_APP_EXCLUDE_LIC_NAME;
-const excludeLicArray = excludeLicName.trim().split(',');
+const excludeLicArray = typeof excludeLicName === 'string' ? excludeLicName.trim().split(',') : '';
 
 const excludeUserName = process.env.REACT_APP_EXCLUDE_USER_NAME;
-const excludeUserArray = excludeUserName.trim().split(',');
+const excludeUserArray = typeof excludeUserName === 'string' ? excludeUserName.trim().split(',') : '';
 
 // ----------------------------------------------------------------------
 
