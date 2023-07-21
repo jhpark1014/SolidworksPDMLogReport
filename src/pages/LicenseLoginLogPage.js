@@ -1,4 +1,3 @@
-import { spacing } from '@mui/system';
 import { Helmet } from 'react-helmet-async';
 import { useEffect, useMemo, useState } from 'react';
 // @mui
@@ -193,9 +192,7 @@ export default function LicenseLoginLogPage() {
     const licNameArray = logDatas.map((lic) => lic.licid);
     excludeLicArray.forEach((data) => {
       if (licNameArray.indexOf(data) !== -1) {
-        // console.log('dataname', data, licNameArray.indexOf(data));
         logDatas.splice(licNameArray.indexOf(data), 1);
-        // console.log('neww', logDatas);
       }
     });
     logDatas.map((row) => {

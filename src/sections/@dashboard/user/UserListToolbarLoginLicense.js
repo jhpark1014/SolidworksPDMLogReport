@@ -11,10 +11,12 @@ import {
   Checkbox,
   ListItemText,
   Box,
+  Button,
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useEffect, useMemo, useState } from 'react';
+import { CSVLink } from 'react-csv';
+import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import axios from 'axios';
@@ -63,7 +65,6 @@ const excludeLicArray = typeof excludeLicName === 'string' ? excludeLicName.trim
 // ----------------------------------------------------------------------
 
 UserListToolbarLoginLicense.propTypes = {
-  // numSelected: PropTypes.number,
   onIsLoading: PropTypes.func,
   onSearchOption: PropTypes.func,
   onDateOption: PropTypes.func,
@@ -73,7 +74,7 @@ UserListToolbarLoginLicense.propTypes = {
 export default function UserListToolbarLoginLicense({
   onIsLoading,
   onSearchOption,
-  onDateOption, // 선택한 날짜 넘겨주는 function
+  onDateOption,
   onLicenseOption,
   onLogDatas,
 }) {
@@ -157,7 +158,7 @@ export default function UserListToolbarLoginLicense({
     onDateOption(searchDate);
     onLicenseOption(selectedLicense);
 
-    // onLogDatas(res.data);
+    return res.data;
   };
 
   // type 변경 시 type별 형식에 맞는 날짜 리턴
@@ -173,7 +174,6 @@ export default function UserListToolbarLoginLicense({
   useEffect(() => {
     callLicenseList(selectedOption, selectedDate); // selectedEndDate
     callLogData(selectedOption, selectedDate, selectedLicense); // selectedEndDate
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 날짜 검색 옵션 바꿀 시
@@ -192,8 +192,8 @@ export default function UserListToolbarLoginLicense({
       const searchDate = getSearchDateForChangeType(type, selectedDate);
       // const searchEndDate = getSearchDateForChangeType(type, selectedEndDate);
 
-      callLicenseList(type, searchDate); // selectedEndDate
-      callLogData(type, searchDate, selectedLicense); // selectedEndDate
+      callLicenseList(type, searchDate);
+      callLogData(type, searchDate, selectedLicense);
     } catch (err) {
       console.log(err);
     }
@@ -201,7 +201,6 @@ export default function UserListToolbarLoginLicense({
 
   // 검색할 날짜를 바꿀 시
   const dateChange = async (value) => {
-    // e.preventDefault();
     try {
       const searchDate = getSearchDateForChangeType(selectedOption, value.$d);
       setSelectedDate(() => searchDate); // selectedDate를 설정해줌
@@ -216,7 +215,6 @@ export default function UserListToolbarLoginLicense({
   const startDateChange = async (value) => {
     try {
       const startDate = getSearchDateForChangeType('day', value.$d);
-      // const startDate = e.target.value;
       setSelectedStartDate(() => startDate);
       console.log('startDateChange', selectedStartDate);
     } catch (err) {
@@ -227,7 +225,6 @@ export default function UserListToolbarLoginLicense({
   const endDateChange = async (value) => {
     try {
       const endDate = getSearchDateForChangeType('day', value.$d);
-      // const endDate = e.target.value;
       setSelectedEndDate(() => endDate);
       console.log('endDateChange', selectedEndDate);
       // callLogData(selectedOption, selectedDate, selectedLicense);
@@ -319,13 +316,11 @@ export default function UserListToolbarLoginLicense({
               views={['year', 'month', 'day']}
               minDate={dayjs('2015-01-01')}
               maxDate={dayjs(selectedEndDate)}
-              // defaultValue={dayjs()}
               format={'YYYY-MM-DD'}
               value={dayjs(selectedStartDate)}
               onAccept={startDateChange}
             />
             <DatePicker
-              // disabled={rangeSearch}
               sx={{ width: 180, my: 2.5, mr: 2.5 }}
               label="종료 날짜"
               openTo="day"
@@ -353,7 +348,6 @@ export default function UserListToolbarLoginLicense({
               }
               minDate={dayjs('2015-01-01')}
               maxDate={dayjs()}
-              // defaultValue={dayjs()}
               format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD'}
               value={dayjs(selectedDate)}
               onAccept={dateChange}
@@ -370,10 +364,8 @@ export default function UserListToolbarLoginLicense({
               id="demo-multiple-checkbox"
               // multiple
               value={licenseList.length === 1 ? 'All' : selectedLicense}
-              // value={licenseName[0]}
               onChange={licenseChange}
               input={<OutlinedInput label="라이선스" />}
-              // renderValue={(selected) => selected.join(', ')}
               MenuProps={MenuProps}
               defaultValue="All"
             >
@@ -385,11 +377,17 @@ export default function UserListToolbarLoginLicense({
             </Select>
           </FormControl>
         </div>
+        <Button>
+          <CSVLink
+            headers={[]}
+            data={callLogData(selectedOption, selectedDate, selectedLicense)}
+            filename={'라이선스 로그인 기록'.concat('_').concat(selectedLicense).concat('.csv')}
+            target="_blank"
+          >
+            EXPORT
+          </CSVLink>
+        </Button>
       </Box>
-      {/* <Box sx={{ m: 3 }}>
-        단위 : {selectedOption === 'year' ? '월' : selectedOption === 'month' ? '일' : '시'}
-        <br />
-      </Box> */}
     </StyledRoot>
   );
 }
