@@ -25,40 +25,52 @@ import { CSVLink } from 'react-csv';
 
 // ----------------------------------------------------------------------
 const DETAIL_HEAD = [
-  { label: '로그일자', key: 'datetime' },
-  { label: '파일명', key: 'filename' },
-  { label: '버전', key: 'version' },
-  { label: '파일사이즈', key: 'filesize' },
+  { label: '사용자', key: 'username' },
+  { label: '장치명', key: 'pcname' },
 ];
 // ----------------------------------------------------------------------
 
-PDMDetailLogPage.propTypes = {
+const excludeUserName = process.env.REACT_APP_EXCLUDE_USER_NAME;
+const excludeUserArray = typeof excludeUserName === 'string' ? excludeUserName.trim().split(',') : '';
+
+LoginDetailLogPage.propTypes = {
   data: PropTypes.string,
-  sParam: PropTypes.string,
   searchType: PropTypes.string,
   searchDate: PropTypes.string,
-  searchUser: PropTypes.string,
+  searchLicense: PropTypes.string,
 };
 
-export default function PDMDetailLogPage({ data, sParam, searchType, searchDate, searchUser }) {
+export default function LoginDetailLogPage({ data, searchType, searchDate, searchLicense, time }) {
   const [isLoading, setIsLoading] = useState(true); // loding
   const [open, setOpen] = useState(false); // dialog open
-  const [detailLogData, setDetailLogData] = useState([]); // detail log data
+  // const [detailLogData, setDetailLogData] = useState([]); // detail log data
+  const [filteredLogData, setFilteredLogData] = useState([]); // filtered detail log data
 
-  const callLogData = async (sParam, searchType, searchDate, searchUser) => {
-    const url = `/logs/${sParam}/detail`;
+  const callLogData = async (searchType, searchDate, searchLicense) => {
+    const url = `/logs/loginuser`;
     const data = {
       search_type: searchType,
       search_date: searchDate,
-      user_id: searchUser,
+      lic_id: searchLicense,
+      exc_user_id: excludeUserArray,
     };
     const config = { 'Content-Type': 'application/json' };
+    let detailLogData = [];
 
     await axios
       .post(url, data, config)
       .then((res) => {
         // success
-        setDetailLogData(res.data);
+        // setDetailLogData(res.data);
+        res.data.forEach((row) => {
+          if (row.logdata[time] !== 0) {
+            detailLogData = detailLogData.concat({
+              username: row.username,
+              pcname: row.pcname,
+            });
+          }
+        });
+        setFilteredLogData(detailLogData);
         setIsLoading(false);
       })
       .catch((err) => {
@@ -69,7 +81,7 @@ export default function PDMDetailLogPage({ data, sParam, searchType, searchDate,
 
   const handleClickOpen = () => () => {
     setOpen(true);
-    callLogData(sParam, searchType, searchDate, searchUser);
+    callLogData(searchType, searchDate, searchLicense);
   };
 
   const handleClose = () => {
@@ -93,7 +105,7 @@ export default function PDMDetailLogPage({ data, sParam, searchType, searchDate,
         aria-describedby="scroll-dialog-description"
         maxWidth="lg"
       >
-        <DialogTitle id="scroll-dialog-title">상세 로그 리스트</DialogTitle>
+        <DialogTitle id="scroll-dialog-title">상세 로그인 리스트</DialogTitle>
         <DialogContent dividers="true">
           <TableContainer>
             <Table>
@@ -101,10 +113,10 @@ export default function PDMDetailLogPage({ data, sParam, searchType, searchDate,
                 <TableRow>
                   <TableCell align="left" colSpan={2} sx={{ padding: 1, backgroundColor: 'white' }}>
                     <Typography variant="subtitle1" noWrap>
-                      {sParam.toUpperCase()}, {data.logusername}, {detailLogData.length} 건
+                      {data.loglicensename}, {filteredLogData.length} 건
                     </Typography>
                   </TableCell>
-                  <TableCell align="right" colSpan={2} sx={{ padding: 1, backgroundColor: 'white' }}>
+                  {/* <TableCell align="right" sx={{ padding: 1, backgroundColor: 'white' }}>
                     <Button>
                       <CSVLink
                         headers={DETAIL_HEAD}
@@ -121,7 +133,7 @@ export default function PDMDetailLogPage({ data, sParam, searchType, searchDate,
                         EXPORT
                       </CSVLink>
                     </Button>
-                  </TableCell>
+                  </TableCell> */}
                 </TableRow>
                 <TableRow>
                   {DETAIL_HEAD.map((headCell) => (
@@ -135,16 +147,13 @@ export default function PDMDetailLogPage({ data, sParam, searchType, searchDate,
               </TableHead>
               <TableBody>
                 {isLoading
-                  ? 'Loding...'
-                  : detailLogData.map((row, idx) => {
-                      const { datetime, filename, version, filesize } = row;
-
+                  ? 'Loading...'
+                  : filteredLogData.map((row, idx) => {
+                      const { username, pcname } = row;
                       return (
                         <TableRow hover key={idx} tabIndex={-1}>
-                          <TableCell align="left">{datetime}</TableCell>
-                          <TableCell align="left">{filename}</TableCell>
-                          <TableCell align="left">{version}</TableCell>
-                          <TableCell align="left">{filesize}</TableCell>
+                          <TableCell align="left">{username}</TableCell>
+                          <TableCell align="left">{pcname}</TableCell>
                         </TableRow>
                       );
                     })}

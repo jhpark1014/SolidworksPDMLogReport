@@ -76,19 +76,22 @@ export default function UserListToolbarLoginUser({
   const todayString = today.format('YYYY-MM-DD'); // 오늘 날짜(년-월) 리턴
   const [selectedOption, setSelectedSearch] = useState('day'); // 날짜 검색 옵션
   const [selectedDate, setSelectedDate] = useState(todayString); // 검색할 날짜
+  const [selectedStartDate, setSelectedStartDate] = useState(todayString); // 검색할 날짜
+  const [selectedEndDate, setSelectedEndDate] = useState(todayString); // 검색할 날짜
   const [licenseList, setLicenseList] = useState(['']); // 선택 날짜에서의 License List 목록
   const [selectedLicense, setSelectedLicense] = useState(''); // select에 보여질 license 이름
+  const [rangeSearch, setRangeSearch] = useState(false);
 
   // const [selectedLicense, setSelectedLicense] = useState(pageType === 'license' ? 'All' : licenseName[0]); // select에 보여질 license 이름
   // server에서 License List 가져오기
-  async function callLicenseList (searchType, searchDate) {
+  async function callLicenseList(searchType, searchDate) {
     const lics = [{ lic_id: 'All', lic_name: 'All' }];
 
     const url = `/logs/licenselist`;
     const data = {
       search_type: searchType,
       search_date: searchDate,
-      exc_lic_id: excludeLicArray
+      exc_lic_id: excludeLicArray,
     };
     const config = { 'Content-Type': 'application/json' };
 
@@ -104,10 +107,10 @@ export default function UserListToolbarLoginUser({
             }
           });
         });
-        
+
         onSearchOption(searchType);
         onDateOption(searchDate);
-        
+
         setLicenseList(res.data);
         return res.data;
       })
@@ -117,8 +120,7 @@ export default function UserListToolbarLoginUser({
       });
 
     return result;
-
-  };
+  }
 
   // server 에서 response 데이터 가져오기
   const callLogData = async (searchType, searchDate, selectedLicense) => {
@@ -134,7 +136,7 @@ export default function UserListToolbarLoginUser({
       search_type: searchType,
       search_date: searchDate,
       lic_id: selectedLicense,
-      exc_user_id: excludeUserArray
+      exc_user_id: excludeUserArray,
     };
     const config = { 'Content-Type': 'application/json' };
 
@@ -176,7 +178,7 @@ export default function UserListToolbarLoginUser({
       search_type: searchType,
       search_date: searchDate,
       lic_id: selectedLicense,
-      exc_lic_id: excludeLicArray
+      exc_lic_id: excludeLicArray,
     };
     const config = { 'Content-Type': 'application/json' };
 
@@ -239,6 +241,12 @@ export default function UserListToolbarLoginUser({
     e.preventDefault();
     try {
       const type = e.target.value;
+
+      if (type === 'range') {
+        setRangeSearch(true);
+      } else {
+        setRangeSearch(false);
+      }
       setSelectedSearch(type);
       // setSearchOption(type);
 
@@ -259,6 +267,29 @@ export default function UserListToolbarLoginUser({
       setSelectedDate(() => searchDate); // selectedDate를 설정해줌
       callLogData(selectedOption, searchDate, selectedLicense);
       callChartData(selectedOption, searchDate, selectedLicense);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const startDateChange = async (value) => {
+    try {
+      const startDate = getSearchDateForChangeType('day', value.$d);
+      // const startDate = e.target.value;
+      setSelectedStartDate(() => startDate);
+      console.log('startDateChange', selectedStartDate);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const endDateChange = async (value) => {
+    try {
+      const endDate = getSearchDateForChangeType('day', value.$d);
+      // const endDate = e.target.value;
+      setSelectedEndDate(() => endDate);
+      console.log('endDateChange', selectedEndDate);
+      // callLogData(selectedOption, selectedDate, selectedLicense);
     } catch (err) {
       console.log(err);
     }
@@ -337,37 +368,61 @@ export default function UserListToolbarLoginUser({
               <MenuItem value="day">일</MenuItem>
               <MenuItem value="month">월</MenuItem>
               <MenuItem value="year">연</MenuItem>
+              <MenuItem value="range">기간</MenuItem>
             </Select>
           </FormControl>
         </div>
         {/* 달력 */}
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
-          <DatePicker
-            sx={{ width: 180, m: 2.5 }}
-            label="검색 날짜"
-            openTo={selectedOption === 'year' ? 'year' : selectedOption === 'month' ? 'month' : 'day'}
-            views={
-              selectedOption === 'year'
-                ? ['year']
-                : selectedOption === 'month'
-                ? ['year', 'month']
-                : ['year', 'month', 'day']
-            }
-            minDate={dayjs('2015-01-01')}
-            maxDate={dayjs()}
-            // defaultValue={dayjs()}
-            format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD'}
-            value={
-              // selectedOption === 'year'
-              //   ? selectedDate.slice(0, 3)
-              //   : selectedOption === 'month'
-              //   ? selectedDate.slice(0, 6)
-              //   : selectedDate
-              dayjs(selectedDate)
-            }
-            onAccept={dateChange}
-          />
-        </LocalizationProvider>
+        {rangeSearch ? (
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
+            <DatePicker
+              sx={{ width: 180, my: 2.5, ml: 2.5, mr: 1.5 }}
+              label="시작 날짜"
+              openTo={'day'}
+              views={['year', 'month', 'day']}
+              minDate={dayjs('2015-01-01')}
+              maxDate={dayjs(selectedEndDate)}
+              // defaultValue={dayjs()}
+              format={'YYYY-MM-DD'}
+              value={dayjs(selectedStartDate)}
+              onAccept={startDateChange}
+            />
+            <DatePicker
+              // disabled={rangeSearch}
+              sx={{ width: 180, my: 2.5, mr: 2.5 }}
+              label="종료 날짜"
+              openTo="day"
+              views={['year', 'month', 'day']}
+              minDate={dayjs(selectedStartDate)}
+              maxDate={dayjs()}
+              // defaultValue={dayjs()}
+              format={'YYYY-MM-DD'}
+              value={dayjs(selectedEndDate)}
+              onAccept={endDateChange}
+            />
+          </LocalizationProvider>
+        ) : (
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
+            <DatePicker
+              sx={{ width: 180, my: 2.5, ml: 2.5, mr: 1.5 }}
+              label="검색 날짜"
+              openTo={selectedOption === 'year' ? 'year' : selectedOption === 'month' ? 'month' : 'day'}
+              views={
+                selectedOption === 'year'
+                  ? ['year']
+                  : selectedOption === 'month'
+                  ? ['year', 'month']
+                  : ['year', 'month', 'day']
+              }
+              minDate={dayjs('2015-01-01')}
+              maxDate={dayjs()}
+              // defaultValue={dayjs()}
+              format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD'}
+              value={dayjs(selectedDate)}
+              onAccept={dateChange}
+            />
+          </LocalizationProvider>
+        )}
         {/* 라이선스 선택 */}
         <div>
           <FormControl sx={{ m: 2.5, width: 350 }}>

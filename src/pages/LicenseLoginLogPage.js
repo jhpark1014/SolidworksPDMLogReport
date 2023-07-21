@@ -31,6 +31,7 @@ import { UserListHeadNotSort, UserListToolbarLoginLicense } from '../sections/@d
 import LoginChartPage from './LoginChartPage';
 // 라이선스 이름 매핑 데이터
 import licnames from '../_mock/licnames';
+import LoginDetailLogPage from './LoginDetailLogPage';
 
 // ----------------------------------------------------------------------
 
@@ -204,6 +205,7 @@ export default function LicenseLoginLogPage() {
         }
       });
     });
+    console.log('asd', logDatas);
     return logDatas;
   };
 
@@ -246,7 +248,7 @@ export default function LicenseLoginLogPage() {
                   {newLogDatas(logDatas)
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row) => {
-                      const { id, licname, holdqty, logdata } = row;
+                      const { id, licid, licname, holdqty, logdata } = row;
 
                       return (
                         <TableRow hover key={id} tabIndex={-1}>
@@ -268,7 +270,20 @@ export default function LicenseLoginLogPage() {
 
                           {logdata.map((data, idx) => (
                             <TableCell key={idx} align="left" value={data}>
-                              {data}
+                              {data === 0 ? (
+                                '-'
+                              ) : (
+                                <LoginDetailLogPage
+                                  data={{
+                                    loglicensename: licname,
+                                    logdata: data,
+                                  }}
+                                  searchType={searchType}
+                                  searchDate={searchDate}
+                                  searchLicense={licid}
+                                  time={idx}
+                                />
+                              )}
                             </TableCell>
                           ))}
                         </TableRow>
