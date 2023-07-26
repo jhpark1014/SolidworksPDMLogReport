@@ -31,23 +31,28 @@ const TABLE_HEAD = [
 
 PDMLogTablePage.propTypes = {
   sParam: PropTypes.string,
-  onSearchType: PropTypes.func,
-  onSearchDate: PropTypes.func,
-  onSearchUser: PropTypes.func,
+  onSearchType: PropTypes.func,  
+  onSearchDate: PropTypes.func,    
+  onSearchUser: PropTypes.func,  
   onLogDatas: PropTypes.func,
   onTableHead: PropTypes.func,
+  onSearchStartDate: PropTypes.func,  
+  onSearchEndDate: PropTypes.func,  
 };
 
-export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, onSearchUser, onLogDatas, onTableHead }) {  
+export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, onSearchUser, onLogDatas, onTableHead, onSearchStartDate, onSearchEndDate }) {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchType, setSearchType] = useState('month'); // 검색 구분
+  const [searchType, setSearchType] = useState(''); // 검색 구분
   const [searchDate, setSearchDate] = useState(''); // 검색 날짜
+  const [searchStartDate, setSearchStartDate] = useState('');
+  const [searchEndDate, setSearchEndDate] = useState('');
   const [searchUser, setSearchUser] = useState(''); // 검색 사용자
   const [logDatas, setLogDatas] = useState([]); // server 처리 결과
   const [tableHead, setTableHead] = useState([]); // 테이블 컬럼
   const [isloading, setIsloading] = useState(true); // 로딩
+
   
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -69,7 +74,10 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
   onSearchUser(searchUser);
   onLogDatas(logDatas);
   onTableHead(tableHead);
+  onSearchStartDate(searchStartDate);
+  onSearchEndDate(searchEndDate);
 
+  
   return (
     <Container maxWidth="false" disableGutters>
       <Card>
@@ -78,6 +86,8 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
           onIsloading={setIsloading}
           onSearchType={setSearchType}
           onSearchDate={setSearchDate}
+          onSearchStartDate={setSearchStartDate}
+          onSearchEndDate={setSearchEndDate}
           onSearchUser={setSearchUser}
           onLogDatas={setLogDatas}
           onTableHead={setTableHead}
@@ -87,9 +97,9 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
           <TableContainer sx={{ minWidth: 800 }}>
             <Table>
               <LogListHead headLabel={tableHeadAll} />
-              <TableBody>
+              <TableBody>          
                 {logDatas.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                  const { userid, username, department, logdata } = row;
+                  const { userid, username, department, logdata } = row;                  
 
                   return (
                     <TableRow hover key={userid} tabIndex={-1}>
@@ -105,16 +115,17 @@ export default function PDMLogTablePage({ sParam, onSearchType, onSearchDate, on
                         </Typography>
                       </TableCell>
 
-                      {logdata.map((data, idx) => (
-                        <TableCell key={idx} align="left" value={data}>
-                          {data===0?'-':(<PDMDetailLogPage                             
-                            data={{
-                              logusername : username,
-                              logdata : data
-                            }}
+                      {logdata.map((data, idx) => (                          
+                        <TableCell key={idx} align="left" value={data}>                                                                            
+                          {data===0?'-':(<PDMDetailLogPage     
+                            isDividers
+                            logusername={username}                                                    
+                            logdata={data}
                             sParam={sParam}                            
-                            searchType={searchType === "month" ? "day" : "month"}
+                            searchType={searchType === "range" ? searchType : searchType === "month" ? "day" : "month"}
                             searchDate={searchDate.concat("-").concat(idx+1)}
+                            searchStartDate={searchStartDate}
+                            searchEndDate={searchEndDate}
                             searchUser={userid}
                           />)}
                         </TableCell>

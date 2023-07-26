@@ -1,24 +1,237 @@
 import {db} from "../db.js"
 
+// db query
+async function getResultData(tablename, values) {  
+  const pool = await db;      
+  const request = await pool.request();
+  
+  (values).forEach((v) => request.input(v.key, v.value));
+  
+  const result = await request
+    .execute('dbo.'.concat(tablename))
+    .then((result) => {      
+      const result_data = {
+        //total: result.output.TOTAL,
+        data: result.recordset,
+      };            
+      return result_data;
+    })
+    .catch((err) => {
+      console.log('err', err);
+    });                  
+
+  return result.data;
+}
+
 // 다운로드, 신규등록, 버전업 공통 함수
-async function getLogData(tableName, req) {
+async function getLogData(req) {
   let arr_result = [];  // 결과값 저장
+
+  const logtype = req.body.log_type;
   const searchtype = req.body.search_type;
   const searchdate = req.body.search_date;
   const user_id = req.body.user_id;   
-  const excuserid = req.body.exc_user_id;
+  const excuserid = req.body.exc_user_id;  
   
+  try {   
+    const values = [
+      { key:'LOG_TYPE', value:logtype},
+      { key:'SEARCH_TYPE', value:searchtype},
+      { key:'SEARCH_DATE', value:searchdate},
+      { key:'USER_ID', value:user_id},
+      { key:'EXC_USER_ID', value:getExcludeData(excuserid)},
+    ]
+
+    const reault_data = await getResultData('SP_PDM_LOG', values);
+
+    reault_data.forEach((data, idx) => {
+      let logdata = new Object() ;
+      
+      logdata.id = idx;        
+      logdata.userid = data.user_id;        
+      logdata.username = data.user_name;        
+      logdata.department = data.department;        
+  
+      // pivot 데이타에서 칼럼이 숫자이면 배열로 합침
+      logdata.logdata = Object.values(JSON.parse(
+        JSON.stringify(data, (key, value) => {                      
+          const ret = (typeof value !== "object") ? ((isNaN(parseInt(key))) ? undefined : value) : value;
+          return ret;            
+        })
+      ));
+  
+      arr_result[idx] = logdata;
+    });
+
+  } catch (err) {
+    console.log(err);
+  }
+  console.log("getLogData arr_result==>", arr_result);
+  return arr_result;
+}
+
+// 다운로드, 신규등록, 버전업 기간 공통 함수 - 기간
+async function getLogDataForRange(req) {
+  let arr_result = [];  // 결과값 저장
+
+  const logtype = req.body.log_type;
+  const searchtype = req.body.search_type;
+  const searchstartdate = req.body.search_start_date;
+  const searchenddate = req.body.search_end_date;
+  const user_id = req.body.user_id;   
+  const excuserid = req.body.exc_user_id;  
+  
+  try {      
+    const values = [
+      { key:'LOG_TYPE', value:logtype},
+      { key:'SEARCH_TYPE', value:searchtype},
+      { key:'SEARCH_START_DATE', value:searchstartdate},
+      { key:'SEARCH_END_DATE', value:searchenddate},
+      { key:'USER_ID', value:user_id},
+      { key:'EXC_USER_ID', value:getExcludeData(excuserid)},
+    ]
+
+    const reault_data = await getResultData('SP_PDM_LOG_RANGE', values);
+    
+    reault_data.forEach((data, idx) => {
+      let logdata = new Object() ;
+      
+      logdata.id = idx;        
+      logdata.userid = data.user_id;        
+      logdata.username = data.user_name;        
+      logdata.department = data.department;        
+      logdata.logdata = [data.cnt];        
+  
+      arr_result[idx] = logdata;
+    });      
+
+  } catch (err) {
+    console.log(err);
+  }
+  console.log("getLogDataForRange arr_result==>", arr_result);
+  return arr_result;
+}
+
+// 상세 다운로드, 신규등록, 버전업 공통 함수
+async function getDetailLogData(req) {
+  let arr_result = [];  // 결과값 저장  
+
+  const logtype = req.body.log_type;
+  const searchtype = req.body.search_type;
+  const searchdate = req.body.search_date;
+  const user_id = req.body.user_id;   
+
   try {                 
-    if (user_id !== '') {        
+    const values = [
+      { key:'LOG_TYPE', value:logtype},
+      { key:'SEARCH_TYPE', value:searchtype},
+      { key:'SEARCH_DATE', value:searchdate},        
+      { key:'USER_ID', value:user_id},        
+    ]
+
+    const reault_data = await getResultData('SP_PDM_DETAIL_LOG', values);
+  
+    reault_data.forEach((data, idx) => {
+      arr_result[idx] = data;
+    });    
+
+  } catch (err) {
+    console.log(err);
+  }
+  console.log("getDetailLogData arr_result==>", arr_result);
+  return arr_result;
+}
+
+// 상세 다운로드, 신규등록, 버전업 공통 함수 - 기간
+async function getDetailLogDataForRange(req) {
+  let arr_result = [];  // 결과값 저장  
+
+  const logtype = req.body.log_type;
+  const searchstartdate = req.body.search_start_date;
+  const searchenddate = req.body.search_end_date;
+  const user_id = req.body.user_id;   
+
+  try {                     
+    const values = [
+      { key:'LOG_TYPE', value:logtype},        
+      { key:'SEARCH_START_DATE', value:searchstartdate},
+      { key:'SEARCH_END_DATE', value:searchenddate},
+      { key:'USER_ID', value:user_id},        
+    ]
+
+    const reault_data = await getResultData('SP_PDM_DETAIL_LOG_RANGE', values);
+  
+    reault_data.forEach((data, idx) => {
+      arr_result[idx] = data;
+    });    
+    
+  } catch (err) {
+    console.log(err);
+  }
+  console.log("getDetailLogDataForRange arr_result==>", arr_result);
+  return arr_result;
+}
+
+// PDM 로그
+export const pdmLogList = async (req,res) => {  
+  res.json(await getLogData(req));
+}
+
+// PDM 로그 - 기간
+export const pdmLogListForRange = async (req,res) => {  
+  res.json(await getLogDataForRange(req));
+}
+
+// PDM 상세 로그
+export const pdmDetailList = async (req,res) => {    
+  res.json(await getDetailLogData(req));
+}
+
+// PDM 상세 로그 - 기간
+export const pdmDetailListForRange = async (req,res) => {    
+  res.json(await getDetailLogDataForRange(req));
+}
+
+
+
+// --------------------- login log ---------------------------------------
+
+// 제외 대상 사용자/라이선스 정리
+function getExcludeData(arr) {  
+  let result = "";  
+  arr.forEach((element) => {
+    result = result.concat("'").concat(element).concat("',");
+  })
+
+  if (result.length !== 0) result = result.substring(0, result.length - 1);  
+  return result
+}
+
+// 로그인 로그(라이선스)
+export const loginlicenseList = async (req,res) => {    
+  let arr_result = [];  // 결과값 저장
+
+  console.log("loginlicenseList req.body==>", req.body);
+
+  const searchtype = req.body.search_type;
+  const searchdate = req.body.search_date;
+  const lic_id = req.body.lic_id;      
+  const exclicid = req.body.exc_lic_id;
+  const excuserid = req.body.exc_user_id;
+
+  try {       
+    if (lic_id !== '') {
+
       const pool = await db;      
       const result = await pool
         .request()                  
         .input('SEARCH_TYPE', searchtype)
         .input('SEARCH_DATE', searchdate)
-        .input('USER_ID', user_id)
-        .input('EXC_USER_ID', getExcludeData(excuserid))
+        .input('LIC_ID', lic_id)
+        .input('EXC_LIC_ID', getExcludeData(exclicid))      
+        .input('EXC_USER_ID', getExcludeData(excuserid))      
         //.output('TOTAL', 0)
-        .execute('dbo.' + tableName)
+        .execute('dbo.SP_LOGIN_LOG_LICENSE')
         .then((result) => {
           const result_data = {
             //total: result.output.TOTAL,
@@ -29,53 +242,60 @@ async function getLogData(tableName, req) {
         .catch((err) => {
           console.log('err', err);
         });                  
-
-      const reault_data = result.result; 
+      
+      const reault_data = result.result;                
 
       reault_data.forEach((data, idx) => {
         let logdata = new Object() ;
         
-        logdata.id = idx;        
-        logdata.userid = data.user_id;        
-        logdata.username = data.user_name;        
-        logdata.department = data.department;        
-
+        logdata.id = idx;
+        logdata.licid = data.lic_id;        
+        logdata.licname = data.lic_name;        
+        logdata.holdqty = data.hold_qty;
         logdata.logdata = Object.values(JSON.parse(
-          JSON.stringify(data, (key, value) => {                      
+          JSON.stringify(data, (key, value) => {            
             const ret = (typeof value !== "object") ? ((isNaN(parseInt(key))) ? undefined : value) : value;
             return ret;            
           })
         ));
 
         arr_result[idx] = logdata;
-      });    
-    }   
+      });      
+    }    
   } catch (err) {
     console.log(err);
   }
-  console.log("arr_result==>", arr_result);
-  return arr_result;
+  console.log("loginlicenseList arr_result==>", arr_result);
+  res.json(arr_result);
 }
 
+// 로그인 로그(라이선스) - 기간
+export const loginlicenseListForRange = async (req,res) => {    
+  let arr_result = [];  // 결과값 저장
 
-// 상세 다운로드, 신규등록, 버전업 공통 함수
-async function getDetailLogData(tableName, req) {
-  let arr_result = [];  // 결과값 저장  
+  console.log("loginlicenseListForRange req.body==>", req.body);
 
   const searchtype = req.body.search_type;
-  const searchdate = req.body.search_date;
-  const user_id = req.body.user_id;   
+  const searchstartdate = req.body.search_start_date;
+  const searchenddate = req.body.search_end_date;
+  const lic_id = req.body.lic_id;    
+  const exclicid = req.body.exc_lic_id;
+  const excuserid = req.body.exc_user_id;
 
-  try {                 
-    if (user_id !== '') {        
+  try {       
+    if (lic_id !== '') {
+
       const pool = await db;      
       const result = await pool
-        .request()                          
+        .request()                  
         .input('SEARCH_TYPE', searchtype)
-        .input('SEARCH_DATE', searchdate)
-        .input('USER_ID', user_id)
+        .input('SEARCH_START_DATE', searchstartdate)
+        .input('SEARCH_END_DATE', searchenddate)
+        .input('LIC_ID', lic_id)
+        .input('EXC_LIC_ID', getExcludeData(exclicid))   
+        .input('EXC_USER_ID', getExcludeData(excuserid))         
         //.output('TOTAL', 0)
-        .execute('dbo.' + tableName)
+        .execute('dbo.SP_LOGIN_LOG_LICENSE_RANGE')
         .then((result) => {
           const result_data = {
             //total: result.output.TOTAL,
@@ -86,58 +306,38 @@ async function getDetailLogData(tableName, req) {
         .catch((err) => {
           console.log('err', err);
         });                  
+      
+      const reault_data = result.result;                
 
-      const reault_data = result.result; 
-    
       reault_data.forEach((data, idx) => {
-        arr_result[idx] = data;
-      });    
-    }   
+        let logdata = new Object() ;
+        
+        logdata.id = idx;
+        logdata.licid = data.lic_id;        
+        logdata.licname = data.lic_name;        
+        logdata.holdqty = data.hold_qty;
+        logdata.logdata = [data.cnt];
+
+        arr_result[idx] = logdata;
+      });      
+    }    
   } catch (err) {
     console.log(err);
   }
-  console.log("arr_result==>", arr_result);
-  return arr_result;
-}
-
-// 다운로드 로그
-export const downloadList = async (req,res) => {  
-  res.json(await getLogData("SP_DOWNLOAD_LOG", req));
-}
-
-// 상세 다운로드 로그
-export const downloadDetailList = async (req,res) => {    
-  res.json(await getDetailLogData("SP_DOWNLOAD_DETAIL_LOG", req));
-}
-
-// 신규 등록 로그
-export const newcreateList = async (req,res)=>{
-    //res.json("newcreateList from controller");
-    res.json(await getLogData("SP_NEWCREATE_LOG", req));
-}
-
-// 상세 신규 등록 로그
-export const newcreateDetailList = async (req,res) => {  
-  res.json(await getDetailLogData("SP_NEWCREATE_DETAIL_LOG", req));
-}
-
-// 버전업 로그
-export const versionupList = async (req,res)=>{
-    //res.json("versionupList from controller");
-    res.json(await getLogData("SP_VERSIONUP_LOG", req));
-}
-
-// 상세 버전업 로그
-export const versionupDetailList = async (req,res) => {  
-  res.json(await getDetailLogData("SP_VERSIONUP_DETAIL_LOG", req));
+  console.log("loginlicenseListForRange arr_result==>", arr_result);
+  res.json(arr_result);
 }
 
 // 로그인 로그(사용자)
 export const loginuserList = async (req,res)=>{
   let arr_result = [];  // 결과값 저장
+  
+  console.log("loginuserList req.body==>", req.body);
+
   const searchtype = req.body.search_type;
   const searchdate = req.body.search_date;
   const lic_id = req.body.lic_id;     
+  const exclicid = req.body.exc_lic_id;
   const excuserid = req.body.exc_user_id;  
   
   try {          
@@ -149,6 +349,7 @@ export const loginuserList = async (req,res)=>{
         .input('SEARCH_TYPE', searchtype)
         .input('SEARCH_DATE', searchdate)
         .input('LIC_ID', lic_id)         
+        .input('EXC_LIC_ID', getExcludeData(exclicid))  
         .input('EXC_USER_ID', getExcludeData(excuserid))      
         //.output('TOTAL', 0)
         .execute('dbo.SP_LOGIN_LOG_USER')
@@ -184,33 +385,40 @@ export const loginuserList = async (req,res)=>{
         arr_result[idx] = logdata;
       });      
     }
-    console.log("arr_result==>", arr_result);
+    console.log("loginuserList arr_result==>", arr_result);
     res.json(arr_result);
   } catch (err) {
     console.log(err);
   }    
 }
 
-// 로그인 로그(라이선스), /logs/loginlicense
-export const loginlicenseList = async (req,res) => {    
+// 로그인 로그(사용자) - 기간
+export const loginuserListForRange = async (req,res)=>{
   let arr_result = [];  // 결과값 저장
-  const searchtype = req.body.search_type;
-  const searchdate = req.body.search_date;
-  const lic_id = req.body.lic_id;    
-  const exclicid = req.body.exc_lic_id;
 
-  try {       
+  console.log("loginuserListForRange req.body==>", req.body);
+
+  const searchtype = req.body.search_type;
+  const searchstartdate = req.body.search_start_date;
+  const searchenddate = req.body.search_end_date;
+  const lic_id = req.body.lic_id;     
+  const exclicid = req.body.exc_lic_id;
+  const excuserid = req.body.exc_user_id;  
+  
+  try {          
     if (lic_id !== '') {
 
       const pool = await db;      
       const result = await pool
         .request()                  
         .input('SEARCH_TYPE', searchtype)
-        .input('SEARCH_DATE', searchdate)
-        .input('LIC_ID', lic_id)
-        .input('EXC_LIC_ID', getExcludeData(exclicid))      
+        .input('SEARCH_START_DATE', searchstartdate)
+        .input('SEARCH_END_DATE', searchenddate)
+        .input('LIC_ID', lic_id)         
+        .input('EXC_LIC_ID', getExcludeData(exclicid))  
+        .input('EXC_USER_ID', getExcludeData(excuserid))      
         //.output('TOTAL', 0)
-        .execute('dbo.SP_LOGIN_LOG_LICENSE')
+        .execute('dbo.SP_LOGIN_LOG_USER_RANGE')
         .then((result) => {
           const result_data = {
             //total: result.output.TOTAL,
@@ -221,111 +429,130 @@ export const loginlicenseList = async (req,res) => {
         .catch((err) => {
           console.log('err', err);
         });                  
-      
+
       const reault_data = result.result;                
 
       reault_data.forEach((data, idx) => {
         let logdata = new Object() ;
         
         logdata.id = idx;
-        logdata.licid = data.lic_id;        
-        logdata.licname = data.lic_name;        
-        logdata.holdqty = data.hold_qty;
-        logdata.logdata = Object.values(JSON.parse(
-          JSON.stringify(data, (key, value) => {            
-            const ret = (typeof value !== "object") ? ((isNaN(parseInt(key))) ? undefined : value) : value;
-            return ret;            
-          })
-        ));
+        logdata.userid = data.user_id;        
+        logdata.username = data.user_name;        
+        logdata.department = data.department;
+        logdata.pcname = data.pc_name;
+        logdata.logdata = [data.cnt];
 
         arr_result[idx] = logdata;
       });      
     }
-    console.log("arr_result==>", arr_result);
+    console.log("loginuserListForRange arr_result==>", arr_result);
     res.json(arr_result);
   } catch (err) {
     console.log(err);
-  }
+  }    
 }
 
-function getExcludeData(arr) {  
-  let result = "";  
-  arr.forEach((element) => {
-    result = result.concat("'").concat(element).concat("',");
-  })
 
-  if (result.length !== 0) result = result.substring(0, result.length - 1);  
-  return result
-}
-
+// ------------------- user or license list --------------------------
 
 // 라이선스 리스트
-export const licenseList = async (req,res) => {
-  //res.json("licenseList from controller");
+export const licenseList = async (req,res) => {  
+
+  console.log("licenseList req.body==>", req.body);
+
   const searchtype = req.body.search_type;
   const searchdate = req.body.search_date;
   const exclicid = req.body.exc_lic_id;
 
-  try {                 
-    const pool = await db;      
-    const result = await pool
-      .request()                  
-      .input('SEARCH_TYPE', searchtype)
-      .input('SEARCH_DATE', searchdate)      
-      .input('EXC_LIC_ID', getExcludeData(exclicid))      
-      //.output('TOTAL', 0)
-      .execute('dbo.SP_LICENSE_LIST')
-      .then((result) => {
-        const result_data = {
-          //total: result.output.TOTAL,
-          result: result.recordset,
-        };            
-        return result_data;
-      })
-      .catch((err) => {
-        console.log('err', err);
-      });                  
+  try {                    
+    const values = [
+      { key:'SEARCH_TYPE', value:searchtype},        
+      { key:'SEARCH_DATE', value:searchdate},      
+      { key:'EXC_LIC_ID', value:getExcludeData(exclicid)},        
+    ]
 
-    const reault_data = result.result;                
-    console.log("reault_data==>", reault_data);
+    const reault_data = await getResultData('SP_LICENSE_LIST', values);
+
+    console.log("licenseList reault_data==>", reault_data);
     res.json(reault_data);
   } catch (err) {
     console.log(err);
   }
 }
 
+// 라이선스 리스트 - 기간
+export const licenseListForRange = async (req,res) => {
+
+  console.log("licenseListForRange req.body==>", req.body);
+
+  const searchstartdate = req.body.search_start_date;
+  const searchenddate = req.body.search_end_date;
+  const exclicid = req.body.exc_lic_id;
+
+  try {                 
+    const values = [
+      { key:'SEARCH_START_DATE', value:searchstartdate},        
+      { key:'SEARCH_END_DATE', value:searchenddate},      
+      { key:'EXC_LIC_ID', value:getExcludeData(exclicid)},        
+    ]
+
+    const reault_data = await getResultData('SP_LICENSE_LIST_RANGE', values);
+
+    console.log("licenseListForRange reault_data==>", reault_data);
+    res.json(reault_data);
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 // 사용자 리스트
 export const userList = async (req,res) => {
-  //res.json("userList from controller");
+
+  console.log("userList req.body==>", req.body);
+
   const logtype = req.body.log_type;
   const searchtype = req.body.search_type;
   const searchdate = req.body.search_date;
   const excuserid = req.body.exc_user_id;
   
-  try {                 
-    const pool = await db;      
-    const result = await pool
-      .request()                  
-      .input('LOG_TYPE', logtype)
-      .input('SEARCH_TYPE', searchtype)
-      .input('SEARCH_DATE', searchdate)      
-      .input('EXC_USER_ID', getExcludeData(excuserid))      
-      //.output('TOTAL', 0)
-      .execute('dbo.SP_USER_LIST')
-      .then((result) => {
-        const result_data = {
-          //total: result.output.TOTAL,
-          result: result.recordset,
-        };            
-        return result_data;
-      })
-      .catch((err) => {
-        console.log('err', err);
-      });                  
+  try {                           
+    const values = [
+      { key:'LOG_TYPE', value:logtype},        
+      { key:'SEARCH_TYPE', value:searchtype},
+      { key:'SEARCH_DATE', value:searchdate},
+      { key:'EXC_USER_ID', value:getExcludeData(excuserid)},        
+    ]
 
-    const reault_data = result.result;                
-    console.log("reault_data==>", reault_data);
+    const reault_data = await getResultData('SP_USER_LIST', values);
+
+    console.log("userList reault_data==>", reault_data);
+    res.json(reault_data);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+// 사용자 리스트 - 기간
+export const userListForRange = async (req,res) => {
+
+  console.log("userListForRange req.body==>", req.body);
+
+  const logtype = req.body.log_type;  
+  const searchstartdate = req.body.search_start_date;
+  const searchenddate = req.body.search_end_date;
+  const excuserid = req.body.exc_user_id;
+
+  try {                 
+    const values = [
+      { key:'LOG_TYPE', value:logtype},        
+      { key:'SEARCH_START_DATE', value:searchstartdate},
+      { key:'SEARCH_END_DATE', value:searchenddate},
+      { key:'EXC_USER_ID', value:getExcludeData(excuserid)},        
+    ]
+
+    const reault_data = await getResultData('SP_USER_LIST_RANGE', values);
+
+    console.log("userListForRange reault_data==>", reault_data);
     res.json(reault_data);
   } catch (err) {
     console.log(err);

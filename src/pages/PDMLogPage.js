@@ -17,6 +17,8 @@ export default function PDMLogPage({ logType, logName }) {
   const [searchUser, setSearchUser] = useState(''); // 검색 사용자
   const [logDatas, setLogDatas] = useState([]); // server 처리 결과
   const [tableHead, setTableHead] = useState([]); // 테이블 칼럼
+  const [searchStartDate, setSearchStartDate] = useState(''); // 검색 시작 날짜
+  const [searchEndDate, setSearchEndDate] = useState(''); // 검색 종료 날짜
 
   return (
     <>
@@ -39,6 +41,8 @@ export default function PDMLogPage({ logType, logName }) {
         onSearchUser={setSearchUser}
         onLogDatas={setLogDatas}
         onTableHead={setTableHead}
+        onSearchStartDate={setSearchStartDate}
+        onSearchEndDate={setSearchEndDate}
       />
     </>
   );

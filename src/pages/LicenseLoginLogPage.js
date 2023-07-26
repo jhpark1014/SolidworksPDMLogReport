@@ -1,27 +1,18 @@
 import { Helmet } from 'react-helmet-async';
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 // @mui
 import {
   Card,
   Table,
-  Stack,
   Paper,
-  Popover,
-  Checkbox,
   TableRow,
-  MenuItem,
   TableBody,
   TableCell,
-  Container,
   Typography,
   TableContainer,
   TablePagination,
-  createTheme,
-  ThemeProvider,
 } from '@mui/material';
 import dayjs from 'dayjs';
-import { useTheme } from '@emotion/react';
-import { koKR } from '@mui/material/locale';
 // components
 // import Label from '../components/label';
 import Scrollbar from '../components/scrollbar';
@@ -35,6 +26,13 @@ import LoginDetailLogPage from './LoginDetailLogPage';
 // ----------------------------------------------------------------------
 
 // Table Headers
+function getTableHeadForRange (sdate, edate) {
+  return ([{
+    id : 1,
+    label : sdate.concat(' ~ ').concat(edate),      
+  }]);
+}
+
 const TABLE_HEAD_HOLDQTY = [
   { id: 'licenseName', label: '라이선스', alignRight: false },
   { id: 'holdQty', label: '보유 수량', alignRight: false },
@@ -85,43 +83,6 @@ const TABLE_HEAD_DAY = [
 ];
 
 // ----------------------------------------------------------------------
-
-// Search Filtering
-// function descendingComparator(a, b, orderBy) {
-//   if (b[orderBy] < a[orderBy]) {
-//     return -1;
-//   }
-//   if (b[orderBy] > a[orderBy]) {
-//     return 1;
-//   }
-//   return 0;
-// }
-
-// function getComparator(order, orderBy) {
-//   return order === 'desc'
-//     ? (a, b) => descendingComparator(a, b, orderBy)
-//     : (a, b) => -descendingComparator(a, b, orderBy);
-// }
-
-// function applySortFilter(array, comparator, query) {
-//   const stabilizedThis = array.map((el, index) => [el, index]);
-//   stabilizedThis.sort((a, b) => {
-//     const order = comparator(a[0], b[0]);
-//     if (order !== 0) return order;
-//     return a[1] - b[1];
-//   });
-//   if (query) {
-//     return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
-//   }
-//   return stabilizedThis.map((el) => el[0]);
-// }
-
-// function applyLicenseFilter(datas, licenseList) {
-//   return datas.filter((data) => licenseList.includes(data.name));
-// }
-
-// applySortFilter(LOGLIST, getComparator(order, orderBy), filterLicense);
-
 const showHoldQty = process.env.REACT_APP_LIC_HOLD_QTY;
 const excludeLicName = process.env.REACT_APP_EXCLUDE_LIC_NAME;
 const excludeLicArray = typeof excludeLicName === 'string' ? excludeLicName.trim().split(',') : '';
@@ -146,8 +107,6 @@ function getTableHead(searchType, searchDate) {
 
 export default function LicenseLoginLogPage() {
   const [page, setPage] = useState(0);
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('name');
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [searchType, setSearchType] = useState('day'); // 검색 구분
@@ -155,12 +114,8 @@ export default function LicenseLoginLogPage() {
   const [searchLicense, setSearchLicense] = useState(''); // 검색 사용자
   const [logDatas, setLogDatas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
+  const [searchStartDate, setSearchStartDate] = useState(''); // 시작일
+  const [searchEndDate, setSearchEndDate] = useState(''); // 종료일
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -171,20 +126,10 @@ export default function LicenseLoginLogPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  // const handleFilterByName = (event) => {
-  //   setPage(0);
-  //   setFilterName(event.target.value);
-  // };
-  // const handleFilterByLicense = (event) => {
-  // const handleFilterByLicense = () => {
-  //   setPage(0);
-  //   setFilterLicense(filterLicense);
-  // };
-
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - logDatas.length) : 0;
   const isNotFound = !logDatas.length && !!logDatas;
 
-  const tableHead = getTableHead(searchType, searchDate);
+  const tableHead = searchType === 'range' ? getTableHeadForRange(searchStartDate, searchEndDate) : getTableHead(searchType, searchDate);
   const tableHeadAll = showHoldQty === 'TRUE' ? TABLE_HEAD_HOLDQTY.concat(tableHead) : TABLE_HEAD.concat(tableHead);
 
   // 예외 필터링 후 라이선스 실제 이름이 매칭된 로그데이터
@@ -195,20 +140,17 @@ export default function LicenseLoginLogPage() {
         logDatas.splice(licNameArray.indexOf(data), 1);
       }
     });
-    logDatas.map((row) => {
-      return licnames.forEach((lic) => {
+    logDatas.map((row) => (
+      licnames.forEach((lic) => {
         if (row.licid === lic.lic_id) {
           row.licname = lic.lic_name;
         }
-      });
-    });
+      })
+    ));
     console.log('asd', logDatas);
     return logDatas;
   };
 
-  // 한국어 Grid
-  const theme = useTheme();
-  const themeWithLocale = useMemo(() => createTheme(theme, koKR), [koKR, theme]);
 
   return (
     <>
@@ -216,7 +158,6 @@ export default function LicenseLoginLogPage() {
         <title>로그인 로그 (라이선스)</title>
       </Helmet>
 
-      {/* <Container maxWidth="false" disableGutters> */}
       <LoginChartPage
         title={'로그인 로그 (라이선스)'}
         subtitle={`${
@@ -224,106 +165,102 @@ export default function LicenseLoginLogPage() {
         }, ${searchDate}, ${searchLicense}`}
         chartDatas={logDatas}
         chartLabels={getTableHead(searchType, searchDate)}
-      />
+      />      
+      <Card>
+        <UserListToolbarLoginLicense
+          onIsLoading={setIsLoading}
+          onSearchOption={setSearchType}
+          onDateOption={setSearchDate}
+          onLicenseOption={setSearchLicense}
+          onLogDatas={setLogDatas}
+          onStartDateOption={setSearchStartDate}
+          onEndDateOption={setSearchEndDate}
+        />
 
-      <ThemeProvider theme={themeWithLocale}>
-        {/* <Container maxWidth="false" disableGutters> */}
-        <Card>
-          <UserListToolbarLoginLicense
-            onIsLoading={setIsLoading}
-            onSearchOption={setSearchType}
-            onDateOption={setSearchDate}
-            onLicenseOption={setSearchLicense}
-            onLogDatas={setLogDatas}
-          />
+        <Scrollbar>
+          <TableContainer sx={{ minWidth: 800 }}>
+            <Table>
+              <UserListHeadNotSort headLabel={tableHeadAll} />
+              <TableBody>
+                {newLogDatas(logDatas)
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row) => {
+                    const { id, licid, licname, holdqty, logdata } = row;
 
-          <Scrollbar>
-            <TableContainer sx={{ minWidth: 800 }}>
-              <Table>
-                <UserListHeadNotSort headLabel={tableHeadAll} />
-                <TableBody>
-                  {newLogDatas(logDatas)
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => {
-                      const { id, licid, licname, holdqty, logdata } = row;
+                    return (
+                      <TableRow hover key={id} tabIndex={-1}>
+                        <TableCell align="left">
+                          <Typography variant="subtitle2" noWrap>
+                            {licname}
+                          </Typography>
+                        </TableCell>
 
-                      return (
-                        <TableRow hover key={id} tabIndex={-1}>
+                        {showHoldQty === 'TRUE' ? (
                           <TableCell align="left">
                             <Typography variant="subtitle2" noWrap>
-                              {licname}
+                              {holdqty}
                             </Typography>
                           </TableCell>
+                        ) : (
+                          ''
+                        )}
 
-                          {showHoldQty === 'TRUE' ? (
-                            <TableCell align="left">
-                              <Typography variant="subtitle2" noWrap>
-                                {holdqty}
-                              </Typography>
-                            </TableCell>
-                          ) : (
-                            ''
-                          )}
-
-                          {logdata.map((data, idx) => (
-                            <TableCell key={idx} align="left" value={data}>
-                              {data === 0 ? (
-                                '-'
-                              ) : (
-                                <LoginDetailLogPage
-                                  data={{
-                                    loglicensename: licname,
-                                    logdata: data,
-                                  }}
-                                  searchType={searchType}
-                                  searchDate={searchDate}
-                                  searchLicense={licid}
-                                  time={idx}
-                                />
-                              )}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      );
-                    })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
-                </TableBody>
-
-                {isNotFound && (
-                  <TableBody>
-                    <TableRow>
-                      <TableCell align="center" colSpan={tableHeadAll.length} sx={{ py: 3 }}>
-                        <Paper sx={{ textAlign: 'center' }}>
-                          <Typography variant="h6" paragraph>
-                            {isLoading ? 'Loading...' : '데이터가 없습니다. 검색 조건을 다시 입력해 주세요.'}
-                          </Typography>
-                        </Paper>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
+                        {logdata.map((data, idx) => (
+                          <TableCell key={idx} align="left" value={data}>
+                            {data === 0 ? (
+                              '-'
+                            ) : (
+                              <LoginDetailLogPage
+                                data={{
+                                  loglicensename: licname,
+                                  logdata: data,
+                                }}
+                                searchType={searchType}
+                                searchDate={searchDate}
+                                searchLicense={licid}
+                                time={idx}
+                              />
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    );
+                  })}
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 53 * emptyRows }}>
+                    <TableCell colSpan={6} />
+                  </TableRow>
                 )}
-              </Table>
-            </TableContainer>
-          </Scrollbar>
+              </TableBody>
 
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={newLogDatas(logDatas).length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage="max row"
-          />
-        </Card>
-        {/* </Container> */}
-      </ThemeProvider>
-      {/* </Container> */}
+              {isNotFound && (
+                <TableBody>
+                  <TableRow>
+                    <TableCell align="center" colSpan={tableHeadAll.length} sx={{ py: 3 }}>
+                      <Paper sx={{ textAlign: 'center' }}>
+                        <Typography variant="h6" paragraph>
+                          {isLoading ? 'Loading...' : '데이터가 없습니다. 검색 조건을 다시 입력해 주세요.'}
+                        </Typography>
+                      </Paper>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              )}
+            </Table>
+          </TableContainer>
+        </Scrollbar>
+
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={newLogDatas(logDatas).length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="max row"
+        />
+      </Card>
     </>
   );
 }

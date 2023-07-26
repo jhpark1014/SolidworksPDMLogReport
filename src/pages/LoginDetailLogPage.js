@@ -30,6 +30,9 @@ const DETAIL_HEAD = [
 ];
 // ----------------------------------------------------------------------
 
+const excludeLicName = process.env.REACT_APP_EXCLUDE_LIC_NAME;
+const excludeLicArray = typeof excludeLicName === 'string' ? excludeLicName.trim().split(',') : '';
+
 const excludeUserName = process.env.REACT_APP_EXCLUDE_USER_NAME;
 const excludeUserArray = typeof excludeUserName === 'string' ? excludeUserName.trim().split(',') : '';
 
@@ -52,6 +55,7 @@ export default function LoginDetailLogPage({ data, searchType, searchDate, searc
       search_type: searchType,
       search_date: searchDate,
       lic_id: searchLicense,
+      exc_lic_id: excludeLicArray,
       exc_user_id: excludeUserArray,
     };
     const config = { 'Content-Type': 'application/json' };
@@ -106,7 +110,7 @@ export default function LoginDetailLogPage({ data, searchType, searchDate, searc
         maxWidth="lg"
       >
         <DialogTitle id="scroll-dialog-title">상세 로그인 리스트</DialogTitle>
-        <DialogContent dividers="true">
+        <DialogContent dividers>
           <TableContainer>
             <Table>
               <TableHead>

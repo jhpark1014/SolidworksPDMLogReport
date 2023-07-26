@@ -57,11 +57,14 @@ const excludeUserArray = typeof excludeUserName === 'string' ? excludeUserName.t
 // ----------------------------------------------------------------------
 
 UserListToolbarLoginUser.propTypes = {
-  // numSelected: PropTypes.number,
   onIsLoading: PropTypes.func,
   onSearchOption: PropTypes.func,
   onDateOption: PropTypes.func,
   onLicenseOption: PropTypes.func,
+  onLogDatas: PropTypes.func,
+  onChartDatas: PropTypes.func,
+  onStartDateOption: PropTypes.func,
+  onEndDateOption: PropTypes.func,
 };
 
 export default function UserListToolbarLoginUser({
@@ -71,22 +74,22 @@ export default function UserListToolbarLoginUser({
   onLicenseOption,
   onLogDatas,
   onChartDatas,
+  onStartDateOption,
+  onEndDateOption,
 }) {
   const today = dayjs();
   const todayString = today.format('YYYY-MM-DD'); // 오늘 날짜(년-월) 리턴
   const [selectedOption, setSelectedSearch] = useState('day'); // 날짜 검색 옵션
   const [selectedDate, setSelectedDate] = useState(todayString); // 검색할 날짜
-  const [selectedStartDate, setSelectedStartDate] = useState(todayString); // 검색할 날짜
+  const [selectedStartDate, setSelectedStartDate] = useState(today.subtract(7, 'd').format('YYYY-MM-DD')); // 검색할 날짜
   const [selectedEndDate, setSelectedEndDate] = useState(todayString); // 검색할 날짜
   const [licenseList, setLicenseList] = useState(['']); // 선택 날짜에서의 License List 목록
   const [selectedLicense, setSelectedLicense] = useState(''); // select에 보여질 license 이름
   const [rangeSearch, setRangeSearch] = useState(false);
 
-  // const [selectedLicense, setSelectedLicense] = useState(pageType === 'license' ? 'All' : licenseName[0]); // select에 보여질 license 이름
+  
   // server에서 License List 가져오기
   async function callLicenseList(searchType, searchDate) {
-    const lics = [{ lic_id: 'All', lic_name: 'All' }];
-
     const url = `/logs/licenselist`;
     const data = {
       search_type: searchType,
@@ -100,13 +103,13 @@ export default function UserListToolbarLoginUser({
       .then((res) => {
         // success
         onIsLoading(false);
-        res.data.map((row) => {
-          return licnames.forEach((lic) => {
+        res.data.map((row) => (
+          licnames.forEach((lic) => {
             if (row.lic_id === lic.lic_id) {
               row.lic_name = lic.lic_name;
             }
-          });
-        });
+          })
+        ));
 
         onSearchOption(searchType);
         onDateOption(searchDate);
@@ -122,46 +125,135 @@ export default function UserListToolbarLoginUser({
     return result;
   }
 
-  // server 에서 response 데이터 가져오기
-  const callLogData = async (searchType, searchDate, selectedLicense) => {
-    const lics = await callLicenseList(searchType, searchDate);
-    setLicenseList(lics);
-    if (lics.length > 0 && selectedLicense.length === 0) {
-      selectedLicense = lics[0].lic_id;
-      setSelectedLicense(lics[0].lic_id);
-    }
-
-    const url = `/logs/loginuser`;
+  // server에서 License List 가져오기 - 기간
+  async function callLicenseListForRange(searchType, searchStartDate, searchEndDate) {    
+    const url = `/logs/licenselist/range`;
     const data = {
-      search_type: searchType,
-      search_date: searchDate,
-      lic_id: selectedLicense,
-      exc_user_id: excludeUserArray,
+      search_start_date: searchStartDate,
+      search_end_date: searchEndDate,
+      exc_lic_id: excludeLicArray,
     };
     const config = { 'Content-Type': 'application/json' };
 
-    await axios
+    const result = await axios
       .post(url, data, config)
       .then((res) => {
         // success
         onIsLoading(false);
+        res.data.map((row) => (
+          licnames.forEach((lic) => {
+            if (row.lic_id === lic.lic_id) {
+              row.lic_name = lic.lic_name;
+            }
+          })
+        ));
 
-        onSearchOption(searchType);
-        onDateOption(searchDate);
-        onLicenseOption(selectedLicense);
-
-        onLogDatas(res.data);
-        console.log(res.data);
+        setLicenseList(res.data);
+        return res.data;
       })
       .catch((err) => {
         // error
         console.log(err.response.data.message); // server error message
       });
 
-    onIsLoading(false);
-    onSearchOption(searchType);
-    onDateOption(searchDate);
-    onLicenseOption(selectedLicense);
+    return result;
+  }
+
+  // 기존 라이선스가 있는지 확인, 없으면 신규 라이선스로 대체
+  function getExistLicense(lics, selectedLicense) {
+    let existLic = '';
+    if (selectedLicense !== '') {
+      lics.map(value => {
+        if(selectedLicense===value.lic_id) {
+          existLic = value.lic_id;                        
+        }            
+        return value.lic_id;
+      });        
+    } 
+
+    if(existLic ===  '') {
+      existLic = lics[0].lic_id;
+      setSelectedLicense(lics[0].lic_id);
+    }
+    return existLic;
+  }
+
+  // server 에서 response 데이터 가져오기
+  const callLogData = async (searchType, searchDate, selectedLicense) => {
+    const lics = await callLicenseList(searchType, searchDate);
+    setLicenseList(lics);
+
+    if (lics.length > 0) {
+      const sLic = getExistLicense(lics, selectedLicense); // 라이선스 체크
+
+      const url = `/logs/loginuser`;
+      const data = {
+        search_type: searchType,
+        search_date: searchDate,
+        lic_id: sLic,
+        exc_lic_id: excludeLicArray,
+        exc_user_id: excludeUserArray,
+      };
+      const config = { 'Content-Type': 'application/json' };
+  
+      await axios
+        .post(url, data, config)
+        .then((res) => {
+          // success
+          onIsLoading(false);
+  
+          onSearchOption(searchType);
+          onDateOption(searchDate);
+          onLicenseOption(sLic);
+  
+          onLogDatas(res.data);
+          console.log(res.data);
+        })
+        .catch((err) => {
+          // error
+          console.log(err.response.data.message); // server error message
+        });
+    }
+
+  };
+
+   // server 에서 response 데이터 가져오기 - 기간
+   const callLogDataForRange = async (searchType, searchStartDate, searchEndDate, selectedLicense) => {
+    const lics = await callLicenseListForRange(searchType, searchStartDate, searchEndDate);    
+    setLicenseList(lics);
+    
+    if (lics.length > 0) {
+      const sLic = getExistLicense(lics, selectedLicense); // 라이선스 체크
+
+      const url = `/logs/loginuser/range`;
+      const data = {
+        search_start_date: searchStartDate,
+        search_end_date: searchEndDate,
+        lic_id: sLic,
+        exc_lic_id: excludeLicArray,
+        exc_user_id: excludeUserArray,
+      };
+      const config = { 'Content-Type': 'application/json' };
+
+      await axios
+        .post(url, data, config)
+        .then((res) => {
+          // success          
+          onIsLoading(false);
+          
+          onSearchOption(searchType);        
+          onStartDateOption(searchStartDate);
+          onEndDateOption(searchEndDate);
+          onLicenseOption(sLic);
+
+          onLogDatas(res.data);        
+        })
+        .catch((err) => {
+          // error
+          console.log(err.response.data.message); // server error message
+        });
+    }
+
   };
 
   // server에서 chart 데이터 가져오기
@@ -179,6 +271,7 @@ export default function UserListToolbarLoginUser({
       search_date: searchDate,
       lic_id: selectedLicense,
       exc_lic_id: excludeLicArray,
+      exc_user_id: excludeUserArray,
     };
     const config = { 'Content-Type': 'application/json' };
 
@@ -188,13 +281,13 @@ export default function UserListToolbarLoginUser({
         // success
         onIsLoading(false);
 
-        res.data.map((row) => {
-          return licnames.forEach((lic) => {
+        res.data.map((row) => (
+          licnames.forEach((lic) => {
             if (row.licid === lic.lic_id) {
               row.licname = lic.lic_name;
             }
-          });
-        });
+          })
+        ));
         if (res.data.length !== 0) {
           onChartDatas(res.data);
         } else {
@@ -214,11 +307,6 @@ export default function UserListToolbarLoginUser({
     onDateOption(searchDate);
     onLicenseOption(selectedLicense);
   };
-
-  // type별 형식에 맞는 날짜 리턴
-  function getSearchDate(searchType, year, month, day) {
-    return searchType === 'day' ? `${year}-${month}-${day}` : searchType === 'month' ? `${year}-${month}` : `${year}`;
-  }
 
   // type 변경 시 type별 형식에 맞는 날짜 리턴
   const getSearchDateForChangeType = (searchType, searchDate) => {
@@ -244,16 +332,19 @@ export default function UserListToolbarLoginUser({
 
       if (type === 'range') {
         setRangeSearch(true);
+        const sDate = getSearchDateForChangeType('day', selectedStartDate);
+        const eDate = getSearchDateForChangeType('day', selectedEndDate);        
+        await callLogDataForRange(type, sDate, eDate, selectedLicense);
+
       } else {
         setRangeSearch(false);
+        const searchDate = getSearchDateForChangeType(type, selectedDate);
+        await callLogData(type, searchDate, selectedLicense);
+        await callChartData(type, searchDate, selectedLicense);
       }
-      setSelectedSearch(type);
-      // setSearchOption(type);
 
-      const searchDate = getSearchDateForChangeType(type, selectedDate);
+      setSelectedSearch(type);      
 
-      callLogData(type, searchDate, selectedLicense);
-      callChartData(type, searchDate, selectedLicense);
     } catch (err) {
       console.log(err);
     }
@@ -265,8 +356,8 @@ export default function UserListToolbarLoginUser({
     try {
       const searchDate = getSearchDateForChangeType(selectedOption, value.$d);
       setSelectedDate(() => searchDate); // selectedDate를 설정해줌
-      callLogData(selectedOption, searchDate, selectedLicense);
-      callChartData(selectedOption, searchDate, selectedLicense);
+      await callLogData(selectedOption, searchDate, selectedLicense);
+      await callChartData(selectedOption, searchDate, selectedLicense);
     } catch (err) {
       console.log(err);
     }
@@ -274,10 +365,12 @@ export default function UserListToolbarLoginUser({
 
   const startDateChange = async (value) => {
     try {
-      const startDate = getSearchDateForChangeType('day', value.$d);
-      // const startDate = e.target.value;
-      setSelectedStartDate(() => startDate);
-      console.log('startDateChange', selectedStartDate);
+      const sDate = getSearchDateForChangeType('day', value.$d);
+      const eDate = getSearchDateForChangeType('day', selectedEndDate);
+      
+      setSelectedStartDate(sDate);
+      
+      await callLogDataForRange(selectedOption, sDate, eDate, selectedLicense);
     } catch (err) {
       console.log(err);
     }
@@ -285,11 +378,12 @@ export default function UserListToolbarLoginUser({
 
   const endDateChange = async (value) => {
     try {
-      const endDate = getSearchDateForChangeType('day', value.$d);
-      // const endDate = e.target.value;
-      setSelectedEndDate(() => endDate);
-      console.log('endDateChange', selectedEndDate);
-      // callLogData(selectedOption, selectedDate, selectedLicense);
+      const sDate = getSearchDateForChangeType('day', selectedStartDate);
+      const eDate = getSearchDateForChangeType('day', value.$d);
+      
+      setSelectedEndDate(eDate);
+            
+      await callLogDataForRange(selectedOption, sDate, eDate, selectedLicense);
     } catch (err) {
       console.log(err);
     }
@@ -302,52 +396,22 @@ export default function UserListToolbarLoginUser({
       const license = e.target.value;
       setSelectedLicense(license);
 
-      const searchDate = getSearchDateForChangeType(selectedOption, selectedDate);
+      if (selectedOption === 'range') {
+        const sDate = getSearchDateForChangeType('day', selectedStartDate);
+        const eDate = getSearchDateForChangeType('day', selectedEndDate);        
+        await callLogDataForRange(selectedOption, sDate, eDate, license);
 
-      callLogData(selectedOption, searchDate, license);
-      callChartData(selectedOption, searchDate, license);
+      } else {
+        const searchDate = getSearchDateForChangeType(selectedOption, selectedDate);
+        await callLogData(selectedOption, searchDate, license);
+        await callChartData(selectedOption, searchDate, license);
+      }  
     } catch (err) {
       console.log(err);
     }
 
-    // MULTIPLE SELECT일 시
-    // setLicenseName(
-    //   // On autofill we get a stringified value.
-    //   typeof value === 'string' ? value.split(',') : value
-    // );
   };
 
-  // MULTIPLE SELECT일 때 쓰는 함수들
-  // const checkAll = (checked) => {
-  //   if (checked) {
-  //     setLicenseName(licenseName);
-  //     // handleChange();
-  //     // console.log('yes checked: ', licenseName);
-  //     // console.log('yes length:', licenseName.filter((license) => license !== 'all').length);
-  //   } else {
-  //     setLicenseName([]);
-  //     // handleChange();
-  //     // console.log('no checked: ', licenseName);
-  //     // console.log('no length:', licenseName.filter((license) => license !== 'all').length);
-  //   }
-  //   // onFilterLicense(licenseName);
-  // };
-
-  // const checkSingle = (checked, value) => {
-  //   if (checked) {
-  //     setLicenseName((prev) => [...prev, value]);
-  //     // handleChange();
-  //     // console.log(inputs);
-  //   } else {
-  //     setLicenseName(licenseName.filter((el) => el !== value));
-  //     // handleChange();
-  //     // console.log(inputs);
-  //   }
-  // };
-
-  const checkSingle = (event) => {
-    setSelectedLicense(event.target.value);
-  };
 
   return (
     <StyledRoot>
@@ -373,11 +437,12 @@ export default function UserListToolbarLoginUser({
           </FormControl>
         </div>
         {/* 달력 */}
-        {rangeSearch ? (
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
+        {rangeSearch ? (          
+          <div>
             <DatePicker
               sx={{ width: 180, my: 2.5, ml: 2.5, mr: 1.5 }}
-              label="시작 날짜"
+              label="시작일"
               openTo={'day'}
               views={['year', 'month', 'day']}
               minDate={dayjs('2015-01-01')}
@@ -390,8 +455,8 @@ export default function UserListToolbarLoginUser({
             <DatePicker
               // disabled={rangeSearch}
               sx={{ width: 180, my: 2.5, mr: 2.5 }}
-              label="종료 날짜"
-              openTo="day"
+              label="종료일"
+              openTo={'day'}
               views={['year', 'month', 'day']}
               minDate={dayjs(selectedStartDate)}
               maxDate={dayjs()}
@@ -400,29 +465,28 @@ export default function UserListToolbarLoginUser({
               value={dayjs(selectedEndDate)}
               onAccept={endDateChange}
             />
-          </LocalizationProvider>
+          </div>          
         ) : (
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
-            <DatePicker
-              sx={{ width: 180, my: 2.5, ml: 2.5, mr: 1.5 }}
-              label="검색 날짜"
-              openTo={selectedOption === 'year' ? 'year' : selectedOption === 'month' ? 'month' : 'day'}
-              views={
-                selectedOption === 'year'
-                  ? ['year']
-                  : selectedOption === 'month'
-                  ? ['year', 'month']
-                  : ['year', 'month', 'day']
-              }
-              minDate={dayjs('2015-01-01')}
-              maxDate={dayjs()}
-              // defaultValue={dayjs()}
-              format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD'}
-              value={dayjs(selectedDate)}
-              onAccept={dateChange}
-            />
-          </LocalizationProvider>
+          <DatePicker
+            sx={{ width: 180, my: 2.5, ml: 2.5, mr: 1.5 }}
+            label="검색 날짜"
+            openTo={selectedOption === 'year' ? 'year' : selectedOption === 'month' ? 'month' : 'day'}
+            views={
+              selectedOption === 'year'
+                ? ['year']
+                : selectedOption === 'month'
+                ? ['year', 'month']
+                : ['year', 'month', 'day']
+            }
+            minDate={dayjs('2015-01-01')}
+            maxDate={dayjs()}
+            // defaultValue={dayjs()}
+            format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD'}
+            value={dayjs(selectedDate)}
+            onAccept={dateChange}
+          />          
         )}
+        </LocalizationProvider>
         {/* 라이선스 선택 */}
         <div>
           <FormControl sx={{ m: 2.5, width: 350 }}>
@@ -438,15 +502,7 @@ export default function UserListToolbarLoginUser({
               input={<OutlinedInput label="라이선스" />}
               // renderValue={(selected) => selected.join(', ')}
               MenuProps={MenuProps}
-            >
-              {/* <MenuItem key="all" value="all" onClick={(event) => checkAll(event.target.checked)}>
-                <Checkbox
-                  checked={licenseName.filter((license) => license !== 'all').length === selected.length}
-                  value="모두 선택"
-                  onChange={(event) => checkAll(event.target.checked)}
-                />
-                <ListItemText primary="모두 선택" />
-              </MenuItem> */}
+            >              
               {licenseList.map((value) => (
                 <MenuItem key={value.lic_id} value={value.lic_id}>
                   {value.lic_name}
@@ -455,11 +511,7 @@ export default function UserListToolbarLoginUser({
             </Select>
           </FormControl>
         </div>
-      </Box>
-      {/* <Box sx={{ m: 3 }}>
-        단위 : {selectedOption === 'year' ? '월' : selectedOption === 'month' ? '일' : '시'}
-        <br />
-      </Box> */}
+      </Box>      
     </StyledRoot>
   );
 }

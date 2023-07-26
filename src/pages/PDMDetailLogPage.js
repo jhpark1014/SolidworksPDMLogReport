@@ -33,21 +33,26 @@ const DETAIL_HEAD = [
 // ----------------------------------------------------------------------
 
 PDMDetailLogPage.propTypes = {
-  data: PropTypes.string,
+  isDividers: PropTypes.bool,
+  logusername: PropTypes.string,
+  logdata: PropTypes.number,
   sParam: PropTypes.string,
   searchType: PropTypes.string,
   searchDate: PropTypes.string,
+  searchStartDate: PropTypes.string,
+  searchEndDate: PropTypes.string,
   searchUser: PropTypes.string,
 };
 
-export default function PDMDetailLogPage({ data, sParam, searchType, searchDate, searchUser }) {
+export default function PDMDetailLogPage({ isDividers, logusername, logdata, sParam, searchType, searchDate, searchStartDate, searchEndDate, searchUser }) {
   const [isLoading, setIsLoading] = useState(true); // loding
   const [open, setOpen] = useState(false); // dialog open
   const [detailLogData, setDetailLogData] = useState([]); // detail log data
-
+  
   const callLogData = async (sParam, searchType, searchDate, searchUser) => {
     const url = `/logs/${sParam}/detail`;
     const data = {
+      log_type : sParam,
       search_type: searchType,
       search_date: searchDate,
       user_id: searchUser,
@@ -58,8 +63,32 @@ export default function PDMDetailLogPage({ data, sParam, searchType, searchDate,
       .post(url, data, config)
       .then((res) => {
         // success
-        setDetailLogData(res.data);
         setIsLoading(false);
+        setDetailLogData(res.data);
+      })
+      .catch((err) => {
+        // error
+        console.log(err.response.data.message); // server error message
+      });
+  };
+
+  const callLogDataForRange = async (sParam, searchStartDate, searchEndDate, searchUser) => {
+    const url = `/logs/${sParam}/detail/range`;
+    const data = {
+      log_type : sParam,
+      search_start_date: searchStartDate,
+      search_end_date: searchEndDate,
+      user_id: searchUser,
+    };
+
+    const config = { 'Content-Type': 'application/json' };
+
+    await axios
+      .post(url, data, config)
+      .then((res) => {
+        // success
+        setIsLoading(false);
+        setDetailLogData(res.data);        
       })
       .catch((err) => {
         // error
@@ -69,7 +98,10 @@ export default function PDMDetailLogPage({ data, sParam, searchType, searchDate,
 
   const handleClickOpen = () => () => {
     setOpen(true);
-    callLogData(sParam, searchType, searchDate, searchUser);
+    if (searchType === 'range')
+      callLogDataForRange(sParam, searchStartDate, searchEndDate, searchUser);
+    else
+      callLogData(sParam, searchType, searchDate, searchUser);
   };
 
   const handleClose = () => {
@@ -82,7 +114,7 @@ export default function PDMDetailLogPage({ data, sParam, searchType, searchDate,
   return (
     <>
       <Link component="button" onClick={handleClickOpen()}>
-        {data.logdata}
+        {logdata}
       </Link>
 
       <Dialog
@@ -94,14 +126,14 @@ export default function PDMDetailLogPage({ data, sParam, searchType, searchDate,
         maxWidth="lg"
       >
         <DialogTitle id="scroll-dialog-title">상세 로그 리스트</DialogTitle>
-        <DialogContent dividers="true">
+        <DialogContent dividers={isDividers}>
           <TableContainer>
             <Table>
               <TableHead>
                 <TableRow>
                   <TableCell align="left" colSpan={2} sx={{ padding: 1, backgroundColor: 'white' }}>
                     <Typography variant="subtitle1" noWrap>
-                      {sParam.toUpperCase()}, {data.logusername}, {detailLogData.length} 건
+                      {sParam.toUpperCase()}, {logusername}, {detailLogData.length} 건
                     </Typography>
                   </TableCell>
                   <TableCell align="right" colSpan={2} sx={{ padding: 1, backgroundColor: 'white' }}>
@@ -112,7 +144,7 @@ export default function PDMDetailLogPage({ data, sParam, searchType, searchDate,
                         filename={sParam
                           .toUpperCase()
                           .concat('_')
-                          .concat(data.logusername)
+                          .concat(logusername)
                           .concat('_')
                           .concat(t)
                           .concat('.csv')}

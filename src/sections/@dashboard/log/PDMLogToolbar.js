@@ -66,6 +66,8 @@ PDMLogToolbar.propTypes = {
   onIsloading: PropTypes.func,
   onSearchType: PropTypes.func,
   onSearchDate: PropTypes.func,
+  onSearchStartDate: PropTypes.func,
+  onSearchEndDate: PropTypes.func,
   onSearchUser: PropTypes.func,
   onLogDatas: PropTypes.func,
   onTableHead: PropTypes.func,
@@ -76,6 +78,8 @@ export default function PDMLogToolbar({
   onIsloading,
   onSearchType,
   onSearchDate,
+  onSearchStartDate,
+  onSearchEndDate,
   onSearchUser,
   onLogDatas,
   onTableHead,
@@ -85,8 +89,11 @@ export default function PDMLogToolbar({
 
   const [searchType, setSearchType] = useState('month');
   const [searchDate, setSearchDate] = useState(dateString);
+  const [searchStartDate, setSearchStartDate] = useState(today.subtract(7, 'd'));
+  const [searchEndDate, setSearchEndDate] = useState(today);
   const [searchUser, setSearchUser] = useState('All');
   const [userList, setUserList] = useState([]);
+  const [rangeSearch, setRangeSearch] = useState(false);
   
   const excludeUserName = process.env.REACT_APP_EXCLUDE_USER_NAME;
   const excludeUserArray = typeof excludeUserName === 'string' ? excludeUserName.trim().split(',') : '';
@@ -95,6 +102,15 @@ export default function PDMLogToolbar({
     onTableHead(getTableHead(searchType, searchDate));
   };
 
+  const callTableHeadForRange = async (sdate, edate) => {
+    onTableHead([{
+      id : 1,
+      label : sdate.concat(' ~ ').concat(edate),      
+    }]);
+  };
+
+
+  // ------------------------- server call start --------------------------------------
   // server에서 user List 가져오기
   const callUserList = async (searchType, searchDate) => {
     const url = `/logs/userlist`;
@@ -120,17 +136,42 @@ export default function PDMLogToolbar({
         });  
   };
 
+   // server에서 user List 가져오기 - 기간
+   const callUserListForRange = async (searchStartDate, searchEndDate) => {
+    const url = `/logs/userlist/range`;
+    const data = {
+        'log_type' : sParam,
+        'search_start_date' : searchStartDate,
+        'search_end_date' : searchEndDate,
+        'exc_user_id' : excludeUserArray,
+    };
+    const config = {"Content-Type": 'application/json'};
+    await axios.post(url, data, config)
+        .then(res => {
+            // success
+            const users = [{ user_id: 'All', user_name: 'All' }];
+            if (res.data.length === 0) {
+              setUserList(users);
+            } else {
+              setUserList(users.concat(res.data));
+            }
+        }).catch(err => {
+            // error
+            console.log(err.response.data.message); // server error message
+        });  
+  };
+
   // server 에서 response 데이터 가져오기
   const callLogData = async (searchType, searchDate, searchUser) => {
     const url = `/logs/${sParam}`;
     const data = {
+        'log_type' : sParam,
         'search_type' : searchType,
-        'search_date' : searchDate,
+        'search_date' : searchDate,        
         'user_id' : searchUser,
         'exc_user_id' : excludeUserArray,
     };
     const config = {"Content-Type": 'application/json'};
-
     await axios.post(url, data, config)
         .then(res => {
             // success
@@ -139,13 +180,43 @@ export default function PDMLogToolbar({
             onSearchType(searchType);
             onSearchDate(searchDate);
             onSearchUser(searchUser);
-        
+
             onLogDatas(res.data);
         }).catch(err => {
             // error
             console.log(err.response.data.message); // server error message
         });  
   };
+
+  // server 에서 response 데이터 가져오기 - 기간
+  const callLogDataForRange = async (searchType, searchStartDate, searchEndDate, searchUser) => {
+    const url = `/logs/${sParam}/range`;
+    const data = {
+        'log_type' : sParam,
+        'search_type' : searchType,
+        'search_start_date' : searchStartDate,
+        'search_end_date' : searchEndDate,
+        'user_id' : searchUser,
+        'exc_user_id' : excludeUserArray,
+    };
+    const config = {"Content-Type": 'application/json'};
+    await axios.post(url, data, config)
+        .then(res => {
+            // success
+            onIsloading(false);
+
+            onSearchType(searchType);
+            onSearchStartDate(searchStartDate);
+            onSearchEndDate(searchEndDate);
+            onSearchUser(searchUser);
+
+            onLogDatas(res.data);
+        }).catch(err => {
+            // error
+            console.log(err.response.data.message); // server error message
+        });  
+  };
+  // ------------------------- server call end --------------------------------------
 
   // type 변경 시 type별 형식에 맞는 날짜 리턴
   const getSearchDateForChangeType = (searchType, searchDate) => {
@@ -159,35 +230,80 @@ export default function PDMLogToolbar({
 
   // 초기 화면 셋팅
   useEffect(() => {
-    callUserList(searchType, searchDate);
-    callLogData(searchType, searchDate, searchUser);
-    callTableHead(searchType, searchDate);
+    
+    async function fetchData() {
+      await callUserList(searchType, searchDate);
+      await callLogData(searchType, searchDate, searchUser);
+      await callTableHead(searchType, searchDate);        
+    }
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearchType = async (event) => {
-    const type = event.target.value;
-    const date = getSearchDateForChangeType(type, searchDate);
+    const type = event.target.value;    
 
-    setSearchType(type);
-    callTableHead(type, searchDate);
+    if (type === 'range') {
+      setRangeSearch(true);
+      setSearchType(type);
+      
+      const sdate = getSearchDateForChangeType('day', searchStartDate);
+      const edate = getSearchDateForChangeType('day', searchEndDate);
 
-    callUserList(type, date);
-    callLogData(type, date, searchUser);
+      await callUserListForRange(sdate, edate); // 사용자 리스트 - 기간
+      await callLogDataForRange(searchType, sdate, edate, searchUser);  // 로그 데이터 - 기간
+      await callTableHeadForRange(sdate, edate); // 테이블 칼럼 - 기간
+    } else {
+      setRangeSearch(false);
+      setSearchType(type);
+
+      const date = getSearchDateForChangeType(type, searchDate);
+
+      await callUserList(type, date);
+      await callLogData(type, date, searchUser);
+      await callTableHead(type, searchDate);
+    }
+
+    
   };
 
+  // Search Date event
   const handleSearchDate = async (newValue) => {
     const date = getSearchDateForChangeType(searchType, newValue.$d);
 
     setSearchDate(date);
-    callTableHead(searchType, date);
 
-    callUserList(searchType, date);
-    callLogData(searchType, date, searchUser);
+    await callUserList(searchType, date);
+    await callLogData(searchType, date, searchUser);
+    await callTableHead(searchType, date);
   };
 
-  const userChange = (event) => {
-    // console.log('event.target', event.target);
+  // Start Date event
+  const handleSearchStartDate = async (newValue) => {
+    const sdate = getSearchDateForChangeType('day', newValue.$d);
+    const edate = getSearchDateForChangeType('day', searchEndDate);
+
+    setSearchStartDate(sdate);
+
+    await callUserListForRange(sdate, edate);   // 사용자 리스트 - 기간
+    await callLogDataForRange(searchType, sdate, edate, searchUser);  // 로그 데이터 - 기간
+    await callTableHeadForRange(sdate, edate);  // 테이블 칼럼 - 기간
+  };
+
+  // End Date event
+  const handleSearchEndDate = async (newValue) => {
+    const sdate = getSearchDateForChangeType('day', searchStartDate);
+    const edate = getSearchDateForChangeType('day', newValue.$d);
+
+    setSearchEndDate(edate);
+
+    await callUserListForRange(sdate, edate);   // 사용자 리스트 - 기간
+    await callLogDataForRange(searchType, sdate, edate, searchUser);  // 로그 데이터 - 기간
+    await callTableHeadForRange(sdate, edate);  // 테이블 칼럼 - 기간
+  };
+  
+
+  const userChange = async (event) => {
     event.preventDefault();
     try {
       const {
@@ -195,12 +311,20 @@ export default function PDMLogToolbar({
       } = event;
       setSearchUser(value);
 
-      const date = getSearchDateForChangeType(searchType, searchDate);
-      callLogData(searchType, date, value);
+      if (searchType === 'range') {
+        const sdate = getSearchDateForChangeType('day', searchStartDate);
+        const edate = getSearchDateForChangeType('day', searchEndDate);
+        await callLogDataForRange(searchType, sdate, edate, value);  // 로그 데이터 - 기간
+      } else {
+        const date = getSearchDateForChangeType(searchType, searchDate);      
+        await callLogData(searchType, date, value);
+      }
+      
     } catch (err) {
       console.log(err);
     }
   };
+
 
   return (
     <StyledRoot>
@@ -219,14 +343,43 @@ export default function PDMLogToolbar({
             >
               <MenuItem value="month">월</MenuItem>
               <MenuItem value="year">연</MenuItem>
+              <MenuItem value="range">기간</MenuItem>
             </Select>
           </FormControl>
         </div>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">          
+        {rangeSearch ? (
+          <div>
+            <DatePicker
+              sx={{ width: 180, m: 2, mr: 0.5 }}
+              label="시작일"
+              openTo={'day'}
+              views={['year', 'month', 'day']}
+              minDate={dayjs('2015-01-01')}
+              maxDate={dayjs(searchEndDate)}
+              format={'YYYY-MM-DD'}
+              // defaultValue={dayjs()}
+              value={dayjs(searchStartDate)}
+              onAccept={handleSearchStartDate}
+            />
+            <DatePicker
+              sx={{ width: 180, m: 2, ml: 0.5 }}
+              label="종료일"
+              openTo={'day'}
+              views={['year', 'month', 'day']}
+              minDate={dayjs(searchStartDate)}
+              maxDate={dayjs()}
+              format={'YYYY-MM-DD'}
+              // defaultValue={dayjs()}
+              value={dayjs(searchEndDate)}
+              onAccept={handleSearchEndDate}
+            />
+          </div>
+          ) : (
           <DatePicker
             sx={{ width: 180, m: 2 }}
             label="검색 날짜"
-            openTo={searchType === 'month' ? 'month' : 'year'}
+            openTo={searchType}
             views={searchType === 'month' ? ['year', 'month'] : ['year']}
             minDate={dayjs('2015-01-01')}
             maxDate={dayjs()}
@@ -235,6 +388,7 @@ export default function PDMLogToolbar({
             value={dayjs(searchDate)}
             onAccept={handleSearchDate}
           />
+        )}
         </LocalizationProvider>
         <div>
           <FormControl sx={{ m: 2, width: 300 }}>
