@@ -3,9 +3,10 @@ import {
     pdmLogList, pdmLogListForRange, 
     pdmDetailList, pdmDetailListForRange,
     loginuserList, loginlicenseList, 
-    loginuserListForRange, loginlicenseListForRange, 
+    loginuserListForRange, loginlicenseListForRange,     
     userList, licenseList,
     userListForRange, licenseListForRange,
+    loginlicenseDeatilList, loginuserDeatilList
     } from "../controllers/log.js"
 
 const router = express.Router();
@@ -24,8 +25,10 @@ router.post("/versionup/detail", pdmDetailList);
 router.post("/versionup/detail/range", pdmDetailListForRange);
 router.post("/loginlicense", loginlicenseList);
 router.post("/loginlicense/range", loginlicenseListForRange);
+router.post("/loginlicense/detail", loginlicenseDeatilList);
 router.post("/loginuser", loginuserList);
 router.post("/loginuser/range", loginuserListForRange);
+router.post("/loginuser/detail", loginuserDeatilList);
 router.post("/userlist", userList);
 router.post("/userlist/range", userListForRange);
 router.post("/licenselist", licenseList);

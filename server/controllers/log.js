@@ -221,29 +221,15 @@ export const loginlicenseList = async (req,res) => {
 
   try {       
     if (lic_id !== '') {
-
-      const pool = await db;      
-      const result = await pool
-        .request()                  
-        .input('SEARCH_TYPE', searchtype)
-        .input('SEARCH_DATE', searchdate)
-        .input('LIC_ID', lic_id)
-        .input('EXC_LIC_ID', getExcludeData(exclicid))      
-        .input('EXC_USER_ID', getExcludeData(excuserid))      
-        //.output('TOTAL', 0)
-        .execute('dbo.SP_LOGIN_LOG_LICENSE')
-        .then((result) => {
-          const result_data = {
-            //total: result.output.TOTAL,
-            result: result.recordset,
-          };            
-          return result_data;
-        })
-        .catch((err) => {
-          console.log('err', err);
-        });                  
-      
-      const reault_data = result.result;                
+      const values = [
+        { key:'SEARCH_TYPE', value:searchtype},        
+        { key:'SEARCH_DATE', value:searchdate},
+        { key:'LIC_ID', value:lic_id},
+        { key:'EXC_LIC_ID', value:getExcludeData(exclicid)},        
+        { key:'EXC_USER_ID', value:getExcludeData(excuserid)},        
+      ]
+  
+      const reault_data = await getResultData('SP_LOGIN_LOG_LICENSE', values);         
 
       reault_data.forEach((data, idx) => {
         let logdata = new Object() ;
@@ -284,30 +270,16 @@ export const loginlicenseListForRange = async (req,res) => {
 
   try {       
     if (lic_id !== '') {
-
-      const pool = await db;      
-      const result = await pool
-        .request()                  
-        .input('SEARCH_TYPE', searchtype)
-        .input('SEARCH_START_DATE', searchstartdate)
-        .input('SEARCH_END_DATE', searchenddate)
-        .input('LIC_ID', lic_id)
-        .input('EXC_LIC_ID', getExcludeData(exclicid))   
-        .input('EXC_USER_ID', getExcludeData(excuserid))         
-        //.output('TOTAL', 0)
-        .execute('dbo.SP_LOGIN_LOG_LICENSE_RANGE')
-        .then((result) => {
-          const result_data = {
-            //total: result.output.TOTAL,
-            result: result.recordset,
-          };            
-          return result_data;
-        })
-        .catch((err) => {
-          console.log('err', err);
-        });                  
-      
-      const reault_data = result.result;                
+      const values = [
+        { key:'SEARCH_TYPE', value:searchtype},        
+        { key:'SEARCH_START_DATE', value:searchstartdate},
+        { key:'SEARCH_END_DATE', value:searchenddate},
+        { key:'LIC_ID', value:lic_id},
+        { key:'EXC_LIC_ID', value:getExcludeData(exclicid)},        
+        { key:'EXC_USER_ID', value:getExcludeData(excuserid)},        
+      ]
+  
+      const reault_data = await getResultData('SP_LOGIN_LOG_LICENSE_RANGE', values);  
 
       reault_data.forEach((data, idx) => {
         let logdata = new Object() ;
@@ -342,29 +314,15 @@ export const loginuserList = async (req,res)=>{
   
   try {          
     if (lic_id !== '') {
-
-      const pool = await db;      
-      const result = await pool
-        .request()                  
-        .input('SEARCH_TYPE', searchtype)
-        .input('SEARCH_DATE', searchdate)
-        .input('LIC_ID', lic_id)         
-        .input('EXC_LIC_ID', getExcludeData(exclicid))  
-        .input('EXC_USER_ID', getExcludeData(excuserid))      
-        //.output('TOTAL', 0)
-        .execute('dbo.SP_LOGIN_LOG_USER')
-        .then((result) => {
-          const result_data = {
-            //total: result.output.TOTAL,
-            result: result.recordset,
-          };            
-          return result_data;
-        })
-        .catch((err) => {
-          console.log('err', err);
-        });                  
-
-      const reault_data = result.result;                
+      const values = [
+        { key:'SEARCH_TYPE', value:searchtype},        
+        { key:'SEARCH_DATE', value:searchdate},
+        { key:'LIC_ID', value:lic_id},
+        { key:'EXC_LIC_ID', value:getExcludeData(exclicid)},        
+        { key:'EXC_USER_ID', value:getExcludeData(excuserid)},        
+      ]
+  
+      const reault_data = await getResultData('SP_LOGIN_LOG_USER', values);    
 
       reault_data.forEach((data, idx) => {
         let logdata = new Object() ;
@@ -407,30 +365,16 @@ export const loginuserListForRange = async (req,res)=>{
   
   try {          
     if (lic_id !== '') {
-
-      const pool = await db;      
-      const result = await pool
-        .request()                  
-        .input('SEARCH_TYPE', searchtype)
-        .input('SEARCH_START_DATE', searchstartdate)
-        .input('SEARCH_END_DATE', searchenddate)
-        .input('LIC_ID', lic_id)         
-        .input('EXC_LIC_ID', getExcludeData(exclicid))  
-        .input('EXC_USER_ID', getExcludeData(excuserid))      
-        //.output('TOTAL', 0)
-        .execute('dbo.SP_LOGIN_LOG_USER_RANGE')
-        .then((result) => {
-          const result_data = {
-            //total: result.output.TOTAL,
-            result: result.recordset,
-          };            
-          return result_data;
-        })
-        .catch((err) => {
-          console.log('err', err);
-        });                  
-
-      const reault_data = result.result;                
+      const values = [
+        { key:'SEARCH_TYPE', value:searchtype},        
+        { key:'SEARCH_START_DATE', value:searchstartdate},
+        { key:'SEARCH_END_DATE', value:searchenddate},
+        { key:'LIC_ID', value:lic_id},
+        { key:'EXC_LIC_ID', value:getExcludeData(exclicid)},        
+        { key:'EXC_USER_ID', value:getExcludeData(excuserid)},        
+      ]
+  
+      const reault_data = await getResultData('SP_LOGIN_LOG_USER_RANGE', values);
 
       reault_data.forEach((data, idx) => {
         let logdata = new Object() ;
@@ -452,6 +396,122 @@ export const loginuserListForRange = async (req,res)=>{
   }    
 }
 
+// 로그인 로그(라이선스) - 상세
+export const loginlicenseDeatilList = async (req,res)=>{
+  let arr_result = [];  // 결과값 저장
+
+  console.log("loginlicenseDeatilList req.body==>", req.body);
+  
+  try {          
+    const searchtype = req.body.search_type;
+    let values = [];
+
+    if (searchtype === 'range') {
+      const searchstartdate = req.body.search_start_date;
+      const searchenddate = req.body.search_end_date;
+      const licid = req.body.lic_id;       
+      const excuserid = req.body.exc_user_id;  
+  
+      values = [
+        { key:'SEARCH_TYPE', value:searchtype},        
+        { key:'SEARCH_START_DATE', value:searchstartdate},
+        { key:'SEARCH_END_DATE', value:searchenddate},
+        { key:'LIC_ID', value:licid},             
+        { key:'EXC_USER_ID', value:getExcludeData(excuserid)},        
+      ]
+    } else {
+      const searchdate = req.body.search_date;      
+      const licid = req.body.lic_id;       
+      const excuserid = req.body.exc_user_id;  
+  
+      values = [
+        { key:'SEARCH_TYPE', value:searchtype},        
+        { key:'SEARCH_START_DATE', value:searchdate},
+        { key:'SEARCH_END_DATE', value:''},
+        { key:'LIC_ID', value:licid},             
+        { key:'EXC_USER_ID', value:getExcludeData(excuserid)},        
+      ]
+    }
+
+    const reault_data = await getResultData('SP_LOGIN_LIC_DETAIL_LOG', values);            
+
+    reault_data.forEach((data, idx) => {
+      let logdata = new Object() ;
+      
+      logdata.id = idx;
+      logdata.logdate = data.logdate;        
+      logdata.userid = data.user_id;        
+      logdata.username = data.user_name;        
+      logdata.department = data.department;
+      logdata.pcname = data.pc_name;        
+
+      arr_result[idx] = logdata;
+    });      
+    console.log("loginlicenseDeatilList arr_result==>", arr_result);
+    res.json(arr_result);
+  } catch (err) {
+    console.log(err);
+  }    
+}
+
+// 로그인 로그(사용자) - 상세
+export const loginuserDeatilList = async (req,res)=>{
+  let arr_result = [];  // 결과값 저장
+
+  console.log("loginuserDeatilList req.body==>", req.body);
+
+  try {          
+    const searchtype = req.body.search_type;
+    let values = [];
+
+    if (searchtype === 'range') {
+      const searchstartdate = req.body.search_start_date;
+      const searchenddate = req.body.search_end_date;
+      const licid = req.body.lic_id;       
+      const userid = req.body.user_id;   
+  
+      values = [
+        { key:'SEARCH_TYPE', value:searchtype},        
+        { key:'SEARCH_START_DATE', value:searchstartdate},
+        { key:'SEARCH_END_DATE', value:searchenddate},
+        { key:'LIC_ID', value:licid},             
+        { key:'USER_ID', value:userid},        
+      ]
+    } else {
+      const searchdate = req.body.search_date;      
+      const licid = req.body.lic_id;       
+      const userid = req.body.userid;  
+  
+      values = [
+        { key:'SEARCH_TYPE', value:searchtype},        
+        { key:'SEARCH_START_DATE', value:searchdate},
+        { key:'SEARCH_END_DATE', value:''},
+        { key:'LIC_ID', value:licid},             
+        { key:'USER_ID', value:userid},        
+      ]
+    }
+
+    const reault_data = await getResultData('SP_LOGIN_USER_DETAIL_LOG', values);            
+
+    reault_data.forEach((data, idx) => {
+      let logdata = new Object() ;
+      
+      logdata.id = idx;
+      logdata.logdate = data.logdate;        
+      logdata.userid = data.user_id;        
+      logdata.username = data.user_name;        
+      logdata.department = data.department;
+      logdata.pcname = data.pc_name;        
+
+      arr_result[idx] = logdata;
+    });      
+    
+    console.log("loginuserDeatilList arr_result==>", arr_result);
+    res.json(arr_result);
+  } catch (err) {
+    console.log(err);
+  }    
+}
 
 // ------------------- user or license list --------------------------
 
