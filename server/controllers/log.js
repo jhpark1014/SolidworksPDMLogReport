@@ -23,9 +23,11 @@ async function getResultData(tablename, values) {
   return result.data;
 }
 
-// 다운로드, 신규등록, 버전업 공통 함수
+// PDM 로그 공통 함수
 async function getLogData(req) {
   let arr_result = [];  // 결과값 저장
+
+  console.log("getLogData req.body==>", req.body);
 
   const logtype = req.body.log_type;
   const searchtype = req.body.search_type;
@@ -70,7 +72,7 @@ async function getLogData(req) {
   return arr_result;
 }
 
-// 다운로드, 신규등록, 버전업 기간 공통 함수 - 기간
+// PDM 로그 기간 공통 함수 - 기간
 async function getLogDataForRange(req) {
   let arr_result = [];  // 결과값 저장
 
@@ -112,7 +114,7 @@ async function getLogDataForRange(req) {
   return arr_result;
 }
 
-// 상세 다운로드, 신규등록, 버전업 공통 함수
+// 상세 PDM 로그 공통 함수
 async function getDetailLogData(req) {
   let arr_result = [];  // 결과값 저장  
 
@@ -142,7 +144,7 @@ async function getDetailLogData(req) {
   return arr_result;
 }
 
-// 상세 다운로드, 신규등록, 버전업 공통 함수 - 기간
+// 상세 PDM 로그 공통 함수 - 기간
 async function getDetailLogDataForRange(req) {
   let arr_result = [];  // 결과값 저장  
 
@@ -480,7 +482,7 @@ export const loginuserDeatilList = async (req,res)=>{
     } else {
       const searchdate = req.body.search_date;      
       const licid = req.body.lic_id;       
-      const userid = req.body.userid;  
+      const userid = req.body.user_id;  
   
       values = [
         { key:'SEARCH_TYPE', value:searchtype},        

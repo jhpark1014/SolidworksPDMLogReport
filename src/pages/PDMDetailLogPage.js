@@ -73,7 +73,7 @@ export default function PDMDetailLogPage({ isDividers, logusername, logdata, sPa
   };
 
   const callLogDataForRange = async (sParam, searchStartDate, searchEndDate, searchUser) => {
-    const url = `/logs/${sParam}/detail/range`;
+    const url = `/logs/${sParam}/range/detail`;
     const data = {
       log_type : sParam,
       search_start_date: searchStartDate,
