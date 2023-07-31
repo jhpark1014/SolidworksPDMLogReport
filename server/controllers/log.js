@@ -24,7 +24,7 @@ async function getResultData(tablename, values) {
 }
 
 // PDM 로그 공통 함수
-async function getLogData(req) {
+async function getLogData(req, querytype) {
   let arr_result = [];  // 결과값 저장
 
   console.log("getLogData req.body==>", req.body);
@@ -37,6 +37,7 @@ async function getLogData(req) {
   
   try {   
     const values = [
+      { key:'QUERY_TYPE', value:querytype},
       { key:'LOG_TYPE', value:logtype},
       { key:'SEARCH_TYPE', value:searchtype},
       { key:'SEARCH_DATE', value:searchdate},
@@ -46,25 +47,30 @@ async function getLogData(req) {
 
     const reault_data = await getResultData('SP_PDM_LOG', values);
 
-    reault_data.forEach((data, idx) => {
-      let logdata = new Object() ;
-      
-      logdata.id = idx;        
-      logdata.userid = data.user_id;        
-      logdata.username = data.user_name;        
-      logdata.department = data.department;        
-  
-      // pivot 데이타에서 칼럼이 숫자이면 배열로 합침
-      logdata.logdata = Object.values(JSON.parse(
-        JSON.stringify(data, (key, value) => {                      
-          const ret = (typeof value !== "object") ? ((isNaN(parseInt(key))) ? undefined : value) : value;
-          return ret;            
-        })
-      ));
-  
-      arr_result[idx] = logdata;
-    });
-
+    if (querytype=== 'DETAIL') {
+      reault_data.forEach((data, idx) => {
+        arr_result[idx] = data;
+      });    
+    } else {
+      reault_data.forEach((data, idx) => {
+        let logdata = new Object() ;
+        
+        logdata.id = idx;        
+        logdata.userid = data.user_id;        
+        logdata.username = data.user_name;        
+        logdata.department = data.department;        
+    
+        // pivot 데이타에서 칼럼이 숫자이면 배열로 합침
+        logdata.logdata = Object.values(JSON.parse(
+          JSON.stringify(data, (key, value) => {                      
+            const ret = (typeof value !== "object") ? ((isNaN(parseInt(key))) ? undefined : value) : value;
+            return ret;            
+          })
+        ));
+        arr_result[idx] = logdata;
+      });
+    }
+        
   } catch (err) {
     console.log(err);
   }
@@ -73,7 +79,7 @@ async function getLogData(req) {
 }
 
 // PDM 로그 기간 공통 함수 - 기간
-async function getLogDataForRange(req) {
+async function getLogDataForRange(req, querytype) {
   let arr_result = [];  // 결과값 저장
 
   const logtype = req.body.log_type;
@@ -85,6 +91,7 @@ async function getLogDataForRange(req) {
   
   try {      
     const values = [
+      { key:'QUERY_TYPE', value:querytype},
       { key:'LOG_TYPE', value:logtype},
       { key:'SEARCH_TYPE', value:searchtype},
       { key:'SEARCH_START_DATE', value:searchstartdate},
@@ -95,18 +102,24 @@ async function getLogDataForRange(req) {
 
     const reault_data = await getResultData('SP_PDM_LOG_RANGE', values);
     
-    reault_data.forEach((data, idx) => {
-      let logdata = new Object() ;
-      
-      logdata.id = idx;        
-      logdata.userid = data.user_id;        
-      logdata.username = data.user_name;        
-      logdata.department = data.department;        
-      logdata.logdata = [data.cnt];        
-  
-      arr_result[idx] = logdata;
-    });      
-
+    if (querytype=== 'DETAIL') {
+      reault_data.forEach((data, idx) => {
+        arr_result[idx] = data;
+      });
+    } else {
+      reault_data.forEach((data, idx) => {
+        let logdata = new Object() ;
+        
+        logdata.id = idx;        
+        logdata.userid = data.user_id;        
+        logdata.username = data.user_name;        
+        logdata.department = data.department;        
+        logdata.logdata = [data.cnt];        
+    
+        arr_result[idx] = logdata;
+      });      
+    }
+    
   } catch (err) {
     console.log(err);
   }
@@ -114,100 +127,43 @@ async function getLogDataForRange(req) {
   return arr_result;
 }
 
-// 상세 PDM 로그 공통 함수
-async function getDetailLogData(req) {
-  let arr_result = [];  // 결과값 저장  
+// 제외 대상 사용자/라이선스 정리
+function getExcludeData(arr) {    
+  let result = "";  
+  if (arr !== undefined && arr.length > 0)
+    arr.forEach((element) => {
+      result = result.concat("'").concat(element).concat("',");
+    })
 
-  const logtype = req.body.log_type;
-  const searchtype = req.body.search_type;
-  const searchdate = req.body.search_date;
-  const user_id = req.body.user_id;   
-
-  try {                 
-    const values = [
-      { key:'LOG_TYPE', value:logtype},
-      { key:'SEARCH_TYPE', value:searchtype},
-      { key:'SEARCH_DATE', value:searchdate},        
-      { key:'USER_ID', value:user_id},        
-    ]
-
-    const reault_data = await getResultData('SP_PDM_DETAIL_LOG', values);
-  
-    reault_data.forEach((data, idx) => {
-      arr_result[idx] = data;
-    });    
-
-  } catch (err) {
-    console.log(err);
-  }
-  console.log("getDetailLogData arr_result==>", arr_result);
-  return arr_result;
+    if (result.length !== 0) result = result.substring(0, result.length - 1);  
+  return result
 }
 
-// 상세 PDM 로그 공통 함수 - 기간
-async function getDetailLogDataForRange(req) {
-  let arr_result = [];  // 결과값 저장  
 
-  const logtype = req.body.log_type;
-  const searchstartdate = req.body.search_start_date;
-  const searchenddate = req.body.search_end_date;
-  const user_id = req.body.user_id;   
-
-  try {                     
-    const values = [
-      { key:'LOG_TYPE', value:logtype},        
-      { key:'SEARCH_START_DATE', value:searchstartdate},
-      { key:'SEARCH_END_DATE', value:searchenddate},
-      { key:'USER_ID', value:user_id},        
-    ]
-
-    const reault_data = await getResultData('SP_PDM_DETAIL_LOG_RANGE', values);
-  
-    reault_data.forEach((data, idx) => {
-      arr_result[idx] = data;
-    });    
-    
-  } catch (err) {
-    console.log(err);
-  }
-  console.log("getDetailLogDataForRange arr_result==>", arr_result);
-  return arr_result;
-}
-
+// --------------------- PDM log ---------------------------------------
 // PDM 로그
 export const pdmLogList = async (req,res) => {  
-  res.json(await getLogData(req));
+  res.json(await getLogData(req, 'LIST'));
 }
 
 // PDM 로그 - 기간
 export const pdmLogListForRange = async (req,res) => {  
-  res.json(await getLogDataForRange(req));
+  res.json(await getLogDataForRange(req, 'LIST'));
 }
 
 // PDM 상세 로그
 export const pdmDetailList = async (req,res) => {    
-  res.json(await getDetailLogData(req));
+  res.json(await getLogData(req, 'DETAIL'));
 }
 
 // PDM 상세 로그 - 기간
 export const pdmDetailListForRange = async (req,res) => {    
-  res.json(await getDetailLogDataForRange(req));
+  res.json(await getLogDataForRange(req, 'DETAIL'));
 }
 
 
 
 // --------------------- login log ---------------------------------------
-
-// 제외 대상 사용자/라이선스 정리
-function getExcludeData(arr) {  
-  let result = "";  
-  arr.forEach((element) => {
-    result = result.concat("'").concat(element).concat("',");
-  })
-
-  if (result.length !== 0) result = result.substring(0, result.length - 1);  
-  return result
-}
 
 // 로그인 로그(라이선스)
 export const loginlicenseList = async (req,res) => {    

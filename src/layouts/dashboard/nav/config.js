@@ -28,12 +28,17 @@ const navConfig = [
     icon: <UpdateIcon />,
   },
   {
-    title: '로그인 로그 (라이선스)',
+    title: '설계변경 로그',
+    path: '/dashboard/engchange',
+    icon: <UpdateIcon />,
+  },
+  {
+    title: '라이선스 로그',
     path: '/dashboard/licenselog',
     icon: <VerifiedIcon />,
   },
   {
-    title: '로그인 로그 (사용자)',
+    title: '라이선스 로그(사용자)',
     path: '/dashboard/userlog',
     icon: icon('ic_user'),
   },

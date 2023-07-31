@@ -12,6 +12,7 @@ import DashboardAppPage from './pages/DashboardAppPage';
 import DownloadLogPage from './pages/DownloadLogPage';
 import NewCreateLogPage from './pages/NewCreateLogPage';
 import VersionUpLogPage from './pages/VersionUpLogPage';
+import EngChangeLogPage from './pages/EngChangeLogPage';
 import UserLoginLogPage from './pages/UserLoginLogPage';
 import LicenseLoginLogPage from './pages/LicenseLoginLogPage';
 
@@ -28,6 +29,7 @@ export default function Router() {
         { path: 'download', element: <DownloadLogPage /> },
         { path: 'newcreate', element: <NewCreateLogPage /> },
         { path: 'versionup', element: <VersionUpLogPage /> },
+        { path: 'engchange', element: <EngChangeLogPage /> },
         { path: 'licenselog', element: <LicenseLoginLogPage /> },
         { path: 'userlog', element: <UserLoginLogPage /> },        
         { path: 'user', element: <UserPage /> },
