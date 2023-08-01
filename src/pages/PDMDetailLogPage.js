@@ -44,15 +44,25 @@ PDMDetailLogPage.propTypes = {
   searchUser: PropTypes.string,
 };
 
-export default function PDMDetailLogPage({ isDividers, logusername, logdata, sParam, searchType, searchDate, searchStartDate, searchEndDate, searchUser }) {
+export default function PDMDetailLogPage({
+  isDividers,
+  logusername,
+  logdata,
+  sParam,
+  searchType,
+  searchDate,
+  searchStartDate,
+  searchEndDate,
+  searchUser,
+}) {
   const [isLoading, setIsLoading] = useState(true); // loding
   const [open, setOpen] = useState(false); // dialog open
   const [detailLogData, setDetailLogData] = useState([]); // detail log data
-  
+
   const callLogData = async (sParam, searchType, searchDate, searchUser) => {
     const url = `/logs/${sParam}/detail`;
     const data = {
-      log_type : sParam,
+      log_type: sParam,
       search_type: searchType,
       search_date: searchDate,
       user_id: searchUser,
@@ -73,9 +83,9 @@ export default function PDMDetailLogPage({ isDividers, logusername, logdata, sPa
   };
 
   const callLogDataForRange = async (sParam, searchStartDate, searchEndDate, searchUser) => {
-    const url = `/logs/${sParam}/range/detail`;
+    const url = `/logs/${sParam}/detail/range`;
     const data = {
-      log_type : sParam,
+      log_type: sParam,
       search_start_date: searchStartDate,
       search_end_date: searchEndDate,
       user_id: searchUser,
@@ -88,7 +98,7 @@ export default function PDMDetailLogPage({ isDividers, logusername, logdata, sPa
       .then((res) => {
         // success
         setIsLoading(false);
-        setDetailLogData(res.data);        
+        setDetailLogData(res.data);
       })
       .catch((err) => {
         // error
@@ -98,10 +108,8 @@ export default function PDMDetailLogPage({ isDividers, logusername, logdata, sPa
 
   const handleClickOpen = () => () => {
     setOpen(true);
-    if (searchType === 'range')
-      callLogDataForRange(sParam, searchStartDate, searchEndDate, searchUser);
-    else
-      callLogData(sParam, searchType, searchDate, searchUser);
+    if (searchType === 'range') callLogDataForRange(sParam, searchStartDate, searchEndDate, searchUser);
+    else callLogData(sParam, searchType, searchDate, searchUser);
   };
 
   const handleClose = () => {

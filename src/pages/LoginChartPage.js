@@ -1,21 +1,9 @@
-import { Helmet } from 'react-helmet-async';
 import PropTypes from 'prop-types';
 // @mui
-import { responsiveFontSizes, useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import { Grid, Container, Typography } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
 // sections
-import {
-  AppTasks,
-  AppNewsUpdate,
-  AppOrderTimeline,
-  AppCurrentVisits,
-  AppWebsiteVisits,
-  AppTrafficBySite,
-  AppWidgetSummary,
-  AppCurrentSubject,
-  AppConversionRates,
-} from '../sections/@dashboard/app';
+import { AppWebsiteVisits } from '../sections/@dashboard/app';
 
 const showHoldQty = process.env.REACT_APP_LIC_HOLD_QTY;
 // ----------------------------------------------------------------------
@@ -107,14 +95,14 @@ export default function LoginChartPage({ title, subtitle, chartLabels, chartData
   function generatePointAnnotation(chartData2) {
     const pointAnnotation = chartData2.map((row) => {
       return {
-        x: 10,
+        // x: 10,
         y: row.data[0],
         marker: {
           size: 0,
         },
         label: {
           borderColor: row.color,
-          offsetY: 0,
+          offsetX: 20,
           textAnchor: 'start',
           style: {
             color: '#fff',
@@ -136,7 +124,6 @@ export default function LoginChartPage({ title, subtitle, chartLabels, chartData
 
   const chartData2 = showHoldQty === 'TRUE' ? generateChartData2(chartDatas) : [];
   const pointAnnotation2 = generatePointAnnotation(chartData2);
-  console.log('chartdata2', showHoldQty, chartData2);
 
   return (
     <>
@@ -161,7 +148,7 @@ export default function LoginChartPage({ title, subtitle, chartLabels, chartData
             };
           })}
           chartData2={chartData2}
-          legendformatter={(seriesName, opts) => {
+          legendformatter={(seriesName) => {
             if (seriesName.includes('보유')) return '';
             return seriesName;
           }}

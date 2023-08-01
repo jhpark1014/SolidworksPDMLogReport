@@ -69,6 +69,7 @@ PDMLogToolbar.propTypes = {
   onSearchStartDate: PropTypes.func,
   onSearchEndDate: PropTypes.func,
   onSearchUser: PropTypes.func,
+  onSearchUserName: PropTypes.func,
   onLogDatas: PropTypes.func,
   onTableHead: PropTypes.func,
 };
@@ -81,6 +82,7 @@ export default function PDMLogToolbar({
   onSearchStartDate,
   onSearchEndDate,
   onSearchUser,
+  onSearchUserName,
   onLogDatas,
   onTableHead,
 }) {
@@ -92,9 +94,10 @@ export default function PDMLogToolbar({
   const [searchStartDate, setSearchStartDate] = useState(today.subtract(7, 'd'));
   const [searchEndDate, setSearchEndDate] = useState(today);
   const [searchUser, setSearchUser] = useState('All');
+  const [searchUserName, setSearchUserName] = useState('All');
   const [userList, setUserList] = useState([]);
   const [rangeSearch, setRangeSearch] = useState(false);
-  
+
   const excludeUserName = process.env.REACT_APP_EXCLUDE_USER_NAME;
   const excludeUserArray = typeof excludeUserName === 'string' ? excludeUserName.trim().split(',') : '';
 
@@ -103,118 +106,142 @@ export default function PDMLogToolbar({
   };
 
   const callTableHeadForRange = async (sdate, edate) => {
-    onTableHead([{
-      id : 1,
-      label : sdate.concat(' ~ ').concat(edate),      
-    }]);
+    onTableHead([
+      {
+        id: 1,
+        label: sdate.concat(' ~ ').concat(edate),
+      },
+    ]);
   };
 
+  // 사용자 아이디와 이름 매칭
+  const getUserName = (searchUser) => {
+    let searchUserName = 'All';
+    userList.forEach((user) => {
+      if (searchUser === user.user_id) {
+        // setSearchUserName(() => user.user_name);
+        searchUserName = user.user_name;
+        console.log('hh', searchUserName, user.user_id, user.user_name);
+      }
+      return searchUserName;
+    });
+    // setSearchUserName('All');
+    return searchUserName;
+  };
 
   // ------------------------- server call start --------------------------------------
   // server에서 user List 가져오기
   const callUserList = async (searchType, searchDate) => {
     const url = `/logs/userlist`;
     const data = {
-        'log_type' : sParam,
-        'search_type' : searchType,
-        'search_date' : searchDate,
-        'exc_user_id' : excludeUserArray,
+      log_type: sParam,
+      search_type: searchType,
+      search_date: searchDate,
+      exc_user_id: excludeUserArray,
     };
-    const config = {"Content-Type": 'application/json'};
-    await axios.post(url, data, config)
-        .then(res => {
-            // success
-            const users = [{ user_id: 'All', user_name: 'All' }];
-            if (res.data.length === 0) {
-              setUserList(users);
-            } else {
-              setUserList(users.concat(res.data));
-            }
-        }).catch(err => {
-            // error
-            console.log(err.response.data.message); // server error message
-        });  
+    const config = { 'Content-Type': 'application/json' };
+    await axios
+      .post(url, data, config)
+      .then((res) => {
+        // success
+        const users = [{ user_id: 'All', user_name: 'All' }];
+        if (res.data.length === 0) {
+          setUserList(users);
+        } else {
+          setUserList(users.concat(res.data));
+        }
+      })
+      .catch((err) => {
+        // error
+        console.log(err.response.data.message); // server error message
+      });
   };
 
-   // server에서 user List 가져오기 - 기간
-   const callUserListForRange = async (searchStartDate, searchEndDate) => {
+  // server에서 user List 가져오기 - 기간
+  const callUserListForRange = async (searchStartDate, searchEndDate) => {
     const url = `/logs/userlist/range`;
     const data = {
-        'log_type' : sParam,
-        'search_start_date' : searchStartDate,
-        'search_end_date' : searchEndDate,
-        'exc_user_id' : excludeUserArray,
+      log_type: sParam,
+      search_start_date: searchStartDate,
+      search_end_date: searchEndDate,
+      exc_user_id: excludeUserArray,
     };
-    const config = {"Content-Type": 'application/json'};
-    await axios.post(url, data, config)
-        .then(res => {
-            // success
-            const users = [{ user_id: 'All', user_name: 'All' }];
-            if (res.data.length === 0) {
-              setUserList(users);
-            } else {
-              setUserList(users.concat(res.data));
-            }
-        }).catch(err => {
-            // error
-            console.log(err.response.data.message); // server error message
-        });  
+    const config = { 'Content-Type': 'application/json' };
+    await axios
+      .post(url, data, config)
+      .then((res) => {
+        // success
+        const users = [{ user_id: 'All', user_name: 'All' }];
+        if (res.data.length === 0) {
+          setUserList(users);
+        } else {
+          setUserList(users.concat(res.data));
+        }
+      })
+      .catch((err) => {
+        // error
+        console.log(err.response.data.message); // server error message
+      });
   };
 
   // server 에서 response 데이터 가져오기
   const callLogData = async (searchType, searchDate, searchUser) => {
     const url = `/logs/${sParam}`;
     const data = {
-        'log_type' : sParam,
-        'search_type' : searchType,
-        'search_date' : searchDate,        
-        'user_id' : searchUser,
-        'exc_user_id' : excludeUserArray,
+      log_type: sParam,
+      search_type: searchType,
+      search_date: searchDate,
+      user_id: searchUser,
+      exc_user_id: excludeUserArray,
     };
-    const config = {"Content-Type": 'application/json'};
-    await axios.post(url, data, config)
-        .then(res => {
-            // success
-            onIsloading(false);
+    const config = { 'Content-Type': 'application/json' };
+    await axios
+      .post(url, data, config)
+      .then((res) => {
+        // success
+        onIsloading(false);
 
-            onSearchType(searchType);
-            onSearchDate(searchDate);
-            onSearchUser(searchUser);
+        onSearchType(searchType);
+        onSearchDate(searchDate);
+        onSearchUser(searchUser);
 
-            onLogDatas(res.data);
-        }).catch(err => {
-            // error
-            console.log(err.response.data.message); // server error message
-        });  
+        onLogDatas(res.data);
+      })
+      .catch((err) => {
+        // error
+        console.log(err.response.data.message); // server error message
+      });
   };
 
   // server 에서 response 데이터 가져오기 - 기간
   const callLogDataForRange = async (searchType, searchStartDate, searchEndDate, searchUser) => {
     const url = `/logs/${sParam}/range`;
     const data = {
-        'log_type' : sParam,
-        'search_type' : searchType,
-        'search_start_date' : searchStartDate,
-        'search_end_date' : searchEndDate,
-        'user_id' : searchUser,
-        'exc_user_id' : excludeUserArray,
+      log_type: sParam,
+      search_type: searchType,
+      search_start_date: searchStartDate,
+      search_end_date: searchEndDate,
+      user_id: searchUser,
+      exc_user_id: excludeUserArray,
     };
-    const config = {"Content-Type": 'application/json'};
-    await axios.post(url, data, config)
-        .then(res => {
-            // success
-            onIsloading(false);
+    const config = { 'Content-Type': 'application/json' };
+    await axios
+      .post(url, data, config)
+      .then((res) => {
+        // success
+        onIsloading(false);
 
-            onSearchType(searchType);
-            onSearchStartDate(searchStartDate);
-            onSearchEndDate(searchEndDate);
-            onSearchUser(searchUser);
+        onSearchType(searchType);
+        onSearchStartDate(searchStartDate);
+        onSearchEndDate(searchEndDate);
+        onSearchUser(searchUser);
 
-            onLogDatas(res.data);
-        }).catch(err => {
-            // error
-            console.log(err.response.data.message); // server error message
-        });  
+        onLogDatas(res.data);
+      })
+      .catch((err) => {
+        // error
+        console.log(err.response.data.message); // server error message
+      });
   };
   // ------------------------- server call end --------------------------------------
 
@@ -230,28 +257,28 @@ export default function PDMLogToolbar({
 
   // 초기 화면 셋팅
   useEffect(() => {
-    
     async function fetchData() {
       await callUserList(searchType, searchDate);
       await callLogData(searchType, searchDate, searchUser);
-      await callTableHead(searchType, searchDate);        
+      await callTableHead(searchType, searchDate);
+      onSearchUserName('All');
     }
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearchType = async (event) => {
-    const type = event.target.value;    
+    const type = event.target.value;
 
     if (type === 'range') {
       setRangeSearch(true);
       setSearchType(type);
-      
+
       const sdate = getSearchDateForChangeType('day', searchStartDate);
       const edate = getSearchDateForChangeType('day', searchEndDate);
 
       await callUserListForRange(sdate, edate); // 사용자 리스트 - 기간
-      await callLogDataForRange(searchType, sdate, edate, searchUser);  // 로그 데이터 - 기간
+      await callLogDataForRange(searchType, sdate, edate, searchUser); // 로그 데이터 - 기간
       await callTableHeadForRange(sdate, edate); // 테이블 칼럼 - 기간
     } else {
       setRangeSearch(false);
@@ -263,8 +290,6 @@ export default function PDMLogToolbar({
       await callLogData(type, date, searchUser);
       await callTableHead(type, searchDate);
     }
-
-    
   };
 
   // Search Date event
@@ -285,9 +310,9 @@ export default function PDMLogToolbar({
 
     setSearchStartDate(sdate);
 
-    await callUserListForRange(sdate, edate);   // 사용자 리스트 - 기간
-    await callLogDataForRange(searchType, sdate, edate, searchUser);  // 로그 데이터 - 기간
-    await callTableHeadForRange(sdate, edate);  // 테이블 칼럼 - 기간
+    await callUserListForRange(sdate, edate); // 사용자 리스트 - 기간
+    await callLogDataForRange(searchType, sdate, edate, searchUser); // 로그 데이터 - 기간
+    await callTableHeadForRange(sdate, edate); // 테이블 칼럼 - 기간
   };
 
   // End Date event
@@ -297,11 +322,10 @@ export default function PDMLogToolbar({
 
     setSearchEndDate(edate);
 
-    await callUserListForRange(sdate, edate);   // 사용자 리스트 - 기간
-    await callLogDataForRange(searchType, sdate, edate, searchUser);  // 로그 데이터 - 기간
-    await callTableHeadForRange(sdate, edate);  // 테이블 칼럼 - 기간
+    await callUserListForRange(sdate, edate); // 사용자 리스트 - 기간
+    await callLogDataForRange(searchType, sdate, edate, searchUser); // 로그 데이터 - 기간
+    await callTableHeadForRange(sdate, edate); // 테이블 칼럼 - 기간
   };
-  
 
   const userChange = async (event) => {
     event.preventDefault();
@@ -310,21 +334,20 @@ export default function PDMLogToolbar({
         target: { value },
       } = event;
       setSearchUser(value);
+      onSearchUserName(getUserName(value));
 
       if (searchType === 'range') {
         const sdate = getSearchDateForChangeType('day', searchStartDate);
         const edate = getSearchDateForChangeType('day', searchEndDate);
-        await callLogDataForRange(searchType, sdate, edate, value);  // 로그 데이터 - 기간
+        await callLogDataForRange(searchType, sdate, edate, value); // 로그 데이터 - 기간
       } else {
-        const date = getSearchDateForChangeType(searchType, searchDate);      
+        const date = getSearchDateForChangeType(searchType, searchDate);
         await callLogData(searchType, date, value);
       }
-      
     } catch (err) {
       console.log(err);
     }
   };
-
 
   return (
     <StyledRoot>
@@ -347,48 +370,48 @@ export default function PDMLogToolbar({
             </Select>
           </FormControl>
         </div>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">          
-        {rangeSearch ? (
-          <div>
-            <DatePicker
-              sx={{ width: 180, m: 2, mr: 0.5 }}
-              label="시작일"
-              openTo={'day'}
-              views={['year', 'month', 'day']}
-              minDate={dayjs('2015-01-01')}
-              maxDate={dayjs(searchEndDate)}
-              format={'YYYY-MM-DD'}
-              // defaultValue={dayjs()}
-              value={dayjs(searchStartDate)}
-              onAccept={handleSearchStartDate}
-            />
-            <DatePicker
-              sx={{ width: 180, m: 2, ml: 0.5 }}
-              label="종료일"
-              openTo={'day'}
-              views={['year', 'month', 'day']}
-              minDate={dayjs(searchStartDate)}
-              maxDate={dayjs()}
-              format={'YYYY-MM-DD'}
-              // defaultValue={dayjs()}
-              value={dayjs(searchEndDate)}
-              onAccept={handleSearchEndDate}
-            />
-          </div>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
+          {rangeSearch ? (
+            <div>
+              <DatePicker
+                sx={{ width: 180, m: 2, mr: 0.5 }}
+                label="시작일"
+                openTo={'day'}
+                views={['year', 'month', 'day']}
+                minDate={dayjs('2015-01-01')}
+                maxDate={dayjs(searchEndDate)}
+                format={'YYYY-MM-DD'}
+                // defaultValue={dayjs()}
+                value={dayjs(searchStartDate)}
+                onAccept={handleSearchStartDate}
+              />
+              <DatePicker
+                sx={{ width: 180, m: 2, ml: 0.5 }}
+                label="종료일"
+                openTo={'day'}
+                views={['year', 'month', 'day']}
+                minDate={dayjs(searchStartDate)}
+                maxDate={dayjs()}
+                format={'YYYY-MM-DD'}
+                // defaultValue={dayjs()}
+                value={dayjs(searchEndDate)}
+                onAccept={handleSearchEndDate}
+              />
+            </div>
           ) : (
-          <DatePicker
-            sx={{ width: 180, m: 2 }}
-            label="검색 날짜"
-            openTo={searchType}
-            views={searchType === 'month' ? ['year', 'month'] : ['year']}
-            minDate={dayjs('2015-01-01')}
-            maxDate={dayjs()}
-            format={searchType === 'month' ? 'YYYY-MM' : 'YYYY'}
-            // defaultValue={dayjs()}
-            value={dayjs(searchDate)}
-            onAccept={handleSearchDate}
-          />
-        )}
+            <DatePicker
+              sx={{ width: 180, m: 2 }}
+              label="검색 날짜"
+              openTo={searchType}
+              views={searchType === 'month' ? ['year', 'month'] : ['year']}
+              minDate={dayjs('2015-01-01')}
+              maxDate={dayjs()}
+              format={searchType === 'month' ? 'YYYY-MM' : 'YYYY'}
+              // defaultValue={dayjs()}
+              value={dayjs(searchDate)}
+              onAccept={handleSearchDate}
+            />
+          )}
         </LocalizationProvider>
         <div>
           <FormControl sx={{ m: 2, width: 300 }}>
