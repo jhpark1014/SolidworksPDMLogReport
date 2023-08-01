@@ -372,7 +372,7 @@ export default function PDMLogToolbar({
         </div>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
           {rangeSearch ? (
-            <div>
+            <>
               <DatePicker
                 sx={{ width: 180, m: 2, mr: 0.5 }}
                 label="시작일"
@@ -397,7 +397,7 @@ export default function PDMLogToolbar({
                 value={dayjs(searchEndDate)}
                 onAccept={handleSearchEndDate}
               />
-            </div>
+            </>
           ) : (
             <DatePicker
               sx={{ width: 180, m: 2 }}
