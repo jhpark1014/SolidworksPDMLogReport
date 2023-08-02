@@ -11,6 +11,7 @@ import {
   Box,
   Button,
   Container,
+  Grid,
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -114,6 +115,7 @@ export default function UserListToolbarLoginUser({
 }) {
   const today = dayjs();
   const todayString = today.format('YYYY-MM-DD'); // 오늘 날짜(년-월) 리턴
+  const t = today.format('YYYYMMDD_HHmmss'); // 오늘 날짜(년-월) 리턴
   const [selectedOption, setSelectedSearch] = useState('day'); // 날짜 검색 옵션
   const [selectedDate, setSelectedDate] = useState(todayString); // 검색할 날짜
   const [selectedStartDate, setSelectedStartDate] = useState(today.subtract(7, 'd').format('YYYY-MM-DD')); // 검색할 날짜
@@ -461,31 +463,29 @@ export default function UserListToolbarLoginUser({
 
   return (
     <StyledRoot>
-      <Box sx={{ display: 'flex', justifyContent: 'left' }}>
-        {/* 날짜 검색 옵션 */}
-        <div>
-          <FormControl sx={{ m: 2.5, minWidth: 120, ml: 'auto' }}>
-            <InputLabel id="demo-simple-select-standard-label">검색 구분</InputLabel>
-            <Select
-              labelId="demo-simple-select-standard-label"
-              id="demo-simple-select-standard"
-              value={selectedOption}
-              onChange={optionChange}
-              label="dateOption"
-              defaultValue={selectedOption}
-              name="search_type"
-            >
-              <MenuItem value="day">일</MenuItem>
-              <MenuItem value="month">월</MenuItem>
-              <MenuItem value="year">연</MenuItem>
-              <MenuItem value="range">기간</MenuItem>
-            </Select>
-          </FormControl>
-        </div>
-        {/* 달력 */}
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
-          {rangeSearch ? (
-            <Box sx={{ width: 415 }}>
+      {/* 날짜 검색 옵션 */}
+      <FormControl sx={{ m: 2.5, minWidth: 120, ml: 'auto' }}>
+        <InputLabel id="demo-simple-select-standard-label">검색 구분</InputLabel>
+        <Select
+          labelId="demo-simple-select-standard-label"
+          id="demo-simple-select-standard"
+          value={selectedOption}
+          onChange={optionChange}
+          label="dateOption"
+          defaultValue={selectedOption}
+          name="search_type"
+        >
+          <MenuItem value="day">일</MenuItem>
+          <MenuItem value="month">월</MenuItem>
+          <MenuItem value="year">연</MenuItem>
+          <MenuItem value="range">기간</MenuItem>
+        </Select>
+      </FormControl>
+      {/* 달력 */}
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
+        {rangeSearch ? (
+          <>
+            <Grid>
               <DatePicker
                 sx={{ width: 180, my: 2.5, ml: 2.5, mr: 1.5 }}
                 label="시작일"
@@ -497,6 +497,8 @@ export default function UserListToolbarLoginUser({
                 value={dayjs(selectedStartDate)}
                 onAccept={startDateChange}
               />
+            </Grid>
+            <Grid>
               <DatePicker
                 sx={{ width: 180, my: 2.5, mr: 2.5 }}
                 label="종료일"
@@ -508,8 +510,10 @@ export default function UserListToolbarLoginUser({
                 value={dayjs(selectedEndDate)}
                 onAccept={endDateChange}
               />
-            </Box>
-          ) : (
+            </Grid>
+          </>
+        ) : (
+          <Grid>
             <DatePicker
               sx={{ width: 180, my: 2.5, ml: 2.5, mr: 1.5 }}
               label="검색 날짜"
@@ -527,41 +531,44 @@ export default function UserListToolbarLoginUser({
               value={dayjs(selectedDate)}
               onAccept={dateChange}
             />
-          )}
-        </LocalizationProvider>
-        {/* 라이선스 선택 */}
-        <div>
-          <FormControl sx={{ m: 2.5, width: 420 }}>
-            <InputLabel id="demo-multiple-checkbox-label">라이선스</InputLabel>
-            <Select
-              sx={{ height: 56 }}
-              labelId="demo-multiple-checkbox-label"
-              id="demo-multiple-checkbox"
-              // multiple
-              value={selectedLicense}
-              onChange={licenseChange}
-              input={<OutlinedInput label="라이선스" />}
-              MenuProps={MenuProps}
-            >
-              {licenseList.map((value) => (
-                <MenuItem key={value.lic_id} value={value.lic_id}>
-                  {value.lic_name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </div>
+          </Grid>
+        )}
+      </LocalizationProvider>
+      {/* 라이선스 선택 */}
+      <Grid>
+        <FormControl sx={{ m: 2.5, width: 420 }}>
+          <InputLabel id="demo-multiple-checkbox-label">라이선스</InputLabel>
+          <Select
+            sx={{ height: 56 }}
+            labelId="demo-multiple-checkbox-label"
+            id="demo-multiple-checkbox"
+            // multiple
+            value={selectedLicense}
+            onChange={licenseChange}
+            input={<OutlinedInput label="라이선스" />}
+            MenuProps={MenuProps}
+          >
+            {licenseList.map((value) => (
+              <MenuItem key={value.lic_id} value={value.lic_id}>
+                {value.lic_name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid container justifyContent="flex-end">
         <Button sx={{ m: 2.5, justifyContent: 'flex-end' }}>
           <CSVLink
             headers={headLabel}
             data={getExcelData(logDatas)}
-            filename={'사용자 로그인 기록'.concat('_').concat(getLicRealName(selectedLicense)).concat('.csv')}
+            filename={'사용자 로그인 기록'.concat('_').concat(getLicRealName(selectedLicense)).concat(t).concat('.csv')}
             target="_blank"
+            style={{ textDecoration: 'none' }}
           >
             EXPORT
           </CSVLink>
         </Button>
-      </Box>
+      </Grid>
     </StyledRoot>
   );
 }

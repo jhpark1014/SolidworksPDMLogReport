@@ -55,7 +55,7 @@ export default function PDMDetailLogPage({
   searchEndDate,
   searchUser,
 }) {
-  const [isLoading, setIsLoading] = useState(true); // loding
+  const [isLoading, setIsLoading] = useState(true); // loading
   const [open, setOpen] = useState(false); // dialog open
   const [detailLogData, setDetailLogData] = useState([]); // detail log data
 
@@ -157,6 +157,7 @@ export default function PDMDetailLogPage({
                           .concat(t)
                           .concat('.csv')}
                         target="_blank"
+                        style={{ textDecoration: 'none' }}
                       >
                         EXPORT
                       </CSVLink>
@@ -175,7 +176,7 @@ export default function PDMDetailLogPage({
               </TableHead>
               <TableBody>
                 {isLoading
-                  ? 'Loding...'
+                  ? 'Loading...'
                   : detailLogData.map((row, idx) => {
                       const { datetime, filename, version, filesize } = row;
 

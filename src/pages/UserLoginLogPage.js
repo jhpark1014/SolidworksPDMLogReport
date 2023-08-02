@@ -158,7 +158,7 @@ export default function UserLoginLogPage() {
       </Helmet>
 
       <LoginChartPage
-        title={'로그인 로그 (사용자)'}
+        title={'라이선스 로그 (사용자)'}
         subtitle={`${
           searchType === 'day' ? '일' : searchType === 'month' ? '월' : '연'
         }, ${searchDate}, ${getLicRealName(searchLicense)}`}

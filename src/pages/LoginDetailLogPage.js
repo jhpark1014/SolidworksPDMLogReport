@@ -44,7 +44,7 @@ LoginDetailLogPage.propTypes = {
 };
 
 export default function LoginDetailLogPage({ data, searchType, searchDate, searchLicense, time }) {
-  const [isLoading, setIsLoading] = useState(true); // loding
+  const [isLoading, setIsLoading] = useState(true); // loading
   const [open, setOpen] = useState(false); // dialog open
   // const [detailLogData, setDetailLogData] = useState([]); // detail log data
   const [filteredLogData, setFilteredLogData] = useState([]); // filtered detail log data

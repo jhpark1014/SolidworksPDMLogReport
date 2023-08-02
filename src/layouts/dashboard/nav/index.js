@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography, Avatar, Stack, IconButton } from '@mui/material';
+import dayjs from 'dayjs';
 // import Icon from '@material-ui/core/Icon';
 import Iconify from '../../../components/iconify/Iconify';
 import SvgColor from '../../../components/svg-color/SvgColor';
@@ -31,6 +32,8 @@ const StyledAccount = styled('div')(({ theme }) => ({
   borderRadius: Number(theme.shape.borderRadius) * 1.5,
   backgroundColor: alpha(theme.palette.grey[500], 0.12),
 }));
+
+const todayYear = dayjs().format('YYYY');
 
 // ----------------------------------------------------------------------
 
@@ -66,13 +69,16 @@ export default function Nav({ openNav, onCloseNav }) {
 
       <Box sx={{ px: 2.5, pb: 3, mt: 10 }}>
         <Stack alignItems="center" spacing={3} sx={{ pt: 5, borderRadius: 2, position: 'relative' }}>
-          
           <Box sx={{ textAlign: 'center' }}>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Copyright 2023. SOLKO.<br />All right reserved.
+              Copyright {todayYear}.{' '}
+              <a href="http://solidkorea.co.kr" style={{ textDecoration: 'none' }}>
+                SOLKO.
+              </a>
+              <br />
+              All rights reserved.
             </Typography>
           </Box>
-
         </Stack>
       </Box>
     </Scrollbar>

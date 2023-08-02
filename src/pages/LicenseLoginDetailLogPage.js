@@ -63,7 +63,7 @@ export default function LicenseLoginDetailLogPage({
   searchStartDate,
   searchEndDate,
 }) {
-  const [isLoading, setIsLoading] = useState(true); // loding
+  const [isLoading, setIsLoading] = useState(true); // loading
   const [open, setOpen] = useState(false); // dialog open
   const [detailLogData, setDetailLogData] = useState([]); // detail log data
   // const [filteredLogData, setFilteredLogData] = useState([]); // filtered detail log data
@@ -157,6 +157,8 @@ export default function LicenseLoginDetailLogPage({
                       {data.loglicensename}, {detailLogData.length} 건
                     </Typography>
                   </TableCell>
+                  {searchType === 'range' ? <TableCell sx={{ backgroundColor: 'white' }} /> : ''}
+                  <TableCell sx={{ backgroundColor: 'white' }} />
                   <TableCell align="right" sx={{ padding: 1, backgroundColor: 'white' }}>
                     <Button>
                       <CSVLink
@@ -169,6 +171,7 @@ export default function LicenseLoginDetailLogPage({
                           .concat(t)
                           .concat('.csv')}
                         target="_blank"
+                        style={{ textDecoration: 'none' }}
                       >
                         EXPORT
                       </CSVLink>

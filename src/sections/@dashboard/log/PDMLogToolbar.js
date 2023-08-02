@@ -2,29 +2,30 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 // @mui
 import { styled } from '@mui/material/styles';
-import { Toolbar, FormControl, InputLabel, Select, MenuItem, Box, OutlinedInput } from '@mui/material';
+import { Toolbar, FormControl, InputLabel, Select, MenuItem, Box, OutlinedInput, Button, Grid } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
+import { CSVLink } from 'react-csv';
 
 // ----------------------------------------------------------------------
 
 // Table Headers
 const TABLE_HEAD_YEAR = [
-  { id: '1', label: '1월', alignRight: false },
-  { id: '2', label: '2월', alignRight: false },
-  { id: '3', label: '3월', alignRight: false },
-  { id: '4', label: '4월', alignRight: false },
-  { id: '5', label: '5월', alignRight: false },
-  { id: '6', label: '6월', alignRight: false },
-  { id: '7', label: '7월', alignRight: false },
-  { id: '8', label: '8월', alignRight: false },
-  { id: '9', label: '9월', alignRight: false },
-  { id: '10', label: '10월', alignRight: false },
-  { id: '11', label: '11월', alignRight: false },
-  { id: '12', label: '12월', alignRight: false },
+  { key: '1', label: '1월', alignRight: false },
+  { key: '2', label: '2월', alignRight: false },
+  { key: '3', label: '3월', alignRight: false },
+  { key: '4', label: '4월', alignRight: false },
+  { key: '5', label: '5월', alignRight: false },
+  { key: '6', label: '6월', alignRight: false },
+  { key: '7', label: '7월', alignRight: false },
+  { key: '8', label: '8월', alignRight: false },
+  { key: '9', label: '9월', alignRight: false },
+  { key: '10', label: '10월', alignRight: false },
+  { key: '11', label: '11월', alignRight: false },
+  { key: '12', label: '12월', alignRight: false },
 ];
 
 const StyledRoot = styled(Toolbar)(({ theme }) => ({
@@ -45,6 +46,29 @@ const MenuProps = {
   },
 };
 
+function getExcelData(logDatas) {
+  const excelData = structuredClone(logDatas);
+  for (let i = 0; i < excelData.length; i += 1) {
+    for (let j = 1; j < excelData[0].logdata.length + 1; j += 1) {
+      excelData[i][j] = excelData[i].logdata[j - 1];
+    }
+  }
+  return excelData;
+}
+
+function getUserRealName(userid, userList) {
+  let realName = '';
+  if (userid === 'All') {
+    return 'All';
+  }
+  userList.forEach((user) => {
+    if (userid === user.user_id) {
+      realName = user.user_name;
+    }
+  });
+  return realName;
+}
+
 // ----------------------------------------------------------------------
 
 function getMonthTableHead(searchDate) {
@@ -52,7 +76,7 @@ function getMonthTableHead(searchDate) {
   const dayInMonth = new Date(date.format('YYYY'), date.format('MM'), 0).getDate();
   const TABLE_HEAD_MONTH = new Array(dayInMonth);
   for (let i = 1; i < dayInMonth + 1; i += 1) {
-    TABLE_HEAD_MONTH[i - 1] = { id: i, label: `${i}일`, alignRight: false };
+    TABLE_HEAD_MONTH[i - 1] = { key: `${i}`, label: `${i}일`, alignRight: false };
   }
   return TABLE_HEAD_MONTH;
 }
@@ -72,6 +96,7 @@ PDMLogToolbar.propTypes = {
   onSearchUserName: PropTypes.func,
   onLogDatas: PropTypes.func,
   onTableHead: PropTypes.func,
+  headLabel: PropTypes.array,
 };
 
 export default function PDMLogToolbar({
@@ -85,16 +110,17 @@ export default function PDMLogToolbar({
   onSearchUserName,
   onLogDatas,
   onTableHead,
+  headLabel,
 }) {
   const today = dayjs();
   const dateString = today.format('YYYY-MM'); // 오늘 날짜(년-월) 리턴
-
+  const t = today.format('YYYYMMDD_HHmmss'); // 오늘 날짜(년-월) 리턴
   const [searchType, setSearchType] = useState('month');
   const [searchDate, setSearchDate] = useState(dateString);
   const [searchStartDate, setSearchStartDate] = useState(today.subtract(7, 'd'));
   const [searchEndDate, setSearchEndDate] = useState(today);
   const [searchUser, setSearchUser] = useState('All');
-  const [searchUserName, setSearchUserName] = useState('All');
+  const [logDatas, setLogDatas] = useState([]);
   const [userList, setUserList] = useState([]);
   const [rangeSearch, setRangeSearch] = useState(false);
 
@@ -108,7 +134,7 @@ export default function PDMLogToolbar({
   const callTableHeadForRange = async (sdate, edate) => {
     onTableHead([
       {
-        id: 1,
+        key: '1',
         label: sdate.concat(' ~ ').concat(edate),
       },
     ]);
@@ -121,7 +147,6 @@ export default function PDMLogToolbar({
       if (searchUser === user.user_id) {
         // setSearchUserName(() => user.user_name);
         searchUserName = user.user_name;
-        console.log('hh', searchUserName, user.user_id, user.user_name);
       }
       return searchUserName;
     });
@@ -206,6 +231,7 @@ export default function PDMLogToolbar({
         onSearchUser(searchUser);
 
         onLogDatas(res.data);
+        setLogDatas(res.data);
       })
       .catch((err) => {
         // error
@@ -237,6 +263,7 @@ export default function PDMLogToolbar({
         onSearchUser(searchUser);
 
         onLogDatas(res.data);
+        setLogDatas(res.data);
       })
       .catch((err) => {
         // error
@@ -351,54 +378,61 @@ export default function PDMLogToolbar({
 
   return (
     <StyledRoot>
-      <Box sx={{ display: 'flex', justifyContent: 'left' }}>
-        <div>
-          <FormControl sx={{ m: 2, minWidth: 120, ml: 'auto' }}>
-            <InputLabel id="demo-simple-select-standard-label">검색 구분</InputLabel>
-            <Select
-              labelId="demo-simple-select-standard-label"
-              id="demo-simple-select-standard"
-              value={searchType}
-              onChange={handleSearchType}
-              label="dateOption"
-              defaultValue="month"
-              selected={searchType}
-            >
-              <MenuItem value="month">월</MenuItem>
-              <MenuItem value="year">연</MenuItem>
-              <MenuItem value="range">기간</MenuItem>
-            </Select>
-          </FormControl>
-        </div>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
-          {rangeSearch ? (
-            <>
+      <FormControl sx={{ m: 2, minWidth: 120, ml: 'auto' }}>
+        <InputLabel id="demo-simple-select-standard-label">검색 구분</InputLabel>
+        <Select
+          labelId="demo-simple-select-standard-label"
+          id="demo-simple-select-standard"
+          value={searchType}
+          onChange={handleSearchType}
+          label="dateOption"
+          defaultValue="month"
+          selected={searchType}
+        >
+          <MenuItem value="month">월</MenuItem>
+          <MenuItem value="year">연</MenuItem>
+          <MenuItem value="range">기간</MenuItem>
+        </Select>
+      </FormControl>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
+        {rangeSearch ? (
+          <>
+            <Grid>
               <DatePicker
-                sx={{ width: 180, m: 2, mr: 0.5 }}
+                sx={{ width: 180, m: 2, mr: 'auto' }}
                 label="시작일"
                 openTo={'day'}
                 views={['year', 'month', 'day']}
                 minDate={dayjs('2015-01-01')}
                 maxDate={dayjs(searchEndDate)}
                 format={'YYYY-MM-DD'}
-                // defaultValue={dayjs()}
                 value={dayjs(searchStartDate)}
                 onAccept={handleSearchStartDate}
+                PopperProps={{
+                  placement: 'right',
+                  anchorEl: null,
+                  // sx: { '&.data-popper-placement': 'bottom-start' },
+                  disablePortal: true,
+                  style: { yIndex: 100000000 },
+                }}
               />
+            </Grid>
+            <Grid>
               <DatePicker
-                sx={{ width: 180, m: 2, ml: 0.5 }}
+                sx={{ width: 180, m: 2 }}
                 label="종료일"
                 openTo={'day'}
                 views={['year', 'month', 'day']}
                 minDate={dayjs(searchStartDate)}
                 maxDate={dayjs()}
                 format={'YYYY-MM-DD'}
-                // defaultValue={dayjs()}
                 value={dayjs(searchEndDate)}
                 onAccept={handleSearchEndDate}
               />
-            </>
-          ) : (
+            </Grid>
+          </>
+        ) : (
+          <Grid>
             <DatePicker
               sx={{ width: 180, m: 2 }}
               label="검색 날짜"
@@ -407,33 +441,51 @@ export default function PDMLogToolbar({
               minDate={dayjs('2015-01-01')}
               maxDate={dayjs()}
               format={searchType === 'month' ? 'YYYY-MM' : 'YYYY'}
-              // defaultValue={dayjs()}
               value={dayjs(searchDate)}
               onAccept={handleSearchDate}
             />
-          )}
-        </LocalizationProvider>
-        <div>
-          <FormControl sx={{ m: 2, width: 300 }}>
-            <InputLabel id="demo-multiple-checkbox-label">사용자</InputLabel>
-            <Select
-              id="searchUser"
-              labelId="demo-multiple-checkbox-label"
-              value={userList.length === 1 ? 'All' : searchUser}
-              onChange={userChange}
-              MenuProps={MenuProps}
-              defaultValue="All"
-              input={<OutlinedInput label="사용자" />}
-            >
-              {userList.map((value) => (
-                <MenuItem key={value.user_id} value={value.user_id}>
-                  {value.user_name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </div>
-      </Box>
+          </Grid>
+        )}
+      </LocalizationProvider>
+      <Grid>
+        <FormControl sx={{ m: 2, width: 300 }}>
+          <InputLabel id="demo-multiple-checkbox-label">사용자</InputLabel>
+          <Select
+            id="searchUser"
+            labelId="demo-multiple-checkbox-label"
+            value={userList.length === 1 ? 'All' : searchUser}
+            onChange={userChange}
+            MenuProps={MenuProps}
+            defaultValue="All"
+            input={<OutlinedInput label="사용자" />}
+          >
+            {userList.map((value) => (
+              <MenuItem key={value.user_id} value={value.user_id}>
+                {value.user_name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid container justifyContent="flex-end">
+        <Button sx={{ m: 2.5, width: 50 }}>
+          <CSVLink
+            headers={headLabel}
+            data={getExcelData(logDatas)}
+            filename={sParam
+              .toUpperCase()
+              .concat(' 로그 기록_')
+              .concat(getUserRealName(searchUser, userList))
+              .concat('_')
+              .concat(t)
+              .concat('.csv')}
+            target="_blank"
+            style={{ textDecoration: 'none' }}
+          >
+            EXPORT
+          </CSVLink>
+        </Button>
+      </Grid>
     </StyledRoot>
   );
 }

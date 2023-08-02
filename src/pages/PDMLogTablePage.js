@@ -23,8 +23,8 @@ import PDMDetailLogPage from './PDMDetailLogPage';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'name', label: '사용자', alignRight: false },
-  { id: 'department', label: '부서', alignRight: false },
+  { key: 'name', label: '사용자', alignRight: false },
+  { key: 'department', label: '부서', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -102,6 +102,7 @@ export default function PDMLogTablePage({
           onSearchUserName={setSearchUserName}
           onLogDatas={setLogDatas}
           onTableHead={setTableHead}
+          headLabel={tableHeadAll}
         />
         {/* {console.log('asd', searchUserName, searchDate)} */}
 

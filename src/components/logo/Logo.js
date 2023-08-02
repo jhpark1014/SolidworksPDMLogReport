@@ -20,7 +20,6 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
 
   // OR using local (public folder)
   // -------------------------------------------------------
-  // const icon = <SvgColor src={`/assets/icons/navbar/solko_logo1.svg`} sx={{ width: 1, height: 1 }} />;
   const logo = (
     <Box
       component="img"
