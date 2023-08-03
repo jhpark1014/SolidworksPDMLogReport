@@ -4,7 +4,7 @@ import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { Box, Link } from '@mui/material';
-import solkoLogo from '../../assets/solko_logo1.png';
+import solkoLogo from '../../assets/saus_logo.png';
 import SvgColor from '../svg-color/SvgColor';
 
 // ----------------------------------------------------------------------
@@ -24,7 +24,7 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
     <Box
       component="img"
       src={solkoLogo} // => your path
-      sx={{ width: 166, height: 51, cursor: 'pointer', ...sx }}
+      sx={{ width: 197, height: 65, cursor: 'pointer', ...sx }}
     />
   );
 

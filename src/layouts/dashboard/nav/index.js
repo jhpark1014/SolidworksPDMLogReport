@@ -104,7 +104,7 @@ export default function Nav({ openNav, onCloseNav }) {
             },
           }}
         >
-          <Box sx={{ px: 3.5, py: 3, display: 'inline-flex' }}>
+          <Box sx={{ px: 2, py: 2, display: 'inline-flex' }}>
             <Logo />
           </Box>
           {renderContent}
@@ -121,7 +121,7 @@ export default function Nav({ openNav, onCloseNav }) {
           }}
         >
           <div>
-            <Box sx={{ px: 3.5, py: 3, display: 'inline-flex', top: 100 }}>
+            <Box sx={{ px: 2, py: 2, display: 'inline-flex', top: 100 }}>
               <Logo />
             </Box>
           </div>
