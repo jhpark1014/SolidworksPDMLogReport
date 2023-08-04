@@ -398,6 +398,7 @@ export default function PDMLogToolbar({
           label="dateOption"
           defaultValue="month"
           selected={searchType}
+          sx={{ height: '52px' }}
         >
           <MenuItem value="month">월</MenuItem>
           <MenuItem value="year">연</MenuItem>
@@ -409,7 +410,14 @@ export default function PDMLogToolbar({
           <>
             <Grid>
               <DatePicker
-                sx={{ width: 180, m: 2, mr: 'auto' }}
+                sx={{
+                  width: 180,
+                  m: 2,
+                  mr: 'auto',
+                  '& .MuiInputBase-root': {
+                    height: '52px',
+                  },
+                }}
                 label="시작일"
                 openTo={'day'}
                 views={['year', 'month', 'day']}
@@ -422,7 +430,13 @@ export default function PDMLogToolbar({
             </Grid>
             <Grid>
               <DatePicker
-                sx={{ width: 180, m: 2 }}
+                sx={{
+                  width: 180,
+                  m: 2,
+                  '& .MuiInputBase-root': {
+                    height: '52px',
+                  },
+                }}
                 label="종료일"
                 openTo={'day'}
                 views={['year', 'month', 'day']}
@@ -437,7 +451,13 @@ export default function PDMLogToolbar({
         ) : (
           <Grid>
             <DatePicker
-              sx={{ width: 180, m: 2 }}
+              sx={{
+                width: 180,
+                m: 2,
+                '& .MuiInputBase-root': {
+                  height: '52px',
+                },
+              }}
               label="검색 날짜"
               openTo={searchType}
               views={searchType === 'month' ? ['year', 'month'] : ['year']}
@@ -461,6 +481,7 @@ export default function PDMLogToolbar({
             MenuProps={MenuProps}
             defaultValue="All"
             input={<OutlinedInput label="사용자" />}
+            sx={{ height: '52px' }}
           >
             {userList.map((value) => (
               <MenuItem key={value.user_id} value={value.user_id}>

@@ -419,6 +419,7 @@ export default function UserListToolbarLoginLicense({
           label="dateOption"
           defaultValue={selectedOption}
           name="search_type"
+          sx={{ height: '52px' }}
         >
           <MenuItem value="day">일</MenuItem>
           <MenuItem value="month">월</MenuItem>
@@ -432,7 +433,15 @@ export default function UserListToolbarLoginLicense({
           <>
             <Grid>
               <DatePicker
-                sx={{ width: 180, my: 2.5, ml: 2.5, mr: 1.5 }}
+                sx={{
+                  width: 180,
+                  my: 2.5,
+                  ml: 2.5,
+                  mr: 1.5,
+                  '& .MuiInputBase-root': {
+                    height: '52px',
+                  },
+                }}
                 label="시작일"
                 openTo={'day'}
                 views={['year', 'month', 'day']}
@@ -445,7 +454,15 @@ export default function UserListToolbarLoginLicense({
             </Grid>
             <Grid>
               <DatePicker
-                sx={{ width: 180, height: 52, my: 2.5, mr: 2.5 }}
+                sx={{
+                  width: 180,
+                  height: 52,
+                  my: 2.5,
+                  mr: 2.5,
+                  '& .MuiInputBase-root': {
+                    height: '52px',
+                  },
+                }}
                 label="종료일"
                 openTo={'day'}
                 views={['year', 'month', 'day']}
@@ -460,7 +477,15 @@ export default function UserListToolbarLoginLicense({
         ) : (
           <Grid>
             <DatePicker
-              sx={{ width: 180, my: 2.5, ml: 2.5, mr: 1.5 }}
+              sx={{
+                width: 180,
+                my: 2.5,
+                ml: 2.5,
+                mr: 1.5,
+                '& .MuiInputBase-root': {
+                  height: '52px',
+                },
+              }}
               label="검색 날짜"
               views={
                 selectedOption === 'year'
@@ -483,7 +508,7 @@ export default function UserListToolbarLoginLicense({
         <FormControl sx={{ m: 2.5, width: 420 }}>
           <InputLabel id="demo-multiple-checkbox-label">라이선스</InputLabel>
           <Select
-            sx={{ height: 56 }}
+            sx={{ height: '52px' }}
             labelId="demo-multiple-checkbox-label"
             id="demo-multiple-checkbox"
             // multiple
