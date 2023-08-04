@@ -8,11 +8,10 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Box,
   Button,
   Tooltip,
   Grid,
-  TextField,
+  Typography,
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -26,7 +25,7 @@ import licnames from '../../../_mock/licnames';
 // ----------------------------------------------------------------------
 
 const StyledRoot = styled(Toolbar)(({ theme }) => ({
-  height: 96,
+  height: 85,
   display: 'flex',
   justifyContent: 'space-between',
   padding: theme.spacing(0, 1, 0, 3),
@@ -115,10 +114,11 @@ export default function UserListToolbarLoginLicense({
   headLabel,
 }) {
   const today = dayjs();
+  const todayDate = today.format('YYYYMMDD');
   const todayString = today.format('YYYY-MM-DD'); // 오늘 날짜(년-월) 리턴
-  const t = today.format('YYYYMMDD_HHmmss'); // 오늘 날짜(년-월) 리턴
   const [selectedOption, setSelectedSearch] = useState('day'); // 날짜 검색 옵션
   const [selectedDate, setSelectedDate] = useState(todayString); // 검색할 날짜
+  const [searchDate, setSearchDate] = useState(''); // 검색할 날짜 포맷 변경
   const [selectedStartDate, setSelectedStartDate] = useState(today.subtract(7, 'd').format('YYYY-MM-DD')); // 시작일
   const [selectedEndDate, setSelectedEndDate] = useState(todayString); // 종료일
   const [licenseList, setLicenseList] = useState([]); // 선택 날짜에서의 License List 목록
@@ -153,6 +153,7 @@ export default function UserListToolbarLoginLicense({
 
         onSearchOption(searchType);
         onDateOption(searchDate);
+        setSearchDate(searchDate);
 
         setLicenseList(lics.concat(res.data));
       })
@@ -243,6 +244,7 @@ export default function UserListToolbarLoginLicense({
 
         onSearchOption(searchType);
         onDateOption(searchDate);
+        setSearchDate(searchDate);
         onLicenseOption(sLic);
 
         onLogDatas(res.data);
@@ -299,6 +301,15 @@ export default function UserListToolbarLoginLicense({
       : searchType === 'month'
       ? `${date.format('YYYY-MM')}`
       : `${date.format('YYYY')}`;
+  };
+
+  // 기간 검색 시 파일 명
+  const getRangeDateFileName = (selectedStartDate, selectedEndDate) => {
+    const filename = '';
+    return filename
+      .concat(getSearchDateForChangeType('day', selectedStartDate))
+      .concat('~')
+      .concat(getSearchDateForChangeType('day', selectedEndDate));
   };
 
   useEffect(() => {
@@ -398,7 +409,7 @@ export default function UserListToolbarLoginLicense({
   return (
     <StyledRoot>
       {/* 날짜 검색 옵션 */}
-      <FormControl sx={{ m: 2.5, minWidth: 120, ml: 'auto' }}>
+      <FormControl sx={{ m: 2.5, ml: 'auto', minWidth: 120 }}>
         <InputLabel id="demo-simple-select-standard-label">검색 구분</InputLabel>
         <Select
           labelId="demo-simple-select-standard-label"
@@ -434,7 +445,7 @@ export default function UserListToolbarLoginLicense({
             </Grid>
             <Grid>
               <DatePicker
-                sx={{ width: 180, my: 2.5, mr: 2.5 }}
+                sx={{ width: 180, height: 52, my: 2.5, mr: 2.5 }}
                 label="종료일"
                 openTo={'day'}
                 views={['year', 'month', 'day']}
@@ -451,7 +462,6 @@ export default function UserListToolbarLoginLicense({
             <DatePicker
               sx={{ width: 180, my: 2.5, ml: 2.5, mr: 1.5 }}
               label="검색 날짜"
-              // openTo={selectedOption === 'year' ? 'year' : selectedOption === 'month' ? 'month' : 'day'}
               views={
                 selectedOption === 'year'
                   ? ['year']
@@ -463,28 +473,7 @@ export default function UserListToolbarLoginLicense({
               maxDate={dayjs()}
               format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD'}
               value={dayjs(selectedDate)}
-              onAccept={dateChange}
-              PopperProps={{
-                sx: {
-                  'MuiPickersPopper-root': {
-                    border: '4px solid red',
-                  },
-                },
-              }}
-              renderInput={(params) => <TextField {...params} />}
-              // PopperProps={{
-              //   anchorOrigin: {
-              //     vertical: 'top',
-              //     horizontal: 'right',
-              //   },
-              //   transformOrigin: {
-              //     vertical: 'top',
-              //     horizontal: 'right',
-              //   },
-              //   sx: { '&.MuiPickersPopper-root': { border: '4px solid red' } },
-              //   disablePortal: true,
-              //   style: { yIndex: 100000000 },
-              // }}
+              onChange={dateChange}
             />
           </Grid>
         )}
@@ -506,8 +495,8 @@ export default function UserListToolbarLoginLicense({
           >
             {licenseList.map((value) => (
               <MenuItem key={value.lic_id} value={value.lic_id}>
-                <Tooltip arrow placement="bottom-end" title={value.lic_name}>
-                  {value.lic_name}
+                <Tooltip arrow placement="right" title={value.lic_name}>
+                  <Typography noWrap>{value.lic_name}</Typography>
                 </Tooltip>
               </MenuItem>
             ))}
@@ -515,15 +504,21 @@ export default function UserListToolbarLoginLicense({
         </FormControl>
       </Grid>
       <Grid container justifyContent="flex-end">
-        <Button sx={{ my: 2.5, ml: 2.5 }}>
+        <Button sx={{ m: 2.5 }}>
           <CSVLink
             headers={headLabel}
             data={getExcelData(logDatas)}
-            filename={'라이선스 로그인 기록'
+            filename={'라이선스 로그'
+              .concat('_')
+              .concat(
+                selectedOption === 'range'
+                  ? getRangeDateFileName(selectedStartDate, selectedEndDate)
+                  : getSearchDateForChangeType(selectedOption, selectedDate)
+              )
               .concat('_')
               .concat(getLicRealName(selectedLicense))
               .concat('_')
-              .concat(t)
+              .concat(todayDate)
               .concat('.csv')}
             target="_blank"
             style={{ textDecoration: 'none' }}

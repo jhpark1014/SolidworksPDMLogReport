@@ -26,7 +26,7 @@ import licnames from '../../../_mock/licnames';
 // ----------------------------------------------------------------------
 
 const StyledRoot = styled(Toolbar)(({ theme }) => ({
-  height: 96,
+  height: 85,
   display: 'flex',
   justifyContent: 'space-between',
   padding: theme.spacing(0, 1, 0, 3),
@@ -114,8 +114,8 @@ export default function UserListToolbarLoginUser({
   headLabel,
 }) {
   const today = dayjs();
+  const todayDate = today.format('YYYYMMDD');
   const todayString = today.format('YYYY-MM-DD'); // 오늘 날짜(년-월) 리턴
-  const t = today.format('YYYYMMDD_HHmmss'); // 오늘 날짜(년-월) 리턴
   const [selectedOption, setSelectedSearch] = useState('day'); // 날짜 검색 옵션
   const [selectedDate, setSelectedDate] = useState(todayString); // 검색할 날짜
   const [selectedStartDate, setSelectedStartDate] = useState(today.subtract(7, 'd').format('YYYY-MM-DD')); // 검색할 날짜
@@ -148,7 +148,6 @@ export default function UserListToolbarLoginUser({
             }
           })
         );
-
         onSearchOption(searchType);
         onDateOption(searchDate);
 
@@ -362,6 +361,15 @@ export default function UserListToolbarLoginUser({
       : `${date.format('YYYY')}`;
   };
 
+  // 기간 검색 시 파일 명
+  const getRangeDateFileName = (selectedStartDate, selectedEndDate) => {
+    const filename = '';
+    return filename
+      .concat(getSearchDateForChangeType('day', selectedStartDate))
+      .concat('~')
+      .concat(getSearchDateForChangeType('day', selectedEndDate));
+  };
+
   useEffect(() => {
     async function fetchData() {
       callLogData(selectedOption, selectedDate, selectedLicense);
@@ -402,7 +410,7 @@ export default function UserListToolbarLoginUser({
   const dateChange = async (value) => {
     try {
       const searchDate = getSearchDateForChangeType(selectedOption, value.$d);
-      setSelectedDate(() => searchDate); // selectedDate를 설정해줌
+      setSelectedDate(() => searchDate);
 
       await callLicenseList(selectedOption, searchDate);
       await callLogData(selectedOption, searchDate, selectedLicense);
@@ -557,11 +565,22 @@ export default function UserListToolbarLoginUser({
         </FormControl>
       </Grid>
       <Grid container justifyContent="flex-end">
-        <Button sx={{ m: 2.5, justifyContent: 'flex-end' }}>
+        <Button sx={{ m: 2.5 }}>
           <CSVLink
             headers={headLabel}
             data={getExcelData(logDatas)}
-            filename={'사용자 로그인 기록'.concat('_').concat(getLicRealName(selectedLicense)).concat(t).concat('.csv')}
+            filename={'라이선스 로그(사용자)'
+              .concat('_')
+              .concat(
+                selectedOption === 'range'
+                  ? getRangeDateFileName(selectedStartDate, selectedEndDate)
+                  : getSearchDateForChangeType(selectedOption, selectedDate)
+              )
+              .concat('_')
+              .concat(getLicRealName(selectedLicense))
+              .concat('_')
+              .concat(todayDate)
+              .concat('.csv')}
             target="_blank"
             style={{ textDecoration: 'none' }}
           >

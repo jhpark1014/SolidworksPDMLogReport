@@ -165,7 +165,7 @@ export default function UserLoginLogPage() {
         chartDatas={chartDatas}
         chartLabels={getTableHead(searchType, searchDate)}
       />
-
+      <br />
       <Container maxWidth="false" disableGutters>
         <Card>
           <UserListToolbarLoginUser
@@ -219,7 +219,8 @@ export default function UserLoginLogPage() {
                                   logdata: data,
                                 }}
                                 searchType={searchType}
-                                searchDate={searchType === 'range' ? searchStartDate : searchDate}
+                                searchDate={searchDate}
+                                searchStartDate={searchStartDate}
                                 searchEndDate={searchEndDate}
                                 searchLicense={searchLicense}
                                 searchUser={userid}

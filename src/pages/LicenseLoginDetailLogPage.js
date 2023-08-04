@@ -66,7 +66,14 @@ export default function LicenseLoginDetailLogPage({
   const [isLoading, setIsLoading] = useState(true); // loading
   const [open, setOpen] = useState(false); // dialog open
   const [detailLogData, setDetailLogData] = useState([]); // detail log data
-  // const [filteredLogData, setFilteredLogData] = useState([]); // filtered detail log data
+  const today = dayjs();
+  const todayDate = today.format('YYYYMMDD');
+
+  // 기간 검색 시 파일 명
+  const getRangeDateFileName = (selectedStartDate, selectedEndDate) => {
+    const filename = '';
+    return filename.concat(selectedStartDate).concat('~').concat(selectedEndDate);
+  };
 
   const callLogData = async (searchType, searchDate, searchLicense) => {
     const url = `/logs/loginlicense/detail`;
@@ -129,9 +136,6 @@ export default function LicenseLoginDetailLogPage({
     setOpen(false);
   };
 
-  const today = dayjs();
-  const t = today.format('YYYYMMDD_HHmmss'); // 오늘 날짜(년-월) 리턴
-
   return (
     <>
       <Link component="button" onClick={handleClickOpen()}>
@@ -164,11 +168,15 @@ export default function LicenseLoginDetailLogPage({
                       <CSVLink
                         headers={searchType === 'range' ? DETAIL_HEAD_RANGE : DETAIL_HEAD}
                         data={detailLogData}
-                        filename={'라이선스 로그인 상세'
+                        filename={'라이선스 로그'
+                          .concat('_')
+                          .concat(
+                            searchType === 'range' ? getRangeDateFileName(searchStartDate, searchEndDate) : searchDate
+                          )
                           .concat('_')
                           .concat(data.loglicensename)
                           .concat('_')
-                          .concat(t)
+                          .concat(todayDate)
                           .concat('.csv')}
                         target="_blank"
                         style={{ textDecoration: 'none' }}

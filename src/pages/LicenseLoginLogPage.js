@@ -13,6 +13,7 @@ import {
   TablePagination,
   Button,
   TableFooter,
+  Container,
 } from '@mui/material';
 import dayjs from 'dayjs';
 import { CSVLink } from 'react-csv';
@@ -189,110 +190,113 @@ export default function LicenseLoginLogPage() {
         chartDatas={logDatas}
         chartLabels={getTableHead(searchType, searchDate)}
       />
-      <Card>
-        <UserListToolbarLoginLicense
-          onIsLoading={setIsLoading}
-          onSearchOption={setSearchType}
-          onDateOption={setSearchDate}
-          onLicenseOption={setSearchLicense}
-          onLogDatas={setLogDatas}
-          onStartDateOption={setSearchStartDate}
-          onEndDateOption={setSearchEndDate}
-          headLabel={tableHeadAll}
-        />
+      <br />
+      <Container maxWidth="false" disableGutters>
+        <Card>
+          <UserListToolbarLoginLicense
+            onIsLoading={setIsLoading}
+            onSearchOption={setSearchType}
+            onDateOption={setSearchDate}
+            onLicenseOption={setSearchLicense}
+            onLogDatas={setLogDatas}
+            onStartDateOption={setSearchStartDate}
+            onEndDateOption={setSearchEndDate}
+            headLabel={tableHeadAll}
+          />
 
-        <Scrollbar>
-          <TableContainer sx={{ minWidth: 800 }}>
-            <Table>
-              <UserListHeadNotSort headLabel={tableHeadAll} />
-              <TableBody>
-                {newLogDatas(logDatas)
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => {
-                    const { id, licid, licname, holdqty, logdata } = row;
+          <Scrollbar>
+            <TableContainer sx={{ minWidth: 800 }}>
+              <Table>
+                <UserListHeadNotSort headLabel={tableHeadAll} />
+                <TableBody>
+                  {newLogDatas(logDatas)
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => {
+                      const { id, licid, licname, holdqty, logdata } = row;
 
-                    return (
-                      <TableRow hover key={id} tabIndex={-1}>
-                        <TableCell align="left">
-                          <Typography variant="subtitle2" noWrap>
-                            {licname}
-                          </Typography>
-                        </TableCell>
-
-                        {showHoldQty === 'TRUE' ? (
+                      return (
+                        <TableRow hover key={id} tabIndex={-1}>
                           <TableCell align="left">
                             <Typography variant="subtitle2" noWrap>
-                              {holdqty}
+                              {licname}
                             </Typography>
                           </TableCell>
-                        ) : (
-                          ''
-                        )}
 
-                        {logdata.map((data, idx) => (
-                          <TableCell key={idx} align="left" value={data}>
-                            {data === 0 ? (
-                              '-'
-                            ) : (
-                              <LicenseLoginDetailLogPage
-                                data={{
-                                  loglicensename: licname,
-                                  logdata: data,
-                                }}
-                                searchType={
-                                  searchType === 'range'
-                                    ? searchType
-                                    : searchType === 'year'
-                                    ? 'month'
-                                    : searchType === 'month'
-                                    ? 'day'
-                                    : 'time'
-                                }
-                                searchDate={searchDate.concat('-').concat(idx + 1)}
-                                searchStartDate={searchStartDate}
-                                searchEndDate={searchEndDate}
-                                searchLicense={licid}
-                              />
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    );
-                  })}
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 53 * emptyRows }}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
-              </TableBody>
+                          {showHoldQty === 'TRUE' ? (
+                            <TableCell align="left">
+                              <Typography variant="subtitle2" noWrap>
+                                {holdqty}
+                              </Typography>
+                            </TableCell>
+                          ) : (
+                            ''
+                          )}
 
-              {isNotFound && (
-                <TableBody>
-                  <TableRow>
-                    <TableCell align="center" colSpan={tableHeadAll.length} sx={{ py: 3 }}>
-                      <Paper sx={{ textAlign: 'center' }}>
-                        <Typography variant="h6" paragraph>
-                          {isLoading ? 'Loading...' : '데이터가 없습니다. 검색 조건을 다시 입력해 주세요.'}
-                        </Typography>
-                      </Paper>
-                    </TableCell>
-                  </TableRow>
+                          {logdata.map((data, idx) => (
+                            <TableCell key={idx} align="left" value={data}>
+                              {data === 0 ? (
+                                '-'
+                              ) : (
+                                <LicenseLoginDetailLogPage
+                                  data={{
+                                    loglicensename: licname,
+                                    logdata: data,
+                                  }}
+                                  searchType={
+                                    searchType === 'range'
+                                      ? searchType
+                                      : searchType === 'year'
+                                      ? 'month'
+                                      : searchType === 'month'
+                                      ? 'day'
+                                      : 'time'
+                                  }
+                                  searchDate={searchDate.concat('-').concat(idx + 1)}
+                                  searchStartDate={searchStartDate}
+                                  searchEndDate={searchEndDate}
+                                  searchLicense={licid}
+                                />
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      );
+                    })}
+                  {emptyRows > 0 && (
+                    <TableRow style={{ height: 53 * emptyRows }}>
+                      <TableCell colSpan={6} />
+                    </TableRow>
+                  )}
                 </TableBody>
-              )}
-            </Table>
-          </TableContainer>
-        </Scrollbar>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={newLogDatas(logDatas).length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="max row"
-        />
-      </Card>
+
+                {isNotFound && (
+                  <TableBody>
+                    <TableRow>
+                      <TableCell align="center" colSpan={tableHeadAll.length} sx={{ py: 3 }}>
+                        <Paper sx={{ textAlign: 'center' }}>
+                          <Typography variant="h6" paragraph>
+                            {isLoading ? 'Loading...' : '데이터가 없습니다. 검색 조건을 다시 입력해 주세요.'}
+                          </Typography>
+                        </Paper>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                )}
+              </Table>
+            </TableContainer>
+          </Scrollbar>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={newLogDatas(logDatas).length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="max row"
+          />
+        </Card>
+      </Container>
     </>
   );
 }

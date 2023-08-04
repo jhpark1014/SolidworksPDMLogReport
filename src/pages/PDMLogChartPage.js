@@ -19,8 +19,13 @@ export default function PDMLogChartPage(values) {
             fill: 'solid',
             data: row.logdata,
           }))}
-          xaxis={{ title: { text: `날짜 (${values.xLabel})`, style: { fontSize: '12px', fontFamily: '굴림체' } } }}
-          yaxis={{ title: { text: '수량 (건)', style: { fontSize: '12px', fontFamily: '굴림체' } } }}
+          sx={{ height: 436 }}
+          chartOffsetY={-33}
+          xaxis={{
+            offsetY: -8,
+            title: { text: `날짜 (${values.xLabel})`, style: { fontSize: '12px', fontFamily: '굴림체' } },
+          }}
+          yaxis={{ offsetX: -3, title: { text: '수량 (건)', style: { fontSize: '12px', fontFamily: '굴림체' } } }}
         />
       </Grid>
     </Container>

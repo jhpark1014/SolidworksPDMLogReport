@@ -58,6 +58,14 @@ export default function PDMDetailLogPage({
   const [isLoading, setIsLoading] = useState(true); // loading
   const [open, setOpen] = useState(false); // dialog open
   const [detailLogData, setDetailLogData] = useState([]); // detail log data
+  const today = dayjs();
+  const todayDate = today.format('YYYYMMDD');
+
+  // 기간 검색 시 파일 명
+  const getRangeDateFileName = (selectedStartDate, selectedEndDate) => {
+    const filename = '';
+    return filename.concat(selectedStartDate).concat('~').concat(selectedEndDate);
+  };
 
   const callLogData = async (sParam, searchType, searchDate, searchUser) => {
     const url = `/logs/${sParam}/detail`;
@@ -116,9 +124,6 @@ export default function PDMDetailLogPage({
     setOpen(false);
   };
 
-  const today = dayjs();
-  const t = today.format('YYYYMMDD_HHmmss'); // 오늘 날짜(년-월) 리턴
-
   return (
     <>
       <Link component="button" onClick={handleClickOpen()}>
@@ -141,7 +146,14 @@ export default function PDMDetailLogPage({
                 <TableRow>
                   <TableCell align="left" colSpan={2} sx={{ padding: 1, backgroundColor: 'white' }}>
                     <Typography variant="subtitle1" noWrap>
-                      {sParam.toUpperCase()}, {logusername}, {detailLogData.length} 건
+                      {sParam === 'download'
+                        ? '다운로드'
+                        : sParam === 'newcreate'
+                        ? '신규등록'
+                        : sParam === 'versionup'
+                        ? '버전업'
+                        : '설계변경'}
+                      , {logusername}, {detailLogData.length} 건
                     </Typography>
                   </TableCell>
                   <TableCell align="right" colSpan={2} sx={{ padding: 1, backgroundColor: 'white' }}>
@@ -149,12 +161,22 @@ export default function PDMDetailLogPage({
                       <CSVLink
                         headers={DETAIL_HEAD}
                         data={detailLogData}
-                        filename={sParam
-                          .toUpperCase()
+                        filename={(sParam === 'download'
+                          ? '다운로드'
+                          : sParam === 'newcreate'
+                          ? '신규등록'
+                          : sParam === 'versionup'
+                          ? '버전업'
+                          : '설계변경'
+                        )
+                          .concat('_')
+                          .concat(
+                            searchType === 'range' ? getRangeDateFileName(searchStartDate, searchEndDate) : searchDate
+                          )
                           .concat('_')
                           .concat(logusername)
                           .concat('_')
-                          .concat(t)
+                          .concat(todayDate)
                           .concat('.csv')}
                         target="_blank"
                         style={{ textDecoration: 'none' }}

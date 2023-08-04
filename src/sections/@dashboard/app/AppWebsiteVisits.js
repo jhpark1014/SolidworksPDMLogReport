@@ -22,7 +22,6 @@ export default function AppWebsiteVisits({ title, subheader, chartLabels, chartD
   const chartOptions = useChart({
     plotOptions: { bar: { columnWidth: '16%' } },
     fill: { type: chartData.map((i) => i.fill) },
-    // labels: chartLabels,
     xaxis: other.xaxis,
     yaxis: other.yaxis,
     tooltip: {
@@ -39,23 +38,18 @@ export default function AppWebsiteVisits({ title, subheader, chartLabels, chartD
     },
     stroke: other.stroke,
     legend: {
-      // position: 'right',
-      // horizontalAlign: 'center',
       formatter: other.legendformatter,
       markers: other.legendmarker,
     },
-    // dataLabels: {
-    //   enabled: true,
-    //   formatter: other.datalabelformatter,
-    // },
     annotations: { points: other.annotations2 },
+    chart: { offsetY: other.chartOffsetY },
   });
 
   return (
     <Card {...other}>
       <CardHeader
         title={title}
-        titleTypographyProps={{ variant: 'h4' }}
+        titleTypographyProps={{ variant: 'h5' }}
         subheader={subheader}
         subheaderTypographyProps={{ variant: 'h7' }}
       />

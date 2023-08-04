@@ -12,7 +12,6 @@ LoginChartPage.propTypes = {
   title: PropTypes.string,
   subtitle: PropTypes.string,
   chartLabels: PropTypes.array,
-  // chartDatas: PropTypes.array,
 };
 
 export default function LoginChartPage({ title, subtitle, chartLabels, chartDatas }) {
@@ -55,7 +54,6 @@ export default function LoginChartPage({ title, subtitle, chartLabels, chartData
     }
     return Array.from(colors, () => generateRandomColor());
   }
-  // const randomColors = generateRandomColorArray(chartDatas);
 
   const randomColors = [
     theme.palette.primary.main,
@@ -95,7 +93,6 @@ export default function LoginChartPage({ title, subtitle, chartLabels, chartData
   function generatePointAnnotation(chartData2) {
     const pointAnnotation = chartData2.map((row) => {
       return {
-        // x: 10,
         y: row.data[0],
         marker: {
           size: 0,
@@ -115,13 +112,6 @@ export default function LoginChartPage({ title, subtitle, chartLabels, chartData
     return pointAnnotation;
   }
 
-  // const dataList = chartDatas.map((row) => row.logdata);
-  // const maxData = Math.max(...dataList.flat());
-
-  // const holdQtyList = chartDatas.map((row) => row.holdqty);
-  // const maxHoldQty = Math.max(...holdQtyList);
-  // const yMax = Math.max(maxData, maxHoldQty);
-
   const chartData2 = showHoldQty === 'TRUE' ? generateChartData2(chartDatas) : [];
   const pointAnnotation2 = generatePointAnnotation(chartData2);
 
@@ -134,10 +124,12 @@ export default function LoginChartPage({ title, subtitle, chartLabels, chartData
           chartLabels={chartLabels.map((row) => {
             return row.label;
           })}
+          sx={{ height: 436 }}
           stroke={{
             dashArray: generateStrokeArray(chartDatas),
             width: generateStrokeWidthArray(chartDatas),
           }}
+          chartOffsetY={-33}
           chartData={chartDatas.map((row) => {
             return {
               name: row.licname,
@@ -156,23 +148,21 @@ export default function LoginChartPage({ title, subtitle, chartLabels, chartData
           annotations2={pointAnnotation2}
           xaxis={{
             title: {
+              offsetY: -8,
               style: { fontSize: '12px', fontFamily: '굴림체' },
               text: subtitle[0] === '일' ? '시간 (시)' : subtitle[0] === '월' ? '날짜 (일)' : '날짜 (월)',
             },
           }}
           yaxis={{
-            title: { text: '수량 (건)', style: { fontSize: '12px', fontFamily: '굴림체' } },
+            title: { offsetX: -3, text: '수량 (건)', style: { fontSize: '12px', fontFamily: '굴림체' } },
             labels: {
               formatter: (val) => {
                 return val.toFixed(0);
               },
             },
-            // max: yMax,
           }}
         />
       </Grid>
-      <br />
-      <br />
     </>
   );
 }

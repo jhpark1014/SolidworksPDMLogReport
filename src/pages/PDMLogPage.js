@@ -28,7 +28,6 @@ export default function PDMLogPage({ logType, logName }) {
         <title>{logName}</title>
       </Helmet>
 
-      {/* {console.log('username', searchUserName, searchDate)} */}
       <PDMLogChartPage
         title={logName}
         subTitle={`${searchType === 'month' ? '월' : '연'}, ${searchDate}, ${searchUserName}`}

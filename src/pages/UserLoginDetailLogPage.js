@@ -59,13 +59,21 @@ export default function UserLoginDetailLogPage({
   searchType,
   searchLicense,
   searchDate,
+  searchStartDate,
   searchEndDate,
   searchUser,
 }) {
   const [isLoading, setIsLoading] = useState(true); // loading
   const [open, setOpen] = useState(false); // dialog open
   const [detailLogData, setDetailLogData] = useState([]); // detail log data
-  // const [filteredLogData, setFilteredLogData] = useState([]); // filtered detail log data
+  const today = dayjs();
+  const todayDate = today.format('YYYYMMDD');
+
+  // 기간 검색 시 파일 명
+  const getRangeDateFileName = (selectedStartDate, selectedEndDate) => {
+    const filename = '';
+    return filename.concat(selectedStartDate).concat('~').concat(selectedEndDate);
+  };
 
   const callLogData = async (searchType, searchDate, searchLicense, searchUser) => {
     const url = `/logs/loginuser/detail`;
@@ -122,16 +130,13 @@ export default function UserLoginDetailLogPage({
     if (searchType !== 'range') {
       callLogData(searchType, searchDate, searchLicense, searchUser);
     } else {
-      callLogRangeData(searchType, searchDate, searchEndDate, searchLicense, searchUser); // searchDate는 searchStartDate
+      callLogRangeData(searchType, searchStartDate, searchEndDate, searchLicense, searchUser); // searchDate는 searchStartDate
     }
   };
 
   const handleClose = () => {
     setOpen(false);
   };
-
-  const today = dayjs();
-  const t = today.format('YYYYMMDD_HHmmss'); // 오늘 날짜(년-월) 리턴
 
   return (
     <>
@@ -165,11 +170,15 @@ export default function UserLoginDetailLogPage({
                       <CSVLink
                         headers={searchType === 'range' ? DETAIL_HEAD_RANGE : DETAIL_HEAD}
                         data={detailLogData}
-                        filename={'사용자 로그인 로그 상세'
+                        filename={'라이선스 로그(사용자)'
+                          .concat('_')
+                          .concat(
+                            searchType === 'range' ? getRangeDateFileName(searchStartDate, searchEndDate) : searchDate
+                          )
                           .concat('_')
                           .concat(data.loglicensename)
                           .concat('_')
-                          .concat(t)
+                          .concat(todayDate)
                           .concat('.csv')}
                         target="_blank"
                         style={{ textDecoration: 'none' }}

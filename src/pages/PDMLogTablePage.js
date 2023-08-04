@@ -104,7 +104,6 @@ export default function PDMLogTablePage({
           onTableHead={setTableHead}
           headLabel={tableHeadAll}
         />
-        {/* {console.log('asd', searchUserName, searchDate)} */}
 
         <Scrollbar>
           <TableContainer sx={{ minWidth: 800 }}>

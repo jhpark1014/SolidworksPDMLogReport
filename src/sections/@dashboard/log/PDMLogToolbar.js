@@ -5,6 +5,7 @@ import { styled } from '@mui/material/styles';
 import { Toolbar, FormControl, InputLabel, Select, MenuItem, Box, OutlinedInput, Button, Grid } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
@@ -29,7 +30,7 @@ const TABLE_HEAD_YEAR = [
 ];
 
 const StyledRoot = styled(Toolbar)(({ theme }) => ({
-  height: 96,
+  height: 85,
   display: 'flex',
   justifyContent: 'space-between',
   padding: theme.spacing(0, 1, 0, 3),
@@ -113,8 +114,8 @@ export default function PDMLogToolbar({
   headLabel,
 }) {
   const today = dayjs();
+  const todayDate = today.format('YYYYMMDD');
   const dateString = today.format('YYYY-MM'); // 오늘 날짜(년-월) 리턴
-  const t = today.format('YYYYMMDD_HHmmss'); // 오늘 날짜(년-월) 리턴
   const [searchType, setSearchType] = useState('month');
   const [searchDate, setSearchDate] = useState(dateString);
   const [searchStartDate, setSearchStartDate] = useState(today.subtract(7, 'd'));
@@ -282,6 +283,15 @@ export default function PDMLogToolbar({
       : `${date.format('YYYY')}`;
   };
 
+  // 기간 검색 시 파일 명
+  const getRangeDateFileName = (searchStartDate, searchEndDate) => {
+    const filename = '';
+    return filename
+      .concat(getSearchDateForChangeType('day', searchStartDate))
+      .concat('~')
+      .concat(getSearchDateForChangeType('day', searchEndDate));
+  };
+
   // 초기 화면 셋팅
   useEffect(() => {
     async function fetchData() {
@@ -408,13 +418,6 @@ export default function PDMLogToolbar({
                 format={'YYYY-MM-DD'}
                 value={dayjs(searchStartDate)}
                 onAccept={handleSearchStartDate}
-                PopperProps={{
-                  placement: 'right',
-                  anchorEl: null,
-                  // sx: { '&.data-popper-placement': 'bottom-start' },
-                  disablePortal: true,
-                  style: { yIndex: 100000000 },
-                }}
               />
             </Grid>
             <Grid>
@@ -468,16 +471,28 @@ export default function PDMLogToolbar({
         </FormControl>
       </Grid>
       <Grid container justifyContent="flex-end">
-        <Button sx={{ m: 2.5, width: 50 }}>
+        <Button sx={{ m: 2.5 }}>
           <CSVLink
             headers={headLabel}
             data={getExcelData(logDatas)}
-            filename={sParam
-              .toUpperCase()
-              .concat(' 로그 기록_')
+            filename={(sParam === 'download'
+              ? '다운로드'
+              : sParam === 'newcreate'
+              ? '신규등록'
+              : sParam === 'versionup'
+              ? '버전업'
+              : '설계변경'
+            )
+              .concat(' 로그_')
+              .concat(
+                searchType === 'range'
+                  ? getRangeDateFileName(searchStartDate, searchEndDate)
+                  : getSearchDateForChangeType(searchType, searchDate)
+              )
+              .concat('_')
               .concat(getUserRealName(searchUser, userList))
               .concat('_')
-              .concat(t)
+              .concat(todayDate)
               .concat('.csv')}
             target="_blank"
             style={{ textDecoration: 'none' }}
