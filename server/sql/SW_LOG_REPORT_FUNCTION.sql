@@ -1,7 +1,7 @@
 -- function user department-------------------------------------------------------------------
 SELECT dbo.GetDepartment('ch.jung');
 
-DROP FUNCTION dbo.GetDepartment;
+--DROP FUNCTION dbo.GetDepartment;
 
 CREATE FUNCTION GetDepartment( @user_name NVARCHAR(MAX) )
 	RETURNS NVARCHAR(100)  	
@@ -21,7 +21,7 @@ END
 -- function user name-------------------------------------------------------------------
 SELECT dbo.GetUsername('ch.jung');
 
-DROP FUNCTION dbo.GetUsername;
+--DROP FUNCTION dbo.GetUsername;
 
 CREATE FUNCTION GetUsername( @user_id NVARCHAR(MAX) )
 	RETURNS NVARCHAR(100) 	
@@ -40,7 +40,7 @@ END
 -- function license Hold Qty-------------------------------------------------------------------
 SELECT dbo.GetLicHoldQty('swepdm_cadeditorandweb', '2023-06-30 23:59:59:999');
 
-DROP FUNCTION dbo.GetLicHoldQty;
+--DROP FUNCTION dbo.GetLicHoldQty;
 
 CREATE FUNCTION GetLicHoldQty( @lic_name NVARCHAR(MAX), @end_date NVARCHAR(MAX) )
 	RETURNS NVARCHAR(5) 	
@@ -144,7 +144,7 @@ END;
 
 
 -- function get parameters  -------------------------------------------------------------------
-DROP FUNCTION dbo.GetParametersForRange;
+--DROP FUNCTION dbo.GetParametersForRange;
 
 select * from dbo.GetParametersForRange('2023-07-01', '2023-07-10');
 
