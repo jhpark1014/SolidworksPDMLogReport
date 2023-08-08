@@ -406,7 +406,7 @@ export default function PDMLogToolbar({
         </Select>
       </FormControl>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
-        {console.log("searchStartDate==>",searchStartDate)}
+        {console.log('searchStartDate==>', searchStartDate)}
         {/* {console.log("searchEndDate==>",searchEndDate)} */}
         {rangeSearch ? (
           <>
@@ -428,6 +428,16 @@ export default function PDMLogToolbar({
                 format={'YYYY-MM-DD'}
                 value={dayjs(searchStartDate)}
                 onAccept={handleSearchStartDate}
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: 'flip',
+                        enabled: false,
+                      },
+                    ],
+                  },
+                }}
               />
             </Grid>
             <Grid>
@@ -447,6 +457,16 @@ export default function PDMLogToolbar({
                 format={'YYYY-MM-DD'}
                 value={dayjs(searchEndDate)}
                 onAccept={handleSearchEndDate}
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: 'flip',
+                        enabled: false,
+                      },
+                    ],
+                  },
+                }}
               />
             </Grid>
           </>
@@ -468,6 +488,16 @@ export default function PDMLogToolbar({
               format={searchType === 'month' ? 'YYYY-MM' : 'YYYY'}
               value={dayjs(searchDate)}
               onAccept={handleSearchDate}
+              slotProps={{
+                popper: {
+                  modifiers: [
+                    {
+                      name: 'flip',
+                      enabled: false,
+                    },
+                  ],
+                },
+              }}
             />
           </Grid>
         )}

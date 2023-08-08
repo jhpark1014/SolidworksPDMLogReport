@@ -450,6 +450,16 @@ export default function UserListToolbarLoginLicense({
                 format={'YYYY-MM-DD'}
                 value={dayjs(selectedStartDate)}
                 onAccept={startDateChange}
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: 'flip',
+                        enabled: false,
+                      },
+                    ],
+                  },
+                }}
               />
             </Grid>
             <Grid>
@@ -471,6 +481,16 @@ export default function UserListToolbarLoginLicense({
                 format={'YYYY-MM-DD'}
                 value={dayjs(selectedEndDate)}
                 onAccept={endDateChange}
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: 'flip',
+                        enabled: false,
+                      },
+                    ],
+                  },
+                }}
               />
             </Grid>
           </>
@@ -498,7 +518,17 @@ export default function UserListToolbarLoginLicense({
               maxDate={dayjs()}
               format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD'}
               value={dayjs(selectedDate)}
-              onChange={dateChange}
+              onAccept={dateChange}
+              slotProps={{
+                popper: {
+                  modifiers: [
+                    {
+                      name: 'flip',
+                      enabled: false,
+                    },
+                  ],
+                },
+              }}
             />
           </Grid>
         )}

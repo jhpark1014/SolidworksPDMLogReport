@@ -515,6 +515,16 @@ export default function UserListToolbarLoginUser({
                 format={'YYYY-MM-DD'}
                 value={dayjs(selectedStartDate)}
                 onAccept={startDateChange}
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: 'flip',
+                        enabled: false,
+                      },
+                    ],
+                  },
+                }}
               />
             </Grid>
             <Grid>
@@ -535,6 +545,16 @@ export default function UserListToolbarLoginUser({
                 format={'YYYY-MM-DD'}
                 value={dayjs(selectedEndDate)}
                 onAccept={endDateChange}
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: 'flip',
+                        enabled: false,
+                      },
+                    ],
+                  },
+                }}
               />
             </Grid>
           </>
@@ -564,6 +584,16 @@ export default function UserListToolbarLoginUser({
               format={selectedOption === 'year' ? 'YYYY' : selectedOption === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD'}
               value={dayjs(selectedDate)}
               onAccept={dateChange}
+              slotProps={{
+                popper: {
+                  modifiers: [
+                    {
+                      name: 'flip',
+                      enabled: false,
+                    },
+                  ],
+                },
+              }}
             />
           </Grid>
         )}
