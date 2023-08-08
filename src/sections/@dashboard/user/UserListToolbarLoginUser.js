@@ -12,6 +12,8 @@ import {
   Button,
   Container,
   Grid,
+  Tooltip,
+  Typography,
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -582,7 +584,9 @@ export default function UserListToolbarLoginUser({
           >
             {licenseList.map((value) => (
               <MenuItem key={value.lic_id} value={value.lic_id}>
-                {value.lic_name}
+                <Tooltip arrow placement="right" title={value.lic_name}>
+                  <Typography noWrap>{value.lic_name}</Typography>
+                </Tooltip>
               </MenuItem>
             ))}
           </Select>

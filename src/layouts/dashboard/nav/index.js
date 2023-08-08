@@ -72,7 +72,7 @@ export default function Nav({ openNav, onCloseNav }) {
           <Box sx={{ textAlign: 'center' }}>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               Copyright {todayYear}.{' '}
-              <a href="http://solidkorea.co.kr" style={{ textDecoration: 'none' }}>
+              <a href="http://solidkorea.co.kr" style={{ textDecoration: 'none' }} target="_blank" rel="noreferrer">
                 SOLKO.
               </a>
               <br />
