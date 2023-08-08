@@ -1,8 +1,8 @@
-## Minimal [(Free version)](https://minimal-kit-react.vercel.app/)
+## Solko App Log System (Made from [Minimal Free version](https://minimal-kit-react.vercel.app/))
 
 ![license](https://img.shields.io/badge/license-MIT-blue.svg)
 
-> Free React Admin Dashboard made with Material-UI components and React.
+> Solko에서 개발한 Solidworks/PDM 로그 시스템
 
 ![preview](public/assets/preview.jpg)
 
@@ -18,12 +18,12 @@
 
 ## Page demo
 
-- [Dashboard](https://minimal-kit-react.vercel.app/dashboard/app)
-- [Users](https://minimal-kit-react.vercel.app/dashboard/user)
-- [Product](https://minimal-kit-react.vercel.app/dashboard/products)
-- [Blog](https://minimal-kit-react.vercel.app/dashboard/blog)
-- [Login](https://minimal-kit-react.vercel.app/login)
-- [Not Found](https://minimal-kit-react.vercel.app/404)
+- [다운로드 로그](https://minimal-kit-react.vercel.app/dashboard/app)
+- [신규등록 로그](https://minimal-kit-react.vercel.app/dashboard/user)
+- [버전업 로그](https://minimal-kit-react.vercel.app/dashboard/products)
+- [설계변경 로그](https://minimal-kit-react.vercel.app/dashboard/blog)
+- [라이선스 로그](https://minimal-kit-react.vercel.app/login)
+- [라이선스 로그(사용자](https://minimal-kit-react.vercel.app/login)
 
 ## Getting started
 
