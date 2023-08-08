@@ -24,6 +24,7 @@ import 'dayjs/locale/ko';
 import axios from 'axios';
 // 라이선스 차트
 import licnames from '../../../_mock/licnames';
+import DatePickerWithAccept from '../../../DatePickerWithAccept';
 
 // ----------------------------------------------------------------------
 
@@ -497,7 +498,7 @@ export default function UserListToolbarLoginUser({
         {rangeSearch ? (
           <>
             <Grid>
-              <DatePicker
+              <DatePickerWithAccept
                 sx={{
                   width: 180,
                   my: 2.5,
@@ -528,7 +529,7 @@ export default function UserListToolbarLoginUser({
               />
             </Grid>
             <Grid>
-              <DatePicker
+              <DatePickerWithAccept
                 sx={{
                   width: 180,
                   my: 2.5,
@@ -560,7 +561,7 @@ export default function UserListToolbarLoginUser({
           </>
         ) : (
           <Grid>
-            <DatePicker
+            <DatePickerWithAccept
               sx={{
                 width: 180,
                 my: 2.5,
@@ -571,7 +572,7 @@ export default function UserListToolbarLoginUser({
                 },
               }}
               label="검색 날짜"
-              openTo={selectedOption === 'year' ? 'year' : selectedOption === 'month' ? 'month' : 'day'}
+              openTo={selectedOption}
               views={
                 selectedOption === 'year'
                   ? ['year']

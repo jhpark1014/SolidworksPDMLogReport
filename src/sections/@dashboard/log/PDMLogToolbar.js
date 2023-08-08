@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import { CSVLink } from 'react-csv';
+import DatePickerWithAccept from '../../../DatePickerWithAccept';
 
 // ----------------------------------------------------------------------
 
@@ -411,7 +412,7 @@ export default function PDMLogToolbar({
         {rangeSearch ? (
           <>
             <Grid>
-              <DatePicker
+              <DatePickerWithAccept
                 sx={{
                   width: 180,
                   m: 2,
@@ -441,7 +442,7 @@ export default function PDMLogToolbar({
               />
             </Grid>
             <Grid>
-              <DatePicker
+              <DatePickerWithAccept
                 sx={{
                   width: 180,
                   m: 2,
@@ -472,7 +473,7 @@ export default function PDMLogToolbar({
           </>
         ) : (
           <Grid>
-            <DatePicker
+            <DatePickerWithAccept
               sx={{
                 width: 180,
                 m: 2,

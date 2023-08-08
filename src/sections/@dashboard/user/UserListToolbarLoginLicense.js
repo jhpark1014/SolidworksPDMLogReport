@@ -21,6 +21,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import axios from 'axios';
 import licnames from '../../../_mock/licnames';
+import DatePickerWithAccept from '../../../DatePickerWithAccept';
 
 // ----------------------------------------------------------------------
 
@@ -496,7 +497,8 @@ export default function UserListToolbarLoginLicense({
           </>
         ) : (
           <Grid>
-            <DatePicker
+            {console.log('dd')}
+            <DatePickerWithAccept
               sx={{
                 width: 180,
                 my: 2.5,
@@ -507,6 +509,7 @@ export default function UserListToolbarLoginLicense({
                 },
               }}
               label="검색 날짜"
+              openTo={selectedOption}
               views={
                 selectedOption === 'year'
                   ? ['year']

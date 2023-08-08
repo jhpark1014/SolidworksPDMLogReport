@@ -251,7 +251,11 @@ export default function LicenseLoginLogPage() {
                                       ? 'day'
                                       : 'time'
                                   }
-                                  searchDate={searchDate.concat('-').concat(idx + 1)}
+                                  searchDate={
+                                    searchType === 'day'
+                                      ? searchDate.concat(' ').concat(idx)
+                                      : searchDate.concat('-').concat(idx + 1)
+                                  }
                                   searchStartDate={searchStartDate}
                                   searchEndDate={searchEndDate}
                                   searchLicense={licid}
