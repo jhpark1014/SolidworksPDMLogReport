@@ -118,8 +118,8 @@ export default function PDMLogToolbar({
   const dateString = today.format('YYYY-MM'); // 오늘 날짜(년-월) 리턴
   const [searchType, setSearchType] = useState('month');
   const [searchDate, setSearchDate] = useState(dateString);
-  const [searchStartDate, setSearchStartDate] = useState(today.subtract(7, 'd'));
-  const [searchEndDate, setSearchEndDate] = useState(today);
+  const [searchStartDate, setSearchStartDate] = useState(today.subtract(7, 'd').format('YYYY-MM-DD'));
+  const [searchEndDate, setSearchEndDate] = useState(today.format('YYYY-MM-DD'));
   const [searchUser, setSearchUser] = useState('All');
   const [logDatas, setLogDatas] = useState([]);
   const [userList, setUserList] = useState([]);
@@ -406,6 +406,8 @@ export default function PDMLogToolbar({
         </Select>
       </FormControl>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
+        {console.log("searchStartDate==>",searchStartDate)}
+        {/* {console.log("searchEndDate==>",searchEndDate)} */}
         {rangeSearch ? (
           <>
             <Grid>

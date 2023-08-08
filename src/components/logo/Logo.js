@@ -4,7 +4,7 @@ import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { Box, Link } from '@mui/material';
-import solkoLogo from '../../assets/saus_logo.png';
+import solkoLogo from '../../assets/sals_logo.png';
 import SvgColor from '../svg-color/SvgColor';
 
 // ----------------------------------------------------------------------

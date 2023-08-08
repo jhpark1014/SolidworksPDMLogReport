@@ -23,7 +23,7 @@ import PDMDetailLogPage from './PDMDetailLogPage';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { key: 'name', label: '사용자', alignRight: false },
+  { key: 'username', label: '사용자', alignRight: false },
   { key: 'department', label: '부서', alignRight: false },
 ];
 
